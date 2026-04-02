@@ -73,6 +73,37 @@ for ENTRY in $FIBO_MODULES; do
   fi
 done
 
+# ── 加载 CTIO 本体（核心类 + 指标实例 + SHACL 规则）──
+echo "[init] 加载 CTIO 本体文件..."
+CTIO_DIR="${SCRIPT_DIR}/../ontology"
+
+for TTL_FILE in \
+    "${CTIO_DIR}/ctio-core.ttl" \
+    "${CTIO_DIR}/ctio-indicators.ttl" \
+    "${CTIO_DIR}/ctio-shacl.ttl"
+do
+    if [ -f "${TTL_FILE}" ]; then
+        FILENAME=$(basename "${TTL_FILE}")
+        GRAPH_IRI="https://drp.example.com/graph/${FILENAME%.ttl}"
+        echo "[init]   加载 ${FILENAME} → Named Graph: ${GRAPH_IRI}"
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST \
+            -H "Content-Type: application/x-turtle" \
+            -H "Accept: application/json" \
+            --data-binary "@${TTL_FILE}" \
+            "${GRAPHDB_URL}/repositories/${REPO_ID}/statements?context=<${GRAPH_IRI}>")
+        if [ "${HTTP_STATUS}" = "204" ]; then
+            echo "[init]   ✓ ${FILENAME} 加载成功"
+        else
+            echo "[init]   ✗ ${FILENAME} 加载失败，HTTP ${HTTP_STATUS}"
+            exit 1
+        fi
+    else
+        echo "[init]   警告: 文件不存在，跳过: ${TTL_FILE}"
+    fi
+done
+echo "[init] CTIO 本体加载完成。"
+
 # 最终三元组统计
 TRIPLE_COUNT=$(curl -sf -X POST \
   "${GRAPHDB_URL}/repositories/${REPO_ID}" \
