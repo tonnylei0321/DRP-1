@@ -86,12 +86,12 @@ do
         FILENAME=$(basename "${TTL_FILE}")
         GRAPH_IRI="https://drp.example.com/graph/${FILENAME%.ttl}"
         echo "[init]   加载 ${FILENAME} → Named Graph: ${GRAPH_IRI}"
-        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+        HTTP_STATUS=$(curl -sf -o /dev/null -w "%{http_code}" \
             -X POST \
             -H "Content-Type: application/x-turtle" \
-            -H "Accept: application/json" \
             --data-binary "@${TTL_FILE}" \
-            "${GRAPHDB_URL}/repositories/${REPO_ID}/statements?context=<${GRAPH_IRI}>")
+            "${GRAPHDB_URL}/repositories/${REPO_ID}/statements?context=%3C${GRAPH_IRI}%3E" \
+            2>/dev/null || echo "000")
         if [ "${HTTP_STATUS}" = "204" ]; then
             echo "[init]   ✓ ${FILENAME} 加载成功"
         else
