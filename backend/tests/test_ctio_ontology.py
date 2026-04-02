@@ -97,14 +97,14 @@ def test_indicator_total_count(require_graphdb):
 @pytest.mark.integration
 def test_four_redline_indicators_exist(require_graphdb):
     """四个红线指标必须存在于图数据库中。"""
-    query = """
-        PREFIX ctio: <https://drp.example.com/ontology/ctio#>
+    query = f"""
+        {CTIO_PREFIX}
         SELECT (COUNT(DISTINCT ?id) AS ?count)
-        WHERE {
+        WHERE {{
             ?ind a ctio:RegulatoryIndicator ;
                  ctio:indicatorId ?id .
-            VALUES ?id { "IND-BA-002" "IND-CC-001" "IND-CC-002" "IND-ST-001" }
-        }
+            VALUES ?id {{ "IND-BA-002" "IND-CC-001" "IND-CC-002" "IND-ST-001" }}
+        }}
     """
     results = sparql_select(query)
     count = int(results[0]["count"]["value"])
