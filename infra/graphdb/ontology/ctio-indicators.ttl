@@ -1,0 +1,464 @@
+# CTIO — 106项监管指标实例
+# 版本: 1.0.0  指标编号规则: IND-{域代码}-{序号3位}
+# 域代码: BA=银行账户 CC=资金集中 ST=结算 BL=票据 DF=债务融资 DR=决策风险 SA=国资委考核
+
+@prefix ctio:  <https://drp.example.com/ontology/ctio/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+# ═════════════════��══════════════════════════════
+# 域1: 银行账户监管域（15项）
+# ══════════════════════════════════════════════
+
+ctio:IND-BA-001 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-001" ;
+    ctio:indicatorName "账户开立合规率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.98"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-001" .
+
+ctio:IND-BA-002 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-002" ;
+    ctio:indicatorName "账户直联率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "0.95"^^xsd:decimal ;
+    ctio:warnThreshold "0.90"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-002" ;
+    rdfs:comment "红线指标：直联账户数/总账户数 ≥ 95%"@zh .
+
+ctio:IND-BA-003 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-003" ;
+    ctio:indicatorName "账户注销及时率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.95"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-003" .
+
+ctio:IND-BA-004 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-004" ;
+    ctio:indicatorName "账户余额异常检测率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.98"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-004" .
+
+ctio:IND-BA-005 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-005" ;
+    ctio:indicatorName "账户信息完整率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.99"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-005" .
+
+ctio:IND-BA-006 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-006" ;
+    ctio:indicatorName "专户专用合规率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.98"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-006" .
+
+ctio:IND-BA-007 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-007" ;
+    ctio:indicatorName "境外账户合规率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.98"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-007" .
+
+ctio:IND-BA-008 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-008" ;
+    ctio:indicatorName "账户印鉴管理合规率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.98"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-008" .
+
+ctio:IND-BA-009 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-009" ;
+    ctio:indicatorName "账户U-Key配置率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.95"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-009" .
+
+ctio:IND-BA-010 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-010" ;
+    ctio:indicatorName "账户授权层级合规率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.98"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-010" .
+
+ctio:IND-BA-011 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-011" ;
+    ctio:indicatorName "账户余额月度盘点率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.98"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-011" .
+
+ctio:IND-BA-012 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-012" ;
+    ctio:indicatorName "账户重复开立风险率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "0.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.01"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-012" .
+
+ctio:IND-BA-013 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-013" ;
+    ctio:indicatorName "账户开立审批合规率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.98"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-013" .
+
+ctio:IND-BA-014 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-014" ;
+    ctio:indicatorName "银行关系集中度"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "0.60"^^xsd:decimal ;
+    ctio:warnThreshold "0.70"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-014" .
+
+ctio:IND-BA-015 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-BA-015" ;
+    ctio:indicatorName "账户有效使用率"@zh ;
+    ctio:businessDomain "银行账户监管域" ;
+    ctio:targetValue "0.95"^^xsd:decimal ;
+    ctio:warnThreshold "0.90"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-BA-015" .
+
+# ══════════════════════════════════════════════
+# 域2: 资金集中监管域（15项）
+# ══════════════════════════════════════════════
+
+ctio:IND-CC-001 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-001" ;
+    ctio:indicatorName "全口径资金集中率"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "0.95"^^xsd:decimal ;
+    ctio:warnThreshold "0.90"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-001" ;
+    rdfs:comment "红线指标：归集账户余额/集团全部账户余额 ≥ 95%"@zh .
+
+ctio:IND-CC-002 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-002" ;
+    ctio:indicatorName "可归集资金集中率"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "0.85"^^xsd:decimal ;
+    ctio:warnThreshold "0.80"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-002" ;
+    rdfs:comment "红线指标：归集账户余额/（全部账户余额−受限账户余额） ≥ 85%"@zh .
+
+ctio:IND-CC-003 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-003" ;
+    ctio:indicatorName "资金池归集效率"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "0.90"^^xsd:decimal ;
+    ctio:warnThreshold "0.85"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-003" .
+
+ctio:IND-CC-004 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-004" ;
+    ctio:indicatorName "集团内部借贷合规率"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.98"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-004" .
+
+ctio:IND-CC-005 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-005" ;
+    ctio:indicatorName "资金归集计划完成率"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "0.95"^^xsd:decimal ;
+    ctio:warnThreshold "0.90"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-005" .
+
+ctio:IND-CC-006 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-006" ;
+    ctio:indicatorName "日间资金归集及时率"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "0.95"^^xsd:decimal ;
+    ctio:warnThreshold "0.90"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-006" .
+
+ctio:IND-CC-007 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-007" ;
+    ctio:indicatorName "成员单位归集率"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "0.95"^^xsd:decimal ;
+    ctio:warnThreshold "0.88"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-007" .
+
+ctio:IND-CC-008 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-008" ;
+    ctio:indicatorName "资金池利率合理性指数"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.95"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-008" .
+
+ctio:IND-CC-009 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-009" ;
+    ctio:indicatorName "跨境资金归集合规率"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.98"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-009" .
+
+ctio:IND-CC-010 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-010" ;
+    ctio:indicatorName "闲置资金投资转化率"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "0.80"^^xsd:decimal ;
+    ctio:warnThreshold "0.70"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-010" .
+
+ctio:IND-CC-011 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-011" ;
+    ctio:indicatorName "资金集中度环比变化率"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "0.00"^^xsd:decimal ;
+    ctio:warnThreshold "-0.05"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-011" .
+
+ctio:IND-CC-012 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-012" ;
+    ctio:indicatorName "资金池容量利用率"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "0.80"^^xsd:decimal ;
+    ctio:warnThreshold "0.95"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-012" .
+
+ctio:IND-CC-013 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-013" ;
+    ctio:indicatorName "内部存款账户余额稳定性"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "0.90"^^xsd:decimal ;
+    ctio:warnThreshold "0.80"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-013" .
+
+ctio:IND-CC-014 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-014" ;
+    ctio:indicatorName "资金归集覆盖率"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "0.95"^^xsd:decimal ;
+    ctio:warnThreshold "0.90"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-014" .
+
+ctio:IND-CC-015 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-CC-015" ;
+    ctio:indicatorName "集团资金使用效率指数"@zh ;
+    ctio:businessDomain "资金集中监管域" ;
+    ctio:targetValue "0.85"^^xsd:decimal ;
+    ctio:warnThreshold "0.75"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-CC-015" .
+
+# ══════════════════════════════════════════════
+# 域3: 结算监管域（15项）
+# ══════════════════════════════════════════════
+
+ctio:IND-ST-001 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-001" ;
+    ctio:indicatorName "结算直联率"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "0.95"^^xsd:decimal ;
+    ctio:warnThreshold "0.90"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-001" ;
+    rdfs:comment "红线指标：持有U-Key且直联的结算账户数/总结算账户数 ≥ 95%"@zh .
+
+ctio:IND-ST-002 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-002" ;
+    ctio:indicatorName "大额支付合规率"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.99"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-002" .
+
+ctio:IND-ST-003 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-003" ;
+    ctio:indicatorName "支付授权及时率"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "0.98"^^xsd:decimal ;
+    ctio:warnThreshold "0.95"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-003" .
+
+ctio:IND-ST-004 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-004" ;
+    ctio:indicatorName "结算差错率"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "0.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.001"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-004" .
+
+ctio:IND-ST-005 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-005" ;
+    ctio:indicatorName "跨行结算及时率"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "0.99"^^xsd:decimal ;
+    ctio:warnThreshold "0.95"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-005" .
+
+ctio:IND-ST-006 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-006" ;
+    ctio:indicatorName "银企直联系统在线率"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "0.999"^^xsd:decimal ;
+    ctio:warnThreshold "0.995"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-006" .
+
+ctio:IND-ST-007 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-007" ;
+    ctio:indicatorName "支付业务集中度"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "0.80"^^xsd:decimal ;
+    ctio:warnThreshold "0.70"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-007" .
+
+ctio:IND-ST-008 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-008" ;
+    ctio:indicatorName "银企对账及时率"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.98"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-008" .
+
+ctio:IND-ST-009 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-009" ;
+    ctio:indicatorName "异常交易检测率"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.99"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-009" .
+
+ctio:IND-ST-010 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-010" ;
+    ctio:indicatorName "结算单据合规率"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.98"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-010" .
+
+ctio:IND-ST-011 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-011" ;
+    ctio:indicatorName "电子支付比率"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "0.98"^^xsd:decimal ;
+    ctio:warnThreshold "0.95"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-011" .
+
+ctio:IND-ST-012 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-012" ;
+    ctio:indicatorName "支付授权链合规率"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.99"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-012" .
+
+ctio:IND-ST-013 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-013" ;
+    ctio:indicatorName "结算系统可用性"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "0.999"^^xsd:decimal ;
+    ctio:warnThreshold "0.995"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-013" .
+
+ctio:IND-ST-014 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-014" ;
+    ctio:indicatorName "支付风险管控率"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.99"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-014" .
+
+ctio:IND-ST-015 a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "IND-ST-015" ;
+    ctio:indicatorName "结算业务合规审查率"@zh ;
+    ctio:businessDomain "结算监管域" ;
+    ctio:targetValue "1.00"^^xsd:decimal ;
+    ctio:warnThreshold "0.98"^^xsd:decimal ;
+    ctio:sparqlRef "SPARQL-ST-015" .
+
+# ═══��══════════════════════════════════════════
+# 域4: 票据监管域（15项）
+# ══════════════════════════════════════════════
+
+ctio:IND-BL-001 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-001" ; ctio:indicatorName "票据背书链深度合规率"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-001" ; rdfs:comment "背书链超过20层触发WARN，超过50层为CRITICAL"@zh .
+ctio:IND-BL-002 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-002" ; ctio:indicatorName "票据真实性验证率"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.99"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-002" .
+ctio:IND-BL-003 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-003" ; ctio:indicatorName "票据逾期率"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "0.00"^^xsd:decimal ; ctio:warnThreshold "0.005"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-003" .
+ctio:IND-BL-004 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-004" ; ctio:indicatorName "商票贴现合规率"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-004" .
+ctio:IND-BL-005 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-005" ; ctio:indicatorName "票据托管合规率"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-005" .
+ctio:IND-BL-006 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-006" ; ctio:indicatorName "电子票据比率"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "0.95"^^xsd:decimal ; ctio:warnThreshold "0.90"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-006" .
+ctio:IND-BL-007 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-007" ; ctio:indicatorName "票据信息完整率"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.99"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-007" .
+ctio:IND-BL-008 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-008" ; ctio:indicatorName "票据风险分散度指数"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "0.70"^^xsd:decimal ; ctio:warnThreshold "0.60"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-008" .
+ctio:IND-BL-009 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-009" ; ctio:indicatorName "票据池管理效率"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "0.90"^^xsd:decimal ; ctio:warnThreshold "0.80"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-009" .
+ctio:IND-BL-010 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-010" ; ctio:indicatorName "关联方票据合规率"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-010" .
+ctio:IND-BL-011 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-011" ; ctio:indicatorName "票据保管合规率"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-011" .
+ctio:IND-BL-012 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-012" ; ctio:indicatorName "票据到期预警及时率"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-012" .
+ctio:IND-BL-013 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-013" ; ctio:indicatorName "票据背书链断裂率"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "0.00"^^xsd:decimal ; ctio:warnThreshold "0.005"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-013" .
+ctio:IND-BL-014 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-014" ; ctio:indicatorName "融资性票据识别率"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-014" .
+ctio:IND-BL-015 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-BL-015" ; ctio:indicatorName "票据业务集中度指数"@zh ; ctio:businessDomain "票据监管域" ; ctio:targetValue "0.60"^^xsd:decimal ; ctio:warnThreshold "0.70"^^xsd:decimal ; ctio:sparqlRef "SPARQL-BL-015" .
+
+# ══════════════════════════════════════════════
+# 域5: 债务融资监管域（15项）
+# ══════════════════════════════════════════════
+
+ctio:IND-DF-001 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-001" ; ctio:indicatorName "6311还款完成率"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.95"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-001" .
+ctio:IND-DF-002 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-002" ; ctio:indicatorName "债务到期预警及时率"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-002" .
+ctio:IND-DF-003 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-003" ; ctio:indicatorName "债务融资成本合规率"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-003" .
+ctio:IND-DF-004 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-004" ; ctio:indicatorName "带息负债增长控制达标率"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.95"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-004" .
+ctio:IND-DF-005 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-005" ; ctio:indicatorName "融资计划执行率"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "0.95"^^xsd:decimal ; ctio:warnThreshold "0.88"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-005" .
+ctio:IND-DF-006 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-006" ; ctio:indicatorName "债务集中度指数"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "0.50"^^xsd:decimal ; ctio:warnThreshold "0.60"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-006" .
+ctio:IND-DF-007 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-007" ; ctio:indicatorName "短期债务占比"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "0.30"^^xsd:decimal ; ctio:warnThreshold "0.40"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-007" .
+ctio:IND-DF-008 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-008" ; ctio:indicatorName "隐性债务识别率"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-008" .
+ctio:IND-DF-009 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-009" ; ctio:indicatorName "担保合规率"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-009" .
+ctio:IND-DF-010 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-010" ; ctio:indicatorName "债务信息披露合规率"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.99"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-010" .
+ctio:IND-DF-011 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-011" ; ctio:indicatorName "债务对冲覆盖率"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "0.80"^^xsd:decimal ; ctio:warnThreshold "0.70"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-011" .
+ctio:IND-DF-012 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-012" ; ctio:indicatorName "融资渠道多元化指数"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "0.60"^^xsd:decimal ; ctio:warnThreshold "0.50"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-012" .
+ctio:IND-DF-013 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-013" ; ctio:indicatorName "债务延期处置合规率"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-013" .
+ctio:IND-DF-014 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-014" ; ctio:indicatorName "债券发行合规率"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "1.00"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-014" .
+ctio:IND-DF-015 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DF-015" ; ctio:indicatorName "利息支付及时率"@zh ; ctio:businessDomain "债务融资监管域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "1.00"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DF-015" .
+
+# ══════════════════════════════════════════════
+# 域6: 决策风险域（16项）
+# ══════════════════════════════════════════════
+
+ctio:IND-DR-001 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-001" ; ctio:indicatorName "资金决策合规率"@zh ; ctio:businessDomain "决���风险域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.99"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-001" .
+ctio:IND-DR-002 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-002" ; ctio:indicatorName "大额资金决策审批率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "1.00"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-002" .
+ctio:IND-DR-003 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-003" ; ctio:indicatorName "关联交易资金合规率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "1.00"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-003" .
+ctio:IND-DR-004 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-004" ; ctio:indicatorName "对外投资资金合规率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "1.00"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-004" .
+ctio:IND-DR-005 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-005" ; ctio:indicatorName "资金预算执行偏差率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "0.05"^^xsd:decimal ; ctio:warnThreshold "0.10"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-005" .
+ctio:IND-DR-006 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-006" ; ctio:indicatorName "流动性风险指标达标率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-006" .
+ctio:IND-DR-007 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-007" ; ctio:indicatorName "汇率风险对冲率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "0.80"^^xsd:decimal ; ctio:warnThreshold "0.70"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-007" .
+ctio:IND-DR-008 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-008" ; ctio:indicatorName "利率风险敞口控制率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "0.80"^^xsd:decimal ; ctio:warnThreshold "0.70"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-008" .
+ctio:IND-DR-009 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-009" ; ctio:indicatorName "操作风险事件发生率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "0.00"^^xsd:decimal ; ctio:warnThreshold "0.001"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-009" .
+ctio:IND-DR-010 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-010" ; ctio:indicatorName "资金决策信息完整率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.99"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-010" .
+ctio:IND-DR-011 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-011" ; ctio:indicatorName "投资决策合规率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "1.00"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-011" .
+ctio:IND-DR-012 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-012" ; ctio:indicatorName "���金风险压力测试覆盖率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.95"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-012" .
+ctio:IND-DR-013 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-013" ; ctio:indicatorName "紧急资金调配响应达标率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-013" .
+ctio:IND-DR-014 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-014" ; ctio:indicatorName "资金风险预警响应率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-014" .
+ctio:IND-DR-015 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-015" ; ctio:indicatorName "资金监管数据准确率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.99"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-015" .
+ctio:IND-DR-016 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-DR-016" ; ctio:indicatorName "内部审计发现整改率"@zh ; ctio:businessDomain "决策风险域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.95"^^xsd:decimal ; ctio:sparqlRef "SPARQL-DR-016" .
+
+# ══════════════════════════════════════════════
+# 域7: 国资委考核域（15项）
+# ══════════════════════════════════════════════
+
+ctio:IND-SA-001 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-001" ; ctio:indicatorName "国资委报表提交及时率"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "1.00"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-001" .
+ctio:IND-SA-002 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-002" ; ctio:indicatorName "资金管理评级分数"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "90.00"^^xsd:decimal ; ctio:warnThreshold "80.00"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-002" .
+ctio:IND-SA-003 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-003" ; ctio:indicatorName "年度资金监管目标完成率"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.95"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-003" .
+ctio:IND-SA-004 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-004" ; ctio:indicatorName "资金集中度年度提升幅度"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "0.02"^^xsd:decimal ; ctio:warnThreshold "0.00"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-004" .
+ctio:IND-SA-005 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-005" ; ctio:indicatorName "监管整改落实率"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.98"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-005" .
+ctio:IND-SA-006 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-006" ; ctio:indicatorName "资金管理体系建设完成率"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.90"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-006" .
+ctio:IND-SA-007 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-007" ; ctio:indicatorName "信息化水平指数"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "0.90"^^xsd:decimal ; ctio:warnThreshold "0.80"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-007" .
+ctio:IND-SA-008 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-008" ; ctio:indicatorName "资金风险案例发生数"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "0.00"^^xsd:decimal ; ctio:warnThreshold "1.00"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-008" .
+ctio:IND-SA-009 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-009" ; ctio:indicatorName "合规培训覆盖率"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.95"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-009" .
+ctio:IND-SA-010 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-010" ; ctio:indicatorName "资金管理制度更新及时率"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.95"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-010" .
+ctio:IND-SA-011 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-011" ; ctio:indicatorName "子企业资金管理督导覆盖率"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "1.00"^^xsd:decimal ; ctio:warnThreshold "0.95"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-011" .
+ctio:IND-SA-012 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-012" ; ctio:indicatorName "数字化转型进度指数"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "0.80"^^xsd:decimal ; ctio:warnThreshold "0.70"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-012" .
+ctio:IND-SA-013 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-013" ; ctio:indicatorName "资金管理创新指数"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "0.80"^^xsd:decimal ; ctio:warnThreshold "0.60"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-013" .
+ctio:IND-SA-014 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-014" ; ctio:indicatorName "ESG资金合规指数"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "0.90"^^xsd:decimal ; ctio:warnThreshold "0.80"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-014" .
+ctio:IND-SA-015 a ctio:RegulatoryIndicator ; ctio:indicatorId "IND-SA-015" ; ctio:indicatorName "综合资金管理效能指数"@zh ; ctio:businessDomain "国资委考核域" ; ctio:targetValue "0.90"^^xsd:decimal ; ctio:warnThreshold "0.80"^^xsd:decimal ; ctio:sparqlRef "SPARQL-SA-015" .
