@@ -32,6 +32,9 @@ dev = [
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+markers = [
+    "integration: 需要外部服务（GraphDB）的集成测试",
+]
 
 [build-system]
 requires = ["hatchling"]

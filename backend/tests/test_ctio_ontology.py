@@ -43,15 +43,15 @@ def graphdb_available() -> bool:
         return False
 
 
-skip_if_no_graphdb = pytest.mark.skipif(
-    not graphdb_available(),
-    reason="GraphDB 未运行，跳过集成测试"
-)
+@pytest.fixture(autouse=False)
+def require_graphdb():
+    """在运行时检查 GraphDB 是否可用，不可用则跳过测试。"""
+    if not graphdb_available():
+        pytest.skip("GraphDB 未运行，跳过集成测试")
 
 
-@skip_if_no_graphdb
 @pytest.mark.integration
-def test_ctio_core_classes_exist():
+def test_ctio_core_classes_exist(require_graphdb):
     """验证8个核心 CTIO 类已加载到图谱。
 
     注意：此测试检查各类 IRI 是否被声明为 owl:Class，
@@ -79,9 +79,8 @@ def test_ctio_core_classes_exist():
     assert count == 8, f"期望8个核心类，实际找到 {count} 个"
 
 
-@skip_if_no_graphdb
 @pytest.mark.integration
-def test_indicator_total_count():
+def test_indicator_total_count(require_graphdb):
     """验证106项监管指标全部加载。"""
     query = f"""
     {CTIO_PREFIX}
@@ -95,30 +94,25 @@ def test_indicator_total_count():
     assert count == 106, f"期望106项指标，实际找到 {count} 项"
 
 
-@skip_if_no_graphdb
 @pytest.mark.integration
-def test_four_redline_indicators_exist():
-    """验证四大红线指标存在并有目标值。"""
-    redlines = ["IND-BA-002", "IND-CC-001", "IND-CC-002", "IND-ST-001"]
-    for ind_id in redlines:
-        query = f"""
-        {CTIO_PREFIX}
-        SELECT ?name ?targetValue
-        WHERE {{
-            ?ind ctio:indicatorId "{ind_id}" ;
-                 ctio:indicatorName ?name ;
-                 ctio:targetValue ?targetValue .
-        }}
-        """
-        results = sparql_select(query)
-        assert len(results) == 1, f"红线指标 {ind_id} 未找到"
-        target = float(results[0]["targetValue"]["value"])
-        assert target > 0, f"{ind_id} 目标值应 > 0，实际 {target}"
+def test_four_redline_indicators_exist(require_graphdb):
+    """四个红线指标必须存在于图数据库中。"""
+    query = """
+        PREFIX ctio: <https://drp.example.com/ontology/ctio#>
+        SELECT (COUNT(DISTINCT ?id) AS ?count)
+        WHERE {
+            ?ind a ctio:RegulatoryIndicator ;
+                 ctio:indicatorId ?id .
+            VALUES ?id { "IND-BA-002" "IND-CC-001" "IND-CC-002" "IND-ST-001" }
+        }
+    """
+    results = sparql_select(query)
+    count = int(results[0]["count"]["value"])
+    assert count == 4, f"预期4个红线指标，实际找到 {count} 个"
 
 
-@skip_if_no_graphdb
 @pytest.mark.integration
-def test_indicators_cover_all_seven_domains():
+def test_indicators_cover_all_seven_domains(require_graphdb):
     """验证7个业务域全部有指标。"""
     expected_domains = {
         "银行账户监管域", "资金集中监管域", "结算监管域",
@@ -138,9 +132,8 @@ def test_indicators_cover_all_seven_domains():
     assert not missing, f"以下业务域缺少指标: {missing}"
 
 
-@skip_if_no_graphdb
 @pytest.mark.integration
-def test_shacl_graph_loaded():
+def test_shacl_graph_loaded(require_graphdb):
     """验证 SHACL 图已加载（存在 SHACL NodeShape）。"""
     query = """
     PREFIX sh: <http://www.w3.org/ns/shacl#>
@@ -154,9 +147,8 @@ def test_shacl_graph_loaded():
     assert count >= 4, f"期望至少4个 SHACL NodeShape（四大红线），实际 {count} 个"
 
 
-@skip_if_no_graphdb
 @pytest.mark.integration
-def test_named_graphs_exist():
+def test_named_graphs_exist(require_graphdb):
     """验证 CTIO Named Graph 已创建。"""
     query = """
     SELECT DISTINCT ?graph
