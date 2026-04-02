@@ -1,0 +1,293 @@
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rd:   <file:////ontology_build/rd/> .
+
+# =============================================================================
+# R&D Ontology Core Schema
+# =============================================================================
+# This ontology defines concepts for software development lifecycle:
+# Requirements, Designs, Code Elements, and Tests.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Entity Layer: Abstract Concepts
+# -----------------------------------------------------------------------------
+
+rd:class/Requirement a owl:Class ;
+    rdfs:label "Requirement" ;
+    rdfs:comment "A software requirement or specification" .
+
+rd:class/Design a owl:Class ;
+    rdfs:label "Design" ;
+    rdfs:comment "A software design document or decision" .
+
+rd:class/CodeElement a owl:Class ;
+    rdfs:label "CodeElement" ;
+    rdfs:comment "An abstract code element (class, method, field, etc.)" .
+
+rd:class/Test a owl:Class ;
+    rdfs:label "Test" ;
+    rdfs:comment "A test case or test suite" .
+
+rd:class/Task a owl:Class ;
+    rdfs:label "Task" ;
+    rdfs:comment "A development task or work item" .
+
+# -----------------------------------------------------------------------------
+# Class Layer: Code Structure Hierarchy
+# -----------------------------------------------------------------------------
+
+rd:class/CodeClass a owl:Class ;
+    rdfs:label "CodeClass" ;
+    rdfs:subClassOf rd:class/CodeElement ;
+    rdfs:comment "A class definition in source code" .
+
+rd:class/CodeInterface a owl:Class ;
+    rdfs:label "CodeInterface" ;
+    rdfs:subClassOf rd:class/CodeElement ;
+    rdfs:comment "An interface definition in source code" .
+
+rd:class/CodeMethod a owl:Class ;
+    rdfs:label "CodeMethod" ;
+    rdfs:subClassOf rd:class/CodeElement ;
+    rdfs:comment "A method or function definition" .
+
+rd:class/CodeField a owl:Class ;
+    rdfs:label "CodeField" ;
+    rdfs:subClassOf rd:class/CodeElement ;
+    rdfs:comment "A field or variable definition" .
+
+rd:class/CodeModule a owl:Class ;
+    rdfs:label "CodeModule" ;
+    rdfs:subClassOf rd:class/CodeElement ;
+    rdfs:comment "A module or package" .
+
+rd:class/CodeEnum a owl:Class ;
+    rdfs:label "CodeEnum" ;
+    rdfs:subClassOf rd:class/CodeElement ;
+    rdfs:comment "An enumeration definition" .
+
+rd:class/CodeConstructor a owl:Class ;
+    rdfs:label "CodeConstructor" ;
+    rdfs:subClassOf rd:class/CodeMethod ;
+    rdfs:comment "A constructor method" .
+
+rd:class/CodeProperty a owl:Class ;
+    rdfs:label "CodeProperty" ;
+    rdfs:subClassOf rd:class/CodeMethod ;
+    rdfs:comment "A property accessor" .
+
+rd:class/CodeComponent a owl:Class ;
+    rdfs:label "CodeComponent" ;
+    rdfs:subClassOf rd:class/CodeElement ;
+    rdfs:comment "A UI component (e.g., React component)" .
+
+# -----------------------------------------------------------------------------
+# Object Properties: Relationships
+# -----------------------------------------------------------------------------
+
+# Requirement-Code relationships
+rd:property/implementsRequirement a owl:ObjectProperty ;
+    rdfs:label "implementsRequirement" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range rd:class/Requirement ;
+    rdfs:comment "Code element implements a requirement" .
+
+rd:property/realizesDesign a owl:ObjectProperty ;
+    rdfs:label "realizesDesign" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range rd:class/Design ;
+    rdfs:comment "Code element realizes a design" .
+
+rd:property/testsCode a owl:ObjectProperty ;
+    rdfs:label "testsCode" ;
+    rdfs:domain rd:class/Test ;
+    rdfs:range rd:class/CodeElement ;
+    rdfs:comment "Test verifies code element" .
+
+rd:property/validatesRequirement a owl:ObjectProperty ;
+    rdfs:label "validatesRequirement" ;
+    rdfs:domain rd:class/Test ;
+    rdfs:range rd:class/Requirement ;
+    rdfs:comment "Test validates a requirement" .
+
+# Code structure relationships
+rd:property/inherits a owl:ObjectProperty ;
+    rdfs:label "inherits" ;
+    rdfs:domain rd:class/CodeClass ;
+    rdfs:range rd:class/CodeClass ;
+    rdfs:comment "Class inherits from another class" .
+
+rd:property/implements a owl:ObjectProperty ;
+    rdfs:label "implements" ;
+    rdfs:domain rd:class/CodeClass ;
+    rdfs:range rd:class/CodeInterface ;
+    rdfs:comment "Class implements an interface" .
+
+rd:property/extends a owl:ObjectProperty ;
+    rdfs:label "extends" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range rd:class/CodeElement ;
+    rdfs:comment "Element extends another element" .
+
+rd:property/calls a owl:ObjectProperty ;
+    rdfs:label "calls" ;
+    rdfs:domain rd:class/CodeMethod ;
+    rdfs:range rd:class/CodeMethod ;
+    rdfs:comment "Method calls another method" .
+
+rd:property/dependsOn a owl:ObjectProperty ;
+    rdfs:label "dependsOn" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range rd:class/CodeElement ;
+    rdfs:comment "Element depends on another element" .
+
+rd:property/contains a owl:ObjectProperty ;
+    rdfs:label "contains" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range rd:class/CodeElement ;
+    rdfs:comment "Element contains another element" .
+
+rd:property/imports a owl:ObjectProperty ;
+    rdfs:label "imports" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range rd:class/CodeModule ;
+    rdfs:comment "Element imports a module" .
+
+rd:property/overrides a owl:ObjectProperty ;
+    rdfs:label "overrides" ;
+    rdfs:domain rd:class/CodeMethod ;
+    rdfs:range rd:class/CodeMethod ;
+    rdfs:comment "Method overrides parent method" .
+
+rd:property/decorates a owl:ObjectProperty ;
+    rdfs:label "decorates" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range rd:class/CodeElement ;
+    rdfs:comment "Decorator applied to element" .
+
+rd:property/uses a owl:ObjectProperty ;
+    rdfs:label "uses" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range rd:class/CodeElement ;
+    rdfs:comment "Element uses another element" .
+
+# Task relationships
+rd:property/affectsFile a owl:ObjectProperty ;
+    rdfs:label "affectsFile" ;
+    rdfs:domain rd:class/Task ;
+    rdfs:range rd:class/CodeElement ;
+    rdfs:comment "Task affects a code file" .
+
+rd:property/belongsToRequirement a owl:ObjectProperty ;
+    rdfs:label "belongsToRequirement" ;
+    rdfs:domain rd:class/Task ;
+    rdfs:range rd:class/Requirement ;
+    rdfs:comment "Task belongs to a requirement" .
+
+# -----------------------------------------------------------------------------
+# Data Properties: Attributes
+# -----------------------------------------------------------------------------
+
+rd:property/fullName a owl:DatatypeProperty ;
+    rdfs:label "fullName" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Fully qualified name of the element" .
+
+rd:property/filePath a owl:DatatypeProperty ;
+    rdfs:label "filePath" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range xsd:string ;
+    rdfs:comment "File path where element is defined" .
+
+rd:property/lineNumber a owl:DatatypeProperty ;
+    rdfs:label "lineNumber" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Line number where element starts" .
+
+rd:property/language a owl:DatatypeProperty ;
+    rdfs:label "language" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Programming language (java, python, javascript, typescript)" .
+
+rd:property/package a owl:DatatypeProperty ;
+    rdfs:label "package" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Package or module name" .
+
+rd:property/modifier a owl:DatatypeProperty ;
+    rdfs:label "modifier" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Access modifier (public, private, protected, static, etc.)" .
+
+rd:property/annotation a owl:DatatypeProperty ;
+    rdfs:label "annotation" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Annotation or decorator applied to element" .
+
+rd:property/docstring a owl:DatatypeProperty ;
+    rdfs:label "docstring" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Documentation string" .
+
+rd:property/returnType a owl:DatatypeProperty ;
+    rdfs:label "returnType" ;
+    rdfs:domain rd:class/CodeMethod ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Return type of method" .
+
+rd:property/parameterName a owl:DatatypeProperty ;
+    rdfs:label "parameterName" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Parameter name" .
+
+rd:property/parameterType a owl:DatatypeProperty ;
+    rdfs:label "parameterType" ;
+    rdfs:domain rd:class/CodeElement ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Parameter type" .
+
+# Requirement/Design properties
+rd:property/rationale a owl:DatatypeProperty ;
+    rdfs:label "rationale" ;
+    rdfs:domain rd:class/Requirement ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Why this requirement exists" .
+
+rd:property/scope a owl:DatatypeProperty ;
+    rdfs:label "scope" ;
+    rdfs:domain rd:class/Requirement ;
+    rdfs:range xsd:string ;
+    rdfs:comment "What changes are included" .
+
+rd:property/decision a owl:DatatypeProperty ;
+    rdfs:label "decision" ;
+    rdfs:domain rd:class/Design ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Architecture decision" .
+
+rd:property/changeId a owl:DatatypeProperty ;
+    rdfs:label "changeId" ;
+    rdfs:domain rd:class/Requirement ;
+    rdfs:range xsd:string ;
+    rdfs:comment "OpenSpec change ID" .
+
+# Link confidence
+rd:property/confidence a owl:DatatypeProperty ;
+    rdfs:label "confidence" ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Confidence score for inferred links (0.0-1.0)" .
+
+rd:property/linkMethod a owl:DatatypeProperty ;
+    rdfs:label "linkMethod" ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Method used to create link (annotation, file_path, git_commit, semantic)" .

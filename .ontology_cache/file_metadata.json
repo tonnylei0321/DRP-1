@@ -1,0 +1,145 @@
+{
+  "files": {
+    "/Users/work/iuapgit/ontologyDevOS/code_processor/parser_factory.py": {
+      "hash": "d68e81a9fc9ff838b6482745776a835d0e1f5ab85dba3ce60fe7de52303aae58",
+      "mtime": 1770002134.2260902,
+      "size": 9998,
+      "last_checked": "2026-02-04T18:08:00.914641"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/code_processor/javascript_parser.py": {
+      "hash": "8c3f547017588f00ad4ebef015598a3c974757072de86537d1eb85c990085d6b",
+      "mtime": 1770002104.0654876,
+      "size": 19222,
+      "last_checked": "2026-02-04T18:08:00.914940"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/code_processor/__init__.py": {
+      "hash": "447c1985ebbb29244e6072c6f915f3ecbb83485036f90d9031f57e8ff87ce9c2",
+      "mtime": 1770033502.406468,
+      "size": 1287,
+      "last_checked": "2026-02-04T18:08:00.914973"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/code_processor/python_parser.py": {
+      "hash": "a9f7d652fbb6ed333928a3af9e8fbc7576514af379815015ac45ec63107fb798",
+      "mtime": 1770002053.2144897,
+      "size": 17022,
+      "last_checked": "2026-02-04T18:08:00.915009"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/code_processor/base_parser.py": {
+      "hash": "854cfe8e1a3f216fae78ff1444585b67b0c40a07fcbafa144cf811aa2138debc",
+      "mtime": 1770016623.909645,
+      "size": 12143,
+      "last_checked": "2026-02-04T18:08:00.915038"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/code_processor/java_parser.py": {
+      "hash": "50f30fdc05cf7715a58c7cc36bdb052647061a28f1cc5ff87d15b598fd27aca0",
+      "mtime": 1770002008.6345944,
+      "size": 16619,
+      "last_checked": "2026-02-04T18:08:00.915071"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/code_processor/cli.py": {
+      "hash": "7a6fca89a9d8775e9ef96bf226ba8485dbf6e7044cb4db2c9981ba6ec449cd83",
+      "mtime": 1770197841.3695934,
+      "size": 14184,
+      "last_checked": "2026-02-04T18:08:00.915100"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/code_processor/document_generator.py": {
+      "hash": "15ae217ba98e6c290099e0aa58a80a519a57d70b41cbfb81c7509904d9c7d07d",
+      "mtime": 1770031275.8277686,
+      "size": 24154,
+      "last_checked": "2026-02-04T18:08:00.915243"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/code_processor/nlp_generator.py": {
+      "hash": "20df0535f14aa38f16d27aef84bf206c7b7a6d709c35b9615919479bf1b7b474",
+      "mtime": 1770031164.054457,
+      "size": 22155,
+      "last_checked": "2026-02-04T18:08:00.915277"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/code_processor/document_writer.py": {
+      "hash": "0237e941f7e04c15af58910bf5d7da7676c4bc3e4eac6fb3a572df61a11efc78",
+      "mtime": 1770031200.5501635,
+      "size": 9155,
+      "last_checked": "2026-02-04T18:08:00.915301"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/code_processor/incremental_processor.py": {
+      "hash": "6731d366fb03396772c5a4fe61a6b0b964044406e08da32b69e02db60af9c3e1",
+      "mtime": 1770033486.2482717,
+      "size": 9540,
+      "last_checked": "2026-02-04T18:08:00.915327"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/sdd_integration/openspec_parser.py": {
+      "hash": "900ff3cfeeb84204223b7498f4aa389dc53b19d76a5e2a8c1f6d749323b609d9",
+      "mtime": 1770002305.3514605,
+      "size": 8262,
+      "last_checked": "2026-02-04T18:08:00.915358"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/sdd_integration/__init__.py": {
+      "hash": "dddffe2b800f4357c4d025db118d5e73e38dafb8f143751fe1c257b7a0704d6a",
+      "mtime": 1770032898.3218837,
+      "size": 539,
+      "last_checked": "2026-02-04T18:08:00.915386"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/sdd_integration/linker.py": {
+      "hash": "ca698c14a90222c5895de87d1bcd70ef88a099a45f53b3058196b5520ade7482",
+      "mtime": 1770032916.6436641,
+      "size": 39513,
+      "last_checked": "2026-02-04T18:08:00.915427"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/tests/test_ttl_generator.py": {
+      "hash": "72af7689a860d08ea18ca80997eeac0a897ef52d37d3b66ce7ae0dc640a77eef",
+      "mtime": 1770002434.3963485,
+      "size": 2937,
+      "last_checked": "2026-02-04T18:08:00.915450"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/tests/test_integration.py": {
+      "hash": "637e11a981d91d0ed6a8ecf9ba03b23fd62278a272d64514d1dc96b1a26b59cc",
+      "mtime": 1770033072.0344992,
+      "size": 15206,
+      "last_checked": "2026-02-04T18:08:00.915476"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/tests/test_code_processor.py": {
+      "hash": "b59be5f879cd20186ee748327be85add8eb7545383c1a34e46c6ecf34e0f0941",
+      "mtime": 1770002421.2914534,
+      "size": 4211,
+      "last_checked": "2026-02-04T18:08:00.915500"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/tests/test_openspec_parser.py": {
+      "hash": "d8c80fdf4881365a7413ed030714fefd89bad13943d127adcc9fd636ab5ebcf6",
+      "mtime": 1770002448.6800349,
+      "size": 2759,
+      "last_checked": "2026-02-04T18:08:00.915523"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/rd_ontology/__init__.py": {
+      "hash": "e44de0bc0a128dffa40ee2ed2ad5f5f930096926426f8e8b2bbaed9704522d2e",
+      "mtime": 1770019446.383732,
+      "size": 848,
+      "last_checked": "2026-02-04T18:08:00.915551"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/ontology_client/config.py": {
+      "hash": "99f18809708511ca70f2ff88e85247543044b4661e97fff3c3585fe8b1029eb6",
+      "mtime": 1770101777.1949966,
+      "size": 3944,
+      "last_checked": "2026-02-04T18:08:00.915576"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/ontology_client/client.py": {
+      "hash": "696e579fc0fca9e971080a73c7e57a6776a2e132dc70aea0590c0e5a1775b040",
+      "mtime": 1770197814.0099845,
+      "size": 43834,
+      "last_checked": "2026-02-04T18:08:00.915617"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/ontology_client/__init__.py": {
+      "hash": "bb61dfbd65b8037523b40aead0f95b9ecc774311061ac37813f5c7c289e49a0d",
+      "mtime": 1770019407.7734056,
+      "size": 325,
+      "last_checked": "2026-02-04T18:08:00.915638"
+    },
+    "/Users/work/iuapgit/ontologyDevOS/plugins/ontology-devos/servers/ontology_mcp/server.py": {
+      "hash": "803165b390ba5b4a26c1f2daa69fa42c3bff1bffcab623f4b96cea46aa2df479",
+      "mtime": 1770100937.9967372,
+      "size": 9705,
+      "last_checked": "2026-02-04T18:08:00.915667"
+    }
+  },
+  "last_update": "2026-02-04T18:08:00.915669",
+  "version": "1.0",
+  "project_path": "/Users/work/iuapgit/ontologyDevOS"
+}

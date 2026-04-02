@@ -1,0 +1,74 @@
+# RL版：
+curl --location --request POST 'https://bip-daily.yonyoucloud.com/iuap-aip-gateway/yonchat/v1/chat/completions' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "messages": [
+        {
+            "content": "hi",
+            "role": "user"
+        }
+    ],
+    "model": "graph_rl",
+    "stream": false,
+    "max_tokens": 8192
+}'
+
+
+# SFT版：
+curl --location --request POST 'https://bip-daily.yonyoucloud.com/iuap-aip-gateway/yonchat/v1/chat/completions' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "messages": [
+        {
+            "content": "hi",
+            "role": "user"
+        }
+    ],
+    "model": "graph_sft",
+    "stream": false
+}'
+
+
+# Prompt:
+你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+
+1. 返回属性值、数量、名称、布尔值的回答
+
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+
+示例：
+
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+
+
+2. 返回路径
+
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+
+示例：
+
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>，
+
+<<<{frozenset({('008164', 'CREATED_BY', '石康')}), frozenset({('GDG4061700', 'OPERATED_BY', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+
+
+3. 返回节点
+
+直接使用节点name（字符串），放入一个set中，外部用<<<>>>括起来。
+
+示例：
+
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+
+
+4. 问题没有特殊说明的情况下。浮点数默认保留两位小数；所有路径或节点的权重相等，设为1；阻尼因子等参数使用常用参数，如0.85；需要迭代的问题可以将迭代限制在3次；最短路径的问题最多进行5跳的查询。
+
+
+
+以下是你需要理解的图网络：{graph}
+
+根据以上图网络的信息，按照前面的规则直接回答用户的问题：
+{query}

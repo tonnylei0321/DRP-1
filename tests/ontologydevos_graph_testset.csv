@@ -1,0 +1,379 @@
+task_type,instruction,output
+NEIGHBOR,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+找出节点 'CodeComponent' 的所有邻居节点（前驱节点和后继节点）。","<<<{'ttl_generator.py', 'python_parser.py', 'parser_factory.py', 'pytest', 'openspec_parser.py', 'base_parser.py', 'Bash包装脚本'}>>>"
+PREDECESSOR,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+找出节点 'ttl_generator.py' 的所有前驱节点。",<<<set()>>>
+EDGE,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""APIRouter"", ""properties"": {""name"": ""APIRouter""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}, {""id"": 9, ""labels"": [""Entity""], ""name"": ""CIConfiguration"", ""properties"": {""name"": ""CIConfiguration""}}, {""id"": 10, ""labels"": [""Entity""], ""name"": ""TTLGenerator"", ""properties"": {""name"": ""TTLGenerator""}}], ""edges"": [[""APIRouter"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""], [""CodeComponent"", ""IS_A"", ""CodeComponent""], [""CIConfiguration"", ""IS_A"", ""CodeComponent""], [""TTLGenerator"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 10, ""num_edges"": 10}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+判断从节点 'openspec_parser.py' 到节点 'CodeComponent' 是否存在直接的连接边。",<<<{True}>>>
+SHORTEST_PATH,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+找出从节点 'ttl_generator.py' 到节点 'python_parser.py' 的最短路径上所有的节点，最大深度限制为5。请返回该路径。","<<<{'ttl_generator.py', 'python_parser.py'}>>>"
+cycle_detection,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+忽略边的方向，该图中是否存在环或循环路径？",<<<{False}>>>
+description,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+请描述节点'ttl_generator.py'的详细信息，返回一个JSON对象。","<<<{""entity_type"": ""Entity"", ""entity_name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}, ""relation_type_counts"": {}, ""neighbor_type_counts"": {}}>>>"
+entity_attribute,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+节点'pytest'的'name'属性值是什么？",<<<{'pytest'}>>>
+entity_relation,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+节点'parser_factory.py'与节点'CodeComponent'之间存在什么类型的关系？",<<<{'IS_A'}>>>
+entity_type,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""APIRouter"", ""properties"": {""name"": ""APIRouter""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}, {""id"": 9, ""labels"": [""Entity""], ""name"": ""CIConfiguration"", ""properties"": {""name"": ""CIConfiguration""}}, {""id"": 10, ""labels"": [""Entity""], ""name"": ""TTLGenerator"", ""properties"": {""name"": ""TTLGenerator""}}], ""edges"": [[""APIRouter"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""], [""CodeComponent"", ""IS_A"", ""CodeComponent""], [""CIConfiguration"", ""IS_A"", ""CodeComponent""], [""TTLGenerator"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 10, ""num_edges"": 10}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+节点'APIRouter'的类型是什么？",<<<{'Entity'}>>>
+relation_between,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""6-stage-development-process"", ""properties"": {""name"": ""6-stage-development-process""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""Design"", ""properties"": {""name"": ""Design""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""sdd_integration.openspec_parser.Design"", ""properties"": {""name"": ""sdd_integration.openspec_parser.Design""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""TTLgenerationintegration"", ""properties"": {""name"": ""TTLgenerationintegration""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""SDDworkflow"", ""properties"": {""name"": ""SDDworkflow""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""OpenSpecthree-phaseworkflow"", ""properties"": {""name"": ""OpenSpecthree-phaseworkflow""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""CLAUDE.md"", ""properties"": {""name"": ""CLAUDE.md""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""OpenSpec"", ""properties"": {""name"": ""OpenSpec""}}, {""id"": 9, ""labels"": [""Entity""], ""name"": ""规范驱动开发(SDD)"", ""properties"": {""name"": ""规范驱动开发(SDD)""}}, {""id"": 10, ""labels"": [""Entity""], ""name"": ""三阶段工作流"", ""properties"": {""name"": ""三阶段工作流""}}, {""id"": 11, ""labels"": [""Entity""], ""name"": ""HOOK_MECHANISMS.md"", ""properties"": {""name"": ""HOOK_MECHANISMS.md""}}, {""id"": 12, ""labels"": [""Entity""], ""name"": ""TRIGGER_TYPES.md"", ""properties"": {""name"": ""TRIGGER_TYPES.md""}}, {""id"": 13, ""labels"": [""Entity""], ""name"": ""TROUBLESHOOTING.md"", ""properties"": {""name"": ""TROUBLESHOOTING.md""}}, {""id"": 14, ""labels"": [""Entity""], ""name"": ""SDD"", ""properties"": {""name"": ""SDD""}}, {""id"": 15, ""labels"": [""Entity""], ""name"": ""code-architecture-reviewer"", ""properties"": {""name"": ""code-architecture-reviewer""}}, {""id"": 16, ""labels"": [""Entity""], ""name"": ""Subagent-DrivenDevelopment"", ""properties"": {""name"": ""Subagent-DrivenDevelopment""}}, {""id"": 17, ""labels"": [""Entity""], ""name"": ""planning-reviewagent"", ""properties"": {""name"": ""planning-reviewagent""}}, {""id"": 18, ""labels"": [""Entity""], ""name"": ""CentralizedDocumentationManagement"", ""properties"": {""name"": ""CentralizedDocumentationManagement""}}, {""id"": 19, ""labels"": [""Entity""], ""name"": ""ArchitectureConsistencyReview"", ""properties"": {""name"": ""ArchitectureConsistencyReview""}}, {""id"": 20, ""labels"": [""Entity""], ""name"": ""SDD实践文档"", ""properties"": {""name"": ""SDD实践文档""}}, {""id"": 21, ""labels"": [""Entity""], ""name"": ""sdd.md"", ""properties"": {""name"": ""sdd.md""}}, {""id"": 22, ""labels"": [""Entity""], ""name"": ""plan-reviewer.md"", ""properties"": {""name"": ""plan-reviewer.md""}}, {""id"": 23, ""labels"": [""Entity""], ""name"": ""subagent-driven-development/SKILL.md"", ""properties"": {""name"": ""subagent-driven-development/SKILL.md""}}, {""id"": 24, ""labels"": [""Entity""], ""name"": ""requesting-code-review/SKILL.md"", ""properties"": {""name"": ""requesting-code-review/SKILL.md""}}], ""edges"": [[""6-stage-development-process"", ""IS_A"", ""Design""], [""sdd_integration.openspec_parser.Design"", ""IS_A"", ""Design""], [""TTLgenerationintegration"", ""IS_A"", ""Design""], [""SDDworkflow"", ""IS_A"", ""Design""], [""OpenSpecthree-phaseworkflow"", ""IS_A"", ""Design""], [""CLAUDE.md"", ""IS_A"", ""Design""], [""OpenSpec"", ""IS_A"", ""Design""], [""规范驱动开发(SDD)"", ""IS_A"", ""Design""], [""三阶段工作流"", ""IS_A"", ""Design""], [""HOOK_MECHANISMS.md"", ""IS_A"", ""Design""], [""TRIGGER_TYPES.md"", ""IS_A"", ""Design""], [""TROUBLESHOOTING.md"", ""IS_A"", ""Design""], [""SDD"", ""IS_A"", ""Design""], [""code-architecture-reviewer"", ""IS_A"", ""Design""], [""Subagent-DrivenDevelopment"", ""IS_A"", ""Design""], [""planning-reviewagent"", ""IS_A"", ""Design""], [""CentralizedDocumentationManagement"", ""IS_A"", ""Design""], [""ArchitectureConsistencyReview"", ""IS_A"", ""Design""], [""SDD实践文档"", ""IS_A"", ""Design""], [""sdd.md"", ""IS_A"", ""Design""], [""plan-reviewer.md"", ""IS_A"", ""Design""], [""subagent-driven-development/SKILL.md"", ""IS_A"", ""Design""], [""requesting-code-review/SKILL.md"", ""IS_A"", ""Design""]], ""metadata"": {""num_nodes"": 24, ""num_edges"": 23}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+节点'SDD'和节点'Design'之间的关系类型是什么？",<<<{'IS_A'}>>>
+relation_path,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+找出从节点'Bash包装脚本'到节点'CodeComponent'的关系路径。","<<<{frozenset([('Bash包装脚本', 'IS_A', 'CodeComponent')])}>>>"
+summary,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+请统计该图的基本信息，返回node_count、edge_count、node_type_counts、relation_type_counts。","<<<{""node_count"": 8, ""edge_count"": 7, ""node_type_counts"": {""Entity"": 7, ""EntityType"": 1}, ""relation_type_counts"": {""IS_A"": 7}}>>>"
+tree_check,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Automation"", ""properties"": {""name"": ""Automation""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""Design"", ""properties"": {""name"": ""Design""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""sdd_integration.openspec_parser.Design"", ""properties"": {""name"": ""sdd_integration.openspec_parser.Design""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""TTLgenerationintegration"", ""properties"": {""name"": ""TTLgenerationintegration""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""SDDworkflow"", ""properties"": {""name"": ""SDDworkflow""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""OpenSpecthree-phaseworkflow"", ""properties"": {""name"": ""OpenSpecthree-phaseworkflow""}}], ""edges"": [[""Automation"", ""IS_A"", ""Design""], [""sdd_integration.openspec_parser.Design"", ""IS_A"", ""Design""], [""TTLgenerationintegration"", ""IS_A"", ""Design""], [""SDDworkflow"", ""IS_A"", ""Design""], [""OpenSpecthree-phaseworkflow"", ""IS_A"", ""Design""]], ""metadata"": {""num_nodes"": 6, ""num_edges"": 5}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+忽略边的方向，判断该图是否是一棵树（连通且无环的图）。",<<<{True}>>>
+tree_lca,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+假设以'Bash包装脚本'为根节点构建树，找出节点'CodeComponent'和节点'parser_factory.py'的最近公共祖先(LCA)。",<<<{'Bash包装脚本'}>>>
+MST,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+使用Prim或Kruskal算法计算该图的最小生成树，假设所有边权重为1。",<<<{'mst_edge_count': 7}>>>
+page_rank_v2,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+使用PageRank算法（阻尼因子0.85，迭代3次）计算图中各节点的重要性得分，返回得分最高的前3个节点。",<<<{'Bash包装脚本': 0.15}>>>
+COMMON_NEIGHBOR,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+找出节点'openspec_parser.py'和节点'parser_factory.py'的公共邻居节点。",<<<{'CodeComponent'}>>>
+BipartiteMatching,"你是一个图网络的分析助手，你需要先理解图网络各个节点的内涵和关系，接着进行用户问题的类型分析，最后列出用于回答问题的信息。下面是需要遵循的规则。
+1. 返回属性值、数量、名称、布尔值的回答
+将回答的值放在一个集合中，外部用<<<>>>括起来。若返回多个值，将值和对应的节点或条目用json形式组织起来。
+示例：
+<<<{'张三'}>>>，<<<{True}>>>，<<<{3.14}>>>，<<<{'大平台': 5, '大财务': 5}>>>，<<<{'出度': 5, '入度': 7}>>>
+
+2. 返回路径
+把每条路径上所有「起点-关系-终点」三元组放入一个frozenset中，若有多条路径则需要用多个frozenset，将所有路径放入一个set，外部用<<<>>>括起来。
+示例：
+<<<{frozenset({('工单A', 'HAS_OPERATION_LOG', '数据更新'), ('数据更新', 'OPERATED_BY', '石康')})}>>>
+
+3. 返回节点
+直接使用节点name的字符串，将其放入一个set中，外部用<<<>>>括起来。
+示例：
+<<<{'GDGZ24061700', 'GDMY24032300'}>>>
+
+4. 如果用户问题没有说明以下内容，请按照默认保留两位小数。返回路径或节点的权重或深度，均为1。阻尼因子等参数使用常见参数如0.85。需要遍历的情况，最大遍历深度限制为3次，最大路径数量限制最多为5条的查询。
+
+下面是你需要分析的图网络：{""directed"": true, ""nodes"": [{""id"": 1, ""labels"": [""Entity""], ""name"": ""Bash包装脚本"", ""properties"": {""name"": ""Bash包装脚本""}}, {""id"": 2, ""labels"": [""EntityType""], ""name"": ""CodeComponent"", ""properties"": {""name"": ""CodeComponent""}}, {""id"": 3, ""labels"": [""Entity""], ""name"": ""openspec_parser.py"", ""properties"": {""name"": ""openspec_parser.py""}}, {""id"": 4, ""labels"": [""Entity""], ""name"": ""ttl_generator.py"", ""properties"": {""name"": ""ttl_generator.py""}}, {""id"": 5, ""labels"": [""Entity""], ""name"": ""base_parser.py"", ""properties"": {""name"": ""base_parser.py""}}, {""id"": 6, ""labels"": [""Entity""], ""name"": ""parser_factory.py"", ""properties"": {""name"": ""parser_factory.py""}}, {""id"": 7, ""labels"": [""Entity""], ""name"": ""python_parser.py"", ""properties"": {""name"": ""python_parser.py""}}, {""id"": 8, ""labels"": [""Entity""], ""name"": ""pytest"", ""properties"": {""name"": ""pytest""}}], ""edges"": [[""Bash包装脚本"", ""IS_A"", ""CodeComponent""], [""openspec_parser.py"", ""IS_A"", ""CodeComponent""], [""ttl_generator.py"", ""IS_A"", ""CodeComponent""], [""base_parser.py"", ""IS_A"", ""CodeComponent""], [""parser_factory.py"", ""IS_A"", ""CodeComponent""], [""python_parser.py"", ""IS_A"", ""CodeComponent""], [""pytest"", ""IS_A"", ""CodeComponent""]], ""metadata"": {""num_nodes"": 8, ""num_edges"": 7}}
+根据上述图网络的相关信息，按照前面的规则直接回答用户的问题：
+假设该图是一个二分图，使用匈牙利算法找出最大匹配数。",<<<{'max_matching': 0}>>>

@@ -1,0 +1,27 @@
+{
+  "description": "Auto-inject ontology context and enforce impact checks",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "You are a routing hook for code-ontology retrieval. If the user request involves code change, architecture, debugging, or references files/classes/functions/modules, require calling the MCP tool `lookup_code_context` from the ontology-devos server before answering. If the user explicitly asks not to query, or the request is purely non-technical, do not request a tool call. Return ONLY a JSON object: {\"systemMessage\": \"...\", \"hookSpecificOutput\": {\"permissionDecision\": \"allow\"}}. If no tool is needed, return {\"systemMessage\": \"\", \"hookSpecificOutput\": {\"permissionDecision\": \"allow\"}}."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "You are a guard hook before code writes. If the target file is NOT markdown/text (e.g., not .md/.markdown/.txt), ensure an impact analysis has been done in the recent assistant output (look for tool call `check_modification_impact` or an explicit 'Impact Analysis:' summary). If missing, return JSON with {\"hookSpecificOutput\": {\"permissionDecision\": \"ask\"}, \"systemMessage\": \"Run check_modification_impact with the file path(s) before writing. Summarize the impact and then retry.\"}. Otherwise allow. Return ONLY a JSON object."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+[project]
+name = "ontology-devos-mcp"
+version = "0.1.0"
+description = "MCP server for code ontology retrieval"
+requires-python = ">=3.10"
+dependencies = [
+  "mcp>=0.2.0",
+  "pydantic>=2.0",
+  "neo4j>=5.0",
+  "openai>=1.0.0",
+  "numpy>=1.24.0"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

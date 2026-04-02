@@ -1,0 +1,140 @@
+# CTIO — 四大红线 SHACL 规则
+# 规则说明：
+#   红线1: 账户直联率 IND-BA-002 currentValue < 0.95 → CRITICAL
+#   红线2: 全口径资金集中率 IND-CC-001 currentValue < 0.95 → CRITICAL
+#   红线3: 可归集资金集中率 IND-CC-002 currentValue < 0.85 → CRITICAL
+#   红线4: 结算直联率 IND-ST-001 currentValue < 0.95 → CRITICAL
+
+@prefix ctio:  <https://drp.example.com/ontology/ctio/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+# ══════════════════════════════════════════════
+# 红线1: 账户直联率 ≥ 95%（IND-BA-002）
+# ══════════════════════════════════════════════
+
+ctio:AccountDirectLinkageRateShape a sh:NodeShape ;
+    sh:targetClass ctio:RegulatoryIndicator ;
+    sh:name "账户直联率红线校验"@zh ;
+    rdfs:comment "IND-BA-002: 直联账户数/总账户数 必须 ≥ 0.95，否则生成CRITICAL风险事件。"@zh ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "红线违规：账户直联率（IND-BA-002）低于阈值 0.95，请立即提升银企直联覆盖率。"@zh ;
+        sh:severity sh:Violation ;
+        sh:select """
+            PREFIX ctio: <https://drp.example.com/ontology/ctio/>
+            SELECT $this
+            WHERE {
+                $this ctio:indicatorId "IND-BA-002" ;
+                      ctio:currentValue ?currentValue .
+                FILTER (?currentValue < 0.95)
+            }
+        """ ;
+    ] .
+
+# ══════════════════════════════════════════════
+# 红线2: 全口径资金集中率 ≥ 95%（IND-CC-001）
+# ══════════════════════════════════════════════
+
+ctio:FullScopeConcentrationRateShape a sh:NodeShape ;
+    sh:targetClass ctio:RegulatoryIndicator ;
+    sh:name "全口径资金集中率红线校验"@zh ;
+    rdfs:comment "IND-CC-001: 归集账户余额/集团全部账户余额 必须 ≥ 0.95"@zh ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "红线违规：全口径资金集中率（IND-CC-001）低于阈值 0.95。"@zh ;
+        sh:severity sh:Violation ;
+        sh:select """
+            PREFIX ctio: <https://drp.example.com/ontology/ctio/>
+            SELECT $this
+            WHERE {
+                $this ctio:indicatorId "IND-CC-001" ;
+                      ctio:currentValue ?currentValue .
+                FILTER (?currentValue < 0.95)
+            }
+        """ ;
+    ] .
+
+# ══════════════════════════════════════════════
+# 红线3: 可归集资金集中率 ≥ 85%（IND-CC-002）
+# ══════════════════════════════════════════════
+
+ctio:PoolableConcentrationRateShape a sh:NodeShape ;
+    sh:targetClass ctio:RegulatoryIndicator ;
+    sh:name "可归集资金集中率红线校验"@zh ;
+    rdfs:comment "IND-CC-002: 归集余额/（全部余额−受限余额） 必须 ≥ 0.85"@zh ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "红线违规：可归集资金集中率（IND-CC-002）低于阈值 0.85。"@zh ;
+        sh:severity sh:Violation ;
+        sh:select """
+            PREFIX ctio: <https://drp.example.com/ontology/ctio/>
+            SELECT $this
+            WHERE {
+                $this ctio:indicatorId "IND-CC-002" ;
+                      ctio:currentValue ?currentValue .
+                FILTER (?currentValue < 0.85)
+            }
+        """ ;
+    ] .
+
+# ══════════════════════════════════════════════
+# 红线4: 结算直联率 ≥ 95%（IND-ST-001）
+# ══════════════════════════════════════════════
+
+ctio:SettlementDirectLinkageRateShape a sh:NodeShape ;
+    sh:targetClass ctio:RegulatoryIndicator ;
+    sh:name "结算直联率红线校验"@zh ;
+    rdfs:comment "IND-ST-001: 持U-Key且直联的结算账户数/总结算账户数 必须 ≥ 0.95"@zh ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "红线违规：结算直联率（IND-ST-001）低于阈值 0.95。"@zh ;
+        sh:severity sh:Violation ;
+        sh:select """
+            PREFIX ctio: <https://drp.example.com/ontology/ctio/>
+            SELECT $this
+            WHERE {
+                $this ctio:indicatorId "IND-ST-001" ;
+                      ctio:currentValue ?currentValue .
+                FILTER (?currentValue < 0.95)
+            }
+        """ ;
+    ] .
+
+# ══════════════════════════════════════════════
+# 6311还款状态枚举校验
+# ══════════════════════════════════════════════
+
+ctio:RepaymentStatusShape a sh:NodeShape ;
+    sh:targetClass ctio:RepaymentMilestone ;
+    sh:name "6311还款状态枚举校验"@zh ;
+    sh:property [
+        sh:path ctio:repaymentStatus6311 ;
+        sh:in ("PlanDefined"^^xsd:string "FundingSourced"^^xsd:string "CashReserved"^^xsd:string "AccountCleared"^^xsd:string) ;
+        sh:message "6311还款状态值非法，必须为: PlanDefined | FundingSourced | CashReserved | AccountCleared"@zh ;
+        sh:severity sh:Violation ;
+    ] .
+
+# ══════════════════════════════════════════════
+# 票据背书链深度警告（深度 > 20 触发 WARN）
+# ══════════════════════════════════════════════
+
+ctio:EndorsementChainDepthShape a sh:NodeShape ;
+    sh:targetClass ctio:EndorsementChain ;
+    sh:name "票据背书链深度校验"@zh ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "票据背书链深度超过20层，触发风险预警，请检查该链的背书节点数。"@zh ;
+        sh:severity sh:Warning ;
+        sh:select """
+            PREFIX ctio: <https://drp.example.com/ontology/ctio/>
+            PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            SELECT $this (COUNT(?step) AS ?depth)
+            WHERE {
+                $this rdf:rest*/rdf:first ?step .
+            }
+            GROUP BY $this
+            HAVING (COUNT(?step) > 20)
+        """ ;
+    ] .
