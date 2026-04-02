@@ -1,0 +1,235 @@
+# CTIO — China Treasury Intelligence Ontology
+# 版本: 1.0.0  基于 FIBO 最小裁剪集扩展（见 design.md 决策6、决策12）
+# IRI 约定: https://drp.example.com/ontology/ctio/
+
+@prefix ctio:      <https://drp.example.com/ontology/ctio/> .
+@prefix owl:       <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:       <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:      <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms:   <http://purl.org/dc/terms/> .
+
+# ── FIBO 最小裁剪集前缀（FIBO 未加载时，类仍可作为 IRI 引用）──
+@prefix fibo-fbc-fas-fca: <https://spec.edmcouncil.org/fibo/ontology/FBC/FunctionalEntities/FinancialServicesEntities/> .
+@prefix fibo-be-le-lp:    <https://spec.edmcouncil.org/fibo/ontology/BE/LegalEntities/LegalPersons/> .
+@prefix fibo-fnd-acc-cur: <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/> .
+
+# ══════════════════════════════════════════════
+# 本体元数据
+# ══════════════════════════════════════════════
+
+ctio: a owl:Ontology ;
+    dcterms:title "China Treasury Intelligence Ontology" ;
+    dcterms:description "面向中国央企资金监管的 FIBO 扩展本体，覆盖银企直联、资金池、6311还款、SHACL风险推理等中国特色监管语义。" ;
+    owl:versionInfo "1.0.0" ;
+    dcterms:created "2026-04-02"^^xsd:date .
+
+# ══════════════════════════════════════════════
+# 核心扩展类（共8个，全部通过 rdfs:subClassOf 挂载到 FIBO）
+# ══════════════════════════════════════════════
+
+# 1. 银企直联账户（可通过 API 实时取数的账户）
+ctio:DirectLinkedAccount a owl:Class ;
+    rdfs:subClassOf fibo-fbc-fas-fca:DepositAccount ;
+    rdfs:label "银企直联账户"@zh , "Direct Linked Account"@en ;
+    skos:definition "通过银企直联系统与企业 ERP/TMS 实时对接的银行账户，可获取实时余额和交易流水。" ;
+    rdfs:comment "指标计算中：直联账户数/总账户数 = 账户直联率，目标 ≥95%。" .
+
+# 2. 内部存款账户（集团内部资金归集账户）
+ctio:InternalDepositAccount a owl:Class ;
+    rdfs:subClassOf fibo-fbc-fas-fca:DepositAccount ;
+    rdfs:label "内部存款账户"@zh , "Internal Deposit Account"@en ;
+    skos:definition "用于集团内部资金归集和调拨的银行存款账户，通常为资金池的成员账户。" .
+
+# 3. 结算安全介质（U-Key 或印鉴管理）
+ctio:ControlToken a owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "结算安全介质"@zh , "Control Token"@en ;
+    skos:definition "用于授权银行账户结算操作的安全介质，包括 U-Key（USB密钥）和印鉴（印章/签章）。" ;
+    rdfs:comment "SHACL 规则：结算直联率 = 持有 U-Key 且直联的账户数/总结算账户数，目标 ≥95%。" .
+
+# 4. 资金池（集团资金归集结构）
+ctio:CashPool a owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "资金池"@zh , "Cash Pool"@en ;
+    skos:definition "集团资金归集管理结构，包含一个主账户（归集账户）和多个成员账户，支持实体资金池和虚拟资金池两种模式。" .
+
+# 5. 6311还款里程碑（债务偿还状态机）
+ctio:RepaymentMilestone a owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "6311还款里程碑"@zh , "6311 Repayment Milestone"@en ;
+    skos:definition "国资委6311政策要求的债务偿还里程碑节点，定义了从还款计划制定到账户清零的四个状态阶段。" ;
+    rdfs:comment "状态机: PlanDefined → FundingSourced → CashReserved → AccountCleared" .
+
+# 6. 风险事件（SHACL推理产物）
+ctio:RiskEvent a owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "风险事件"@zh , "Risk Event"@en ;
+    skos:definition "由 SHACL 校验器在监管指标违规时自动生成的风险事件实例，包含严重等级、触发原因和关联实体信息。" .
+
+# 7. 监管指标（国资委106项指标本体实例）
+ctio:RegulatoryIndicator a owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "监管指标"@zh , "Regulatory Indicator"@en ;
+    skos:definition "国资委发布的资金监管指标，以本体实例形式存储在图谱中，支持从指标节点出发的三级穿透溯源。" ;
+    rdfs:comment "存储在图谱而非关系库（见 design.md 决策5），确保穿透路径不断裂。" .
+
+# 8. 票据背书链
+ctio:EndorsementChain a owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "票据背书链"@zh , "Endorsement Chain"@en ;
+    skos:definition "记录票据从出票到到期全生命周期背书转让路径的有序链式结构。" ;
+    rdfs:comment "SHACL 校验：背书链最大深度50，超过20层触发 WARN 级别 RiskEvent。" .
+
+# ══════════════════════════════════════════════
+# 核心扩展属性（共6个）
+# ══════════════════════════════════════════════
+
+# 1. 账户受限标志（冻结/质押/共管）
+ctio:isRestricted a owl:DatatypeProperty ;
+    rdfs:domain fibo-fbc-fas-fca:DepositAccount ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label  "受限标志"@zh , "Is Restricted"@en ;
+    skos:definition "标识账户是否处于冻结、质押或共管等受限状态。受限账户余额不计入可归集集中率分母。" .
+
+# 2. 银企直联标志
+ctio:isDirectLinked a owl:DatatypeProperty ;
+    rdfs:domain fibo-fbc-fas-fca:DepositAccount ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label  "直联标志"@zh , "Is Direct Linked"@en ;
+    skos:definition "标识账户是否已接入银企直联系统，可实时获取余额和流水。" .
+
+# 3. 6311还款状态（枚举）
+# 注意: 属性名以 repaymentStatus6311 命名，避免 Turtle PN_LOCAL 不允许数字开头的限制
+ctio:repaymentStatus6311 a owl:DatatypeProperty ;
+    rdfs:domain ctio:RepaymentMilestone ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "6311还款状态"@zh , "6311 Repayment Status"@en ;
+    skos:definition "6311还款里程碑的当前状态。合法值：PlanDefined | FundingSourced | CashReserved | AccountCleared" ;
+    rdfs:comment "SHACL 约束：值必须在上述四个合法枚举中，否则生成违规报告。" .
+
+# 4. U-Key 状态
+ctio:hasUKeyStatus a owl:ObjectProperty ;
+    rdfs:domain fibo-fbc-fas-fca:DepositAccount ;
+    rdfs:range  ctio:ControlToken ;
+    rdfs:label  "U-Key状态"@zh , "Has UKey Status"@en ;
+    skos:definition "账户关联的 U-Key（USB密钥）安全介质状态，用于结算直联率计算。" .
+
+# 5. 归属细分（法人分部归属）
+ctio:belongsToSegment a owl:ObjectProperty ;
+    rdfs:domain fibo-fbc-fas-fca:DepositAccount ;
+    rdfs:range  fibo-be-le-lp:LegalPerson ;
+    rdfs:label  "归属细分"@zh , "Belongs To Segment"@en ;
+    skos:definition "账户所属的法人实体或业务细分单元，用于集团穿透监管中的归属定位。" .
+
+# 6. 资金池归属
+ctio:inCashPool a owl:ObjectProperty ;
+    rdfs:domain ctio:InternalDepositAccount ;
+    rdfs:range  ctio:CashPool ;
+    rdfs:label  "资金池归属"@zh , "In Cash Pool"@en ;
+    skos:definition "标识内部存款账户所属的资金池归集结构。" .
+
+# ══════════════════════════════════════════════
+# RiskEvent 属性（用于 SHACL 生成事件实例）
+# ══════════════════════════════════════════════
+
+ctio:riskLevel a owl:DatatypeProperty ;
+    rdfs:domain ctio:RiskEvent ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "风险等级"@zh ;
+    rdfs:comment "合法值：CRITICAL | WARN | INFO" .
+
+ctio:riskDescription a owl:DatatypeProperty ;
+    rdfs:domain ctio:RiskEvent ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "风险描述"@zh .
+
+ctio:triggeredAt a owl:DatatypeProperty ;
+    rdfs:domain ctio:RiskEvent ;
+    rdfs:range  xsd:dateTime ;
+    rdfs:label  "触发时间"@zh .
+
+ctio:triggeredByRun a owl:DatatypeProperty ;
+    rdfs:domain ctio:RiskEvent ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "触发批次"@zh ;
+    rdfs:comment "关联到 etl_job.run_id，见 design.md 决策13" .
+
+ctio:asOfTime a owl:DatatypeProperty ;
+    rdfs:domain ctio:RiskEvent ;
+    rdfs:range  xsd:dateTime ;
+    rdfs:label  "数据快照时间"@zh .
+
+ctio:evidenceValue a owl:DatatypeProperty ;
+    rdfs:domain ctio:RiskEvent ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "违规时指标值"@zh .
+
+ctio:thresholdValue a owl:DatatypeProperty ;
+    rdfs:domain ctio:RiskEvent ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "对应阈值"@zh .
+
+ctio:affectedIndicator a owl:ObjectProperty ;
+    rdfs:domain ctio:RiskEvent ;
+    rdfs:range  ctio:RegulatoryIndicator ;
+    rdfs:label  "关联指标"@zh .
+
+# ══════════════════════════════════════════════
+# RegulatoryIndicator 属性
+# ══════════════════════════════════════════════
+
+ctio:indicatorId a owl:DatatypeProperty ;
+    rdfs:domain ctio:RegulatoryIndicator ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "指标编号"@zh .
+
+ctio:indicatorName a owl:DatatypeProperty ;
+    rdfs:domain ctio:RegulatoryIndicator ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "指标名称"@zh .
+
+ctio:businessDomain a owl:DatatypeProperty ;
+    rdfs:domain ctio:RegulatoryIndicator ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "业务域"@zh ;
+    rdfs:comment "合法值：银行账户监管域|资金集中监管域|结算监管域|票据监管域|债务融资监管域|决策风险域|国资委考核域" .
+
+ctio:targetValue a owl:DatatypeProperty ;
+    rdfs:domain ctio:RegulatoryIndicator ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "目标值"@zh .
+
+ctio:warnThreshold a owl:DatatypeProperty ;
+    rdfs:domain ctio:RegulatoryIndicator ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "预警阈值"@zh .
+
+ctio:currentValue a owl:DatatypeProperty ;
+    rdfs:domain ctio:RegulatoryIndicator ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "当前计算值"@zh .
+
+ctio:lastCalculatedAt a owl:DatatypeProperty ;
+    rdfs:domain ctio:RegulatoryIndicator ;
+    rdfs:range  xsd:dateTime ;
+    rdfs:label  "最近计算时间"@zh .
+
+ctio:calculationStatus a owl:DatatypeProperty ;
+    rdfs:domain ctio:RegulatoryIndicator ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "计算状态"@zh ;
+    rdfs:comment "合法值：OK | COMPUTATION_ERROR | DATA_INCOMPLETE | PARTIAL_REFRESH" .
+
+ctio:sparqlRef a owl:DatatypeProperty ;
+    rdfs:domain ctio:RegulatoryIndicator ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "SPARQL查询引用"@zh ;
+    rdfs:comment "关联到指标计算引擎中对应的 SPARQL 语句 ID" .
+
+ctio:dataQualityIssue a owl:DatatypeProperty ;
+    rdfs:domain owl:Thing ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label  "数据质量问题"@zh ;
+    rdfs:comment "ETL 写入后 SHACL 完整性校验失败时标记为 true" .
