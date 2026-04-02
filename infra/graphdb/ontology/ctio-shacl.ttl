@@ -22,7 +22,6 @@ ctio:AccountDirectLinkageRateShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "红线违规：账户直联率（IND-BA-002）低于阈值 0.95，请立即提升银企直联覆盖率。"@zh ;
         sh:severity sh:Violation ;
-        sh:prefixes ctio: ;
         sh:select """
             PREFIX ctio: <https://drp.example.com/ontology/ctio/>
             SELECT $this
@@ -46,7 +45,6 @@ ctio:FullScopeConcentrationRateShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "红线违规：全口径资金集中率（IND-CC-001）低于阈值 0.95。"@zh ;
         sh:severity sh:Violation ;
-        sh:prefixes ctio: ;
         sh:select """
             PREFIX ctio: <https://drp.example.com/ontology/ctio/>
             SELECT $this
@@ -70,7 +68,6 @@ ctio:PoolableConcentrationRateShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "红线违规：可归集资金集中率（IND-CC-002）低于阈值 0.85。"@zh ;
         sh:severity sh:Violation ;
-        sh:prefixes ctio: ;
         sh:select """
             PREFIX ctio: <https://drp.example.com/ontology/ctio/>
             SELECT $this
@@ -94,7 +91,6 @@ ctio:SettlementDirectLinkageRateShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "红线违规：结算直联率（IND-ST-001）低于阈值 0.95。"@zh ;
         sh:severity sh:Violation ;
-        sh:prefixes ctio: ;
         sh:select """
             PREFIX ctio: <https://drp.example.com/ontology/ctio/>
             SELECT $this
@@ -131,7 +127,6 @@ ctio:EndorsementChainDepthShape a sh:NodeShape ;
         a sh:SPARQLConstraint ;
         sh:message "票据背书链深度超过20层，触发风险预警，请检查该链的背书节点数。"@zh ;
         sh:severity sh:Warning ;
-        sh:prefixes ctio: ;
         sh:select """
             PREFIX ctio: <https://drp.example.com/ontology/ctio/>
             PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
