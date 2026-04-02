@@ -1,0 +1,208 @@
+/* 表单向导基础样式（已完成） */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.app-header {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.app-header h1 {
+  font-size: 24px;
+  color: #1a1a1a;
+}
+
+.app-main {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 步骤指示器 */
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 32px;
+  gap: 8px;
+}
+
+.step-indicator__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-indicator__dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  border: 2px solid #ddd;
+  color: #999;
+  background: white;
+}
+
+.step-indicator__dot--active {
+  border-color: #1677ff;
+  color: white;
+  background: #1677ff;
+}
+
+.step-indicator__dot--completed {
+  border-color: #52c41a;
+  color: white;
+  background: #52c41a;
+}
+
+.step-indicator__line {
+  width: 40px;
+  height: 2px;
+  background: #ddd;
+}
+
+.step-indicator__line--active {
+  background: #1677ff;
+}
+
+/* 表单字段 */
+.form-field {
+  margin-bottom: 20px;
+}
+
+.form-field__label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-field__required {
+  color: #ff4d4f;
+}
+
+.form-field__input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.form-field__input:focus {
+  outline: none;
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+}
+
+.form-field--error .form-field__input {
+  border-color: #ff4d4f;
+}
+
+.form-field__error {
+  display: block;
+  font-size: 12px;
+  color: #ff4d4f;
+  margin-top: 4px;
+}
+
+/* 按钮 */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 32px;
+  gap: 12px;
+}
+
+.btn {
+  padding: 8px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.btn--primary {
+  background: #1677ff;
+  color: white;
+}
+
+.btn--primary:hover {
+  background: #4096ff;
+}
+
+.btn--secondary {
+  background: white;
+  color: #666;
+  border-color: #d9d9d9;
+}
+
+.btn--secondary:hover {
+  color: #1677ff;
+  border-color: #1677ff;
+}
+
+.btn--danger {
+  background: white;
+  color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+/* 汇总展示 */
+.summary {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.summary__section {
+  margin-bottom: 16px;
+}
+
+.summary__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.summary__item {
+  display: flex;
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+.summary__label {
+  width: 80px;
+  color: #999;
+  flex-shrink: 0;
+}
+
+.summary__value {
+  color: #333;
+}

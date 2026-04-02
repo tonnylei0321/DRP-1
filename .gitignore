@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+log/
+
+# Temporary files
+*.tmp
+*.temp
+*.pyc
+
+# Git worktrees (project-local)
+.worktrees/
+
+# Claude Code cache
+.claude/tsc-cache/
+
+# Local settings (personal overrides)
+.claude/
+docs/ontology/code_docs/
+ppt_assets/
+openclaw-migrate-2026-03-04.tar.gz
+rag-system/

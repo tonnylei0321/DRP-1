@@ -1,0 +1,906 @@
+<?xml version="1.0" ?>
+<DesignDocument version="1.0" encoding="UTF-8">
+  <Metadata>
+    <Title>AI Coding 脚手架详细设计文档</Title>
+    <Description>本文档描述 ontologyDevOS 项目作为 AI Coding 脚手架的整体架构设计。 ontologyDevOS 是 Claude Code 开发环境的配置源项目，用户克隆后运行安装脚本即可初始化一致的多 AI 协同开发环境。</Description>
+    <Author>AI Coding Team</Author>
+    <Version>1.0</Version>
+    <DocNumber>AICODE-DESIGN-001</DocNumber>
+    <CreatedDate>2026-02-27</CreatedDate>
+    <ModifiedDate>2026-02-27</ModifiedDate>
+  </Metadata>
+  <Sections>
+    <Section number="1" level="2">
+      <Title>概述</Title>
+      <Subsections>
+        <Section number="1.1" level="3">
+          <Title>目的</Title>
+          <Content>
+            <Paragraph>本文档详细描述 ontologyDevOS 项目的系统架构和技术设计，旨在为开发团队提供 AI Coding 脚手架的完整设计参考。</Paragraph>
+            <Paragraph>ontologyDevOS 的核心目标是将 Claude Code 从单一 AI 编码工具升级为**多 AI 协同开发平台**，通过标准化的配置模板实现：</Paragraph>
+            <Paragraph>- 一键初始化：新环境克隆项目后运行脚本即可完成全部配置</Paragraph>
+            <Paragraph>- 多 AI 协同：Claude（主体决策）+ Codex（后端顾问）+ Gemini（前端主力）</Paragraph>
+            <Paragraph>- 规范驱动：OpenSpec 提供规范骨架，Superpowers 提供执行方法论</Paragraph>
+            <Paragraph>- 质量保障：多 AI 交叉验证 + 技能驱动的开发流程</Paragraph>
+          </Content>
+        </Section>
+        <Section number="1.2" level="3">
+          <Title>阅读对象</Title>
+          <Tables>
+            <Table>
+              <Row>
+                <Cell>角色</Cell>
+                <Cell>关注内容</Cell>
+              </Row>
+              <Row>
+                <Cell>AI 开发工程师</Cell>
+                <Cell>整体架构、技能系统、工作流配置</Cell>
+              </Row>
+              <Row>
+                <Cell>DevOps 工程师</Cell>
+                <Cell>安装脚本、部署设计、配置一致性</Cell>
+              </Row>
+              <Row>
+                <Cell>技能开发者</Cell>
+                <Cell>技能系统、钩子系统、子代理设计</Cell>
+              </Row>
+              <Row>
+                <Cell>项目管理者</Cell>
+                <Cell>概述、整体设计、工作流引擎</Cell>
+              </Row>
+            </Table>
+          </Tables>
+        </Section>
+        <Section number="1.3" level="3">
+          <Title>设计原则与前提</Title>
+          <Content>
+            <Paragraph>**设计原则：**</Paragraph>
+            <Paragraph>- 规范先行，实现在后 — 所有功能变更必须先通过 OpenSpec 提案</Paragraph>
+            <Paragraph>- 主体思考原则 — Claude Code 是主体决策者，Codex/Gemini 是辅助工具</Paragraph>
+            <Paragraph>- 配置即代码 — 所有配置通过 git 版本控制，脚本自动部署</Paragraph>
+            <Paragraph>- 最小权限 — 工具调用遵循只读优先，需要写入时明确授权</Paragraph>
+            <Paragraph>**前提条件：**</Paragraph>
+            <Paragraph>- 运行环境需要 Node.js 18+、Python 3.10+</Paragraph>
+            <Paragraph>- 需要有效的 Claude Code、OpenAI (Codex)、Google (Gemini) API 密钥</Paragraph>
+            <Paragraph>- 目标项目使用 git 进行版本控制</Paragraph>
+          </Content>
+        </Section>
+        <Section number="1.4" level="3">
+          <Title>相关资料</Title>
+          <Tables>
+            <Table>
+              <Row>
+                <Cell>资料</Cell>
+                <Cell>说明</Cell>
+              </Row>
+              <Row>
+                <Cell>Claude Code 官方文档</Cell>
+                <Cell>Claude Code CLI 功能和配置参考</Cell>
+              </Row>
+              <Row>
+                <Cell>OpenSpec 规范</Cell>
+                <Cell>规范驱动开发方法论</Cell>
+              </Row>
+              <Row>
+                <Cell>Superpowers 插件</Cell>
+                <Cell>开发方法论技能体系</Cell>
+              </Row>
+              <Row>
+                <Cell>design-template/xxx微服务详细设计参考模板-v1.6.docx</Cell>
+                <Cell>企业文档模板</Cell>
+              </Row>
+            </Table>
+          </Tables>
+        </Section>
+        <Section number="1.5" level="3">
+          <Title>名词解释</Title>
+          <Tables>
+            <Table>
+              <Row>
+                <Cell>术语</Cell>
+                <Cell>说明</Cell>
+              </Row>
+              <Row>
+                <Cell>Claude Code</Cell>
+                <Cell>Anthropic 提供的 AI 编码 CLI 工具</Cell>
+              </Row>
+              <Row>
+                <Cell>MCP</Cell>
+                <Cell>Model Context Protocol，AI 模型与外部工具的通信协议</Cell>
+              </Row>
+              <Row>
+                <Cell>OpenSpec</Cell>
+                <Cell>规范驱动开发方法论，通过提案-实现-归档流程管理变更</Cell>
+              </Row>
+              <Row>
+                <Cell>Superpowers</Cell>
+                <Cell>Claude Code 的方法论插件，提供 14 个开发技能</Cell>
+              </Row>
+              <Row>
+                <Cell>Codex</Cell>
+                <Cell>OpenAI 的编码模型，通过 MCP 接入作为后端技术顾问</Cell>
+              </Row>
+              <Row>
+                <Cell>Gemini</Cell>
+                <Cell>Google 的多模态模型，通过 MCP 接入作为前端开发主力</Cell>
+              </Row>
+              <Row>
+                <Cell>技能 (Skill)</Cell>
+                <Cell>Claude Code 的可复用指令模板，定义特定领域的行为规范</Cell>
+              </Row>
+              <Row>
+                <Cell>钩子 (Hook)</Cell>
+                <Cell>在特定事件触发时自动执行的脚本</Cell>
+              </Row>
+              <Row>
+                <Cell>子代理 (Agent)</Cell>
+                <Cell>专业化的 AI 代理，通过 Task 工具在隔离环境中执行任务</Cell>
+              </Row>
+            </Table>
+          </Tables>
+        </Section>
+      </Subsections>
+    </Section>
+    <Section number="2" level="2">
+      <Title>整体设计</Title>
+      <Subsections>
+        <Section number="2.1" level="3">
+          <Title>系统定义与定位</Title>
+          <Content>
+            <Paragraph>ontologyDevOS 是一个 AI Coding 脚手架项目，作为 Claude Code 开发环境的**配置源和分发中心**。它不是一个运行时应用，而是一组配置模板和安装脚本的集合。</Paragraph>
+            <Paragraph>**部署链路：**</Paragraph>
+          </Content>
+          <CodeBlocks>
+            <CodeBlock language="text">ontologyDevOS (git 源项目)
+    │
+    ├── 运行 setup-global.sh ──→ ~/.claude/ (全局配置)
+    │                              ├── CLAUDE.md (全局规则)
+    │                              ├── hooks/ (全局钩子)
+    │                              └── config-templates/ → 指向本项目
+    │
+    └── 运行 setup-claude-config.sh &lt;项目路径&gt; ──→ 目标项目/.claude/ (项目配置)
+                                                    ├── skills/ (项目技能)
+                                                    ├── hooks/ (项目钩子)
+                                                    ├── agents/ (子代理)
+                                                    ├── commands/ (斜杠命令)
+                                                    └── settings.json (权限/钩子)</CodeBlock>
+          </CodeBlocks>
+        </Section>
+        <Section number="2.2" level="3">
+          <Title>与其他系统的关系</Title>
+          <Content>
+            <Paragraph>本系统通过 MCP 协议与外部 AI 系统集成，形成多 AI 协同开发架构：</Paragraph>
+            <Paragraph>**协同流程：**</Paragraph>
+            <Paragraph>**MCP 接入方式（通过 .mcp.json 配置）：**</Paragraph>
+            <Paragraph>- Codex：codex mcp-server（默认只读沙箱）</Paragraph>
+            <Paragraph>- Gemini：npx -y gemini-mcp-tool（只读分析）</Paragraph>
+            <Paragraph>- ontology-devos：自定义 Python MCP 服务（代码知识图谱）</Paragraph>
+          </Content>
+          <CodeBlocks>
+            <CodeBlock language="text">                    ┌─────────────────────────┐
+                    │     Claude Code (你)      │
+                    │   主体思考者 &amp; 决策者      │
+                    │   后端开发主力            │
+                    └─────────┬───────────────┘
+                              │
+              ┌───────────────┼───────────────┐
+              ▼               ▼               ▼
+    ┌─────────────┐  ┌──────────────┐  ┌──────────────┐
+    │  Codex MCP  │  │ Gemini MCP   │  │ 子代理 (Task) │
+    │  后端顾问    │  │ 前端主力     │  │ 专业化任务     │
+    │  交叉审查    │  │ 大规模分析   │  │ 并行执行       │
+    └─────────────┘  └──────────────┘  └──────────────┘</CodeBlock>
+          </CodeBlocks>
+          <Tables>
+            <Table>
+              <Row>
+                <Cell>场景</Cell>
+                <Cell>流程</Cell>
+              </Row>
+              <Row>
+                <Cell>后端开发</Cell>
+                <Cell>Claude 实现 → Claude 自检 → Codex 交叉检查 → Claude 修复</Cell>
+              </Row>
+              <Row>
+                <Cell>前端开发</Cell>
+                <Cell>Claude 设计 → Gemini 实现 → Claude 审查 → 修正</Cell>
+              </Row>
+              <Row>
+                <Cell>复杂分析</Cell>
+                <Cell>Claude 初步分析 → Codex 分析 → Gemini 分析 → Claude 综合决策</Cell>
+              </Row>
+            </Table>
+          </Tables>
+        </Section>
+        <Section number="2.3" level="3">
+          <Title>核心业务活动</Title>
+          <Content>
+            <Paragraph>系统的核心业务活动是全局 5 步工作流，贯穿需求到交付的完整生命周期：</Paragraph>
+            <Paragraph>**OpenSpec 与 Superpowers 整合映射：**</Paragraph>
+          </Content>
+          <CodeBlocks>
+            <CodeBlock language="text">Step 1          Step 2              Step 3              Step 4              Step 5
+项目设计文件 → 需求设计            → Spec 提案          → 开发实现          → 验证与完成
+              (brainstorming)      (/openspec:proposal)  (writing-plans     (verification +
+              + 多AI交叉验证                             + TDD执行)         finishing-branch)</CodeBlock>
+          </CodeBlocks>
+          <Tables>
+            <Table>
+              <Row>
+                <Cell>工作流步骤</Cell>
+                <Cell>OpenSpec 输出</Cell>
+                <Cell>Superpowers 技能</Cell>
+              </Row>
+              <Row>
+                <Cell>需求设计</Cell>
+                <Cell>-</Cell>
+                <Cell>brainstorming</Cell>
+              </Row>
+              <Row>
+                <Cell>Spec 提案</Cell>
+                <Cell>proposal.md, tasks.md, spec deltas</Cell>
+                <Cell>/openspec:proposal</Cell>
+              </Row>
+              <Row>
+                <Cell>计划细化</Cell>
+                <Cell>-</Cell>
+                <Cell>writing-plans</Cell>
+              </Row>
+              <Row>
+                <Cell>开发实现</Cell>
+                <Cell>按 tasks.md 执行</Cell>
+                <Cell>subagent-driven-development / TDD</Cell>
+              </Row>
+              <Row>
+                <Cell>代码审查</Cell>
+                <Cell>-</Cell>
+                <Cell>requesting-code-review</Cell>
+              </Row>
+              <Row>
+                <Cell>验证完成</Cell>
+                <Cell>tasks.md 全部 [x]</Cell>
+                <Cell>verification-before-completion</Cell>
+              </Row>
+              <Row>
+                <Cell>分支集成</Cell>
+                <Cell>-</Cell>
+                <Cell>finishing-a-development-branch</Cell>
+              </Row>
+              <Row>
+                <Cell>归档</Cell>
+                <Cell>archive/</Cell>
+                <Cell>/openspec:archive</Cell>
+              </Row>
+            </Table>
+          </Tables>
+        </Section>
+      </Subsections>
+    </Section>
+    <Section number="3" level="2">
+      <Title>详细设计</Title>
+      <Subsections>
+        <Section number="3.1" level="3">
+          <Title>目录结构设计</Title>
+          <CodeBlocks>
+            <CodeBlock language="text">ontologyDevOS/
+├── CLAUDE.md                    # 项目级配置（包含完整工作流定义）
+├── AGENTS.md                    # OpenSpec AI 助手指令
+├── README.md                    # 项目说明
+├── .gitignore                   # .claude/ 目录被 gitignore
+│
+├── setup-global.sh              # 全局环境初始化脚本 (macOS/Linux)
+├── setup-global.ps1             # 全局环境初始化脚本 (Windows)
+├── setup-claude-config.sh       # 项目配置部署脚本 (macOS/Linux)
+├── setup-claude-config.ps1      # 项目配置部署脚本 (Windows)
+│
+├── global/                      # 全局配置模板
+│   ├── CLAUDE.md                # 全局 CLAUDE.md（精简版）
+│   └── codex-skills/            # Codex CLI 技能（14 个 Superpowers 技能）
+│
+├── skills/                      # 项目级技能模板
+│   ├── skill-rules.json         # 技能激活规则
+│   ├── README.md                # 技能说明
+│   ├── git-workflow/            # Git 工作流管理
+│   ├── openspec-workflow/       # OpenSpec 规范驱动开发
+│   ├── python-backend-guidelines/ # Python 后端开发规范
+│   ├── python-error-tracking/   # Sentry 错误追踪
+│   ├── skill-developer/         # 技能开发工具
+│   ├── ppt-generator/           # PPT 素材生成
+│   ├── document-reader/         # Word/Excel 文档读取
+│   └── design-doc-generator/    # 设计文档生成
+│
+├── hooks/                       # 钩子模板
+│   ├── skill-activation-prompt.sh  # 技能激活入口（bash 包装）
+│   ├── skill-activation-prompt.ts  # 技能激活逻辑（TypeScript）
+│   ├── post-tool-use-tracker.sh    # 文件编辑追踪钩子
+│   └── package.json               # 钩子依赖
+│
+├── agents/                      # 子代理模板（11 个专业代理）
+│   ├── auth-route-debugger.md   # 认证路由调试
+│   ├── auth-route-tester.md     # 路由测试
+│   ├── auto-error-resolver.md   # 自动错误修复
+│   ├── code-architecture-reviewer.md # 架构审查
+│   ├── code-refactor-master.md  # 代码重构
+│   ├── documentation-architect.md   # 文档生成
+│   ├── frontend-error-fixer.md  # 前端错误修复
+│   ├── plan-reviewer.md         # 计划审查
+│   ├── refactor-planner.md      # 重构规划
+│   └── web-research-specialist.md   # 网络研究
+│
+├── commands/                    # 斜杠命令模板
+│   └── openspec/
+│       ├── proposal.md          # /openspec:proposal
+│       ├── apply.md             # /openspec:apply
+│       └── archive.md           # /openspec:archive
+│
+├── openspec/                    # OpenSpec 规范目录
+│   ├── AGENTS.md                # OpenSpec AI 指令
+│   ├── project.md               # 项目约定
+│   ├── specs/                   # 当前规范
+│   └── changes/                 # 变更提案
+│
+├── settings.json                # 项目 settings.json 模板
+├── .mcp.json                    # MCP 工具配置模板
+│
+└── docs/                        # 设计文档目录
+    └── plans/                   # 实现计划</CodeBlock>
+          </CodeBlocks>
+        </Section>
+        <Section number="3.2" level="3">
+          <Title>三层配置体系</Title>
+          <Subsections>
+            <Section number="3.2.1" level="4">
+              <Title>全局层</Title>
+              <Content>
+                <Paragraph>由 setup-global.sh 安装，影响所有项目：</Paragraph>
+              </Content>
+              <Tables>
+                <Table>
+                  <Row>
+                    <Cell>组件</Cell>
+                    <Cell>来源</Cell>
+                    <Cell>用途</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>CLAUDE.md</Cell>
+                    <Cell>global/CLAUDE.md</Cell>
+                    <Cell>全局行为规则（精简版）</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>插件</Cell>
+                    <Cell>Marketplace</Cell>
+                    <Cell>claude-mem, superpowers, pyright-lsp 等</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>MCP 工具</Cell>
+                    <Cell>claude mcp add</Cell>
+                    <Cell>Codex, Gemini（全局级）</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>Codex 技能</Cell>
+                    <Cell>global/codex-skills/</Cell>
+                    <Cell>14 个 Superpowers 技能同步到 Codex</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>Gemini 配置</Cell>
+                    <Cell>global/GEMINI.md</Cell>
+                    <Cell>Gemini CLI 角色定义</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>全局钩子</Cell>
+                    <Cell>hooks/</Cell>
+                    <Cell>技能激活等全局钩子</Cell>
+                  </Row>
+                </Table>
+              </Tables>
+            </Section>
+            <Section number="3.2.2" level="4">
+              <Title>项目层</Title>
+              <Content>
+                <Paragraph>由 setup-claude-config.sh 部署，项目级配置：</Paragraph>
+              </Content>
+              <Tables>
+                <Table>
+                  <Row>
+                    <Cell>组件</Cell>
+                    <Cell>来源</Cell>
+                    <Cell>用途</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>skills/</Cell>
+                    <Cell>skills/</Cell>
+                    <Cell>项目技能（可选择性安装）</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>skill-rules.json</Cell>
+                    <Cell>skills/skill-rules.json</Cell>
+                    <Cell>技能激活触发规则</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>hooks/</Cell>
+                    <Cell>hooks/</Cell>
+                    <Cell>项目钩子（技能激活 + 编辑追踪）</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>agents/</Cell>
+                    <Cell>agents/</Cell>
+                    <Cell>11 个专业子代理</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>commands/</Cell>
+                    <Cell>commands/</Cell>
+                    <Cell>OpenSpec 斜杠命令</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>settings.json</Cell>
+                    <Cell>settings.json</Cell>
+                    <Cell>权限、钩子绑定</Cell>
+                  </Row>
+                </Table>
+              </Tables>
+            </Section>
+            <Section number="3.2.3" level="4">
+              <Title>项目根层</Title>
+              <Tables>
+                <Table>
+                  <Row>
+                    <Cell>组件</Cell>
+                    <Cell>用途</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>CLAUDE.md</Cell>
+                    <Cell>完整工作流定义（OpenSpec + Superpowers + 多 AI 协同）</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>.mcp.json</Cell>
+                    <Cell>MCP 工具配置（Codex, Gemini, ontology-devos）</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>openspec/</Cell>
+                    <Cell>规范和变更提案目录</Cell>
+                  </Row>
+                </Table>
+              </Tables>
+            </Section>
+          </Subsections>
+        </Section>
+        <Section number="3.3" level="3">
+          <Title>技能系统设计</Title>
+          <Subsections>
+            <Section number="3.3.1" level="4">
+              <Title>技能激活机制</Title>
+              <CodeBlocks>
+                <CodeBlock language="text">用户输入 → UserPromptSubmit 钩子
+              │
+              ▼
+    skill-activation-prompt.ts
+              │
+              ├── 读取 skill-rules.json
+              ├── 关键词匹配 (keywords)
+              ├── 意图模式匹配 (intentPatterns)
+              │
+              ▼
+    输出激活建议 → Claude 使用 Skill 工具调用</CodeBlock>
+              </CodeBlocks>
+            </Section>
+            <Section number="3.3.2" level="4">
+              <Title>项目技能</Title>
+              <Tables>
+                <Table>
+                  <Row>
+                    <Cell>技能</Cell>
+                    <Cell>类型</Cell>
+                    <Cell>用途</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>git-workflow</Cell>
+                    <Cell>domain</Cell>
+                    <Cell>Git 分支管理、提交规范</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>openspec-workflow</Cell>
+                    <Cell>domain</Cell>
+                    <Cell>规范驱动开发流程</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>python-backend-guidelines</Cell>
+                    <Cell>domain</Cell>
+                    <Cell>Python 后端开发规范</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>python-error-tracking</Cell>
+                    <Cell>domain</Cell>
+                    <Cell>Sentry 错误追踪集成</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>skill-developer</Cell>
+                    <Cell>domain</Cell>
+                    <Cell>技能创建和管理工具</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>ppt-generator</Cell>
+                    <Cell>domain</Cell>
+                    <Cell>PPT 素材生成（SVG + 文案）</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>document-reader</Cell>
+                    <Cell>domain</Cell>
+                    <Cell>Word/Excel 文档读取</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>design-doc-generator</Cell>
+                    <Cell>domain</Cell>
+                    <Cell>Markdown 转企业标准 Word/XML</Cell>
+                  </Row>
+                </Table>
+              </Tables>
+            </Section>
+            <Section number="3.3.3" level="4">
+              <Title>Superpowers 插件技能</Title>
+              <Content>
+                <Paragraph>通过 Marketplace 安装，提供完整的开发方法论：</Paragraph>
+              </Content>
+              <Tables>
+                <Table>
+                  <Row>
+                    <Cell>技能</Cell>
+                    <Cell>场景</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>brainstorming</Cell>
+                    <Cell>需求探索与设计</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>writing-plans</Cell>
+                    <Cell>实现计划编写</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>test-driven-development</Cell>
+                    <Cell>RED-GREEN-REFACTOR</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>subagent-driven-development</Cell>
+                    <Cell>子代理并行开发</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>executing-plans</Cell>
+                    <Cell>分批执行计划</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>dispatching-parallel-agents</Cell>
+                    <Cell>独立任务并行</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>requesting-code-review</Cell>
+                    <Cell>请求代码审查</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>receiving-code-review</Cell>
+                    <Cell>接收审查反馈</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>verification-before-completion</Cell>
+                    <Cell>完成前验证</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>finishing-a-development-branch</Cell>
+                    <Cell>分支集成</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>systematic-debugging</Cell>
+                    <Cell>系统化调试</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>using-git-worktrees</Cell>
+                    <Cell>Git 工作树隔离</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>using-superpowers</Cell>
+                    <Cell>技能使用引导</Cell>
+                  </Row>
+                  <Row>
+                    <Cell>writing-skills</Cell>
+                    <Cell>技能编写</Cell>
+                  </Row>
+                </Table>
+              </Tables>
+            </Section>
+          </Subsections>
+        </Section>
+        <Section number="3.4" level="3">
+          <Title>钩子系统设计</Title>
+          <Subsections>
+            <Section number="3.4.1" level="4">
+              <Title>UserPromptSubmit 钩子</Title>
+              <Content>
+                <Paragraph>触发时机：用户提交每条消息前。</Paragraph>
+                <Paragraph>功能：技能激活检测 — 分析用户输入，匹配 skill-rules.json 中定义的关键词和意图模式，输出建议激活的技能列表。</Paragraph>
+              </Content>
+              <CodeBlocks>
+                <CodeBlock language="text">触发 → skill-activation-prompt.sh → npx tsx skill-activation-prompt.ts
+                                          │
+                                          ├── 读取 skill-rules.json
+                                          ├── 按 priority 分级：critical &gt; high &gt; medium &gt; low
+                                          └── 输出激活建议</CodeBlock>
+              </CodeBlocks>
+            </Section>
+            <Section number="3.4.2" level="4">
+              <Title>PostToolUse 钩子</Title>
+              <Content>
+                <Paragraph>触发时机：Edit/MultiEdit/Write 工具执行后。</Paragraph>
+                <Paragraph>功能：编辑追踪 — 记录被编辑的文件和所属仓库，收集构建命令，用于后续的自动构建验证。</Paragraph>
+              </Content>
+              <CodeBlocks>
+                <CodeBlock language="text">触发 → post-tool-use-tracker.sh
+         │
+         ├── 检测文件所属仓库（frontend/backend/packages/...）
+         ├── 记录到 .claude/tsc-cache/{session}/edited-files.log
+         ├── 收集 affected-repos.txt
+         └── 收集 TSC/build 命令到 commands.txt</CodeBlock>
+              </CodeBlocks>
+            </Section>
+          </Subsections>
+        </Section>
+        <Section number="3.5" level="3">
+          <Title>子代理系统设计</Title>
+          <Content>
+            <Paragraph>11 个预置子代理，通过 Claude Code 的 Task 工具调用：</Paragraph>
+          </Content>
+          <Tables>
+            <Table>
+              <Row>
+                <Cell>代理</Cell>
+                <Cell>专长</Cell>
+                <Cell>典型场景</Cell>
+              </Row>
+              <Row>
+                <Cell>auth-route-debugger</Cell>
+                <Cell>认证问题诊断</Cell>
+                <Cell>401/403 错误、Cookie/JWT 问题</Cell>
+              </Row>
+              <Row>
+                <Cell>auth-route-tester</Cell>
+                <Cell>路由功能测试</Cell>
+                <Cell>新路由创建后的端到端验证</Cell>
+              </Row>
+              <Row>
+                <Cell>auto-error-resolver</Cell>
+                <Cell>TypeScript 错误修复</Cell>
+                <Cell>编译错误自动修复</Cell>
+              </Row>
+              <Row>
+                <Cell>code-architecture-reviewer</Cell>
+                <Cell>架构审查</Cell>
+                <Cell>新代码的架构一致性检查</Cell>
+              </Row>
+              <Row>
+                <Cell>code-refactor-master</Cell>
+                <Cell>代码重构</Cell>
+                <Cell>文件重组、导入路径更新</Cell>
+              </Row>
+              <Row>
+                <Cell>documentation-architect</Cell>
+                <Cell>文档生成</Cell>
+                <Cell>API 文档、架构概览</Cell>
+              </Row>
+              <Row>
+                <Cell>frontend-error-fixer</Cell>
+                <Cell>前端错误修复</Cell>
+                <Cell>构建错误、运行时错误</Cell>
+              </Row>
+              <Row>
+                <Cell>plan-reviewer</Cell>
+                <Cell>计划审查</Cell>
+                <Cell>实现计划的风险评估</Cell>
+              </Row>
+              <Row>
+                <Cell>refactor-planner</Cell>
+                <Cell>重构规划</Cell>
+                <Cell>重构方案设计和风险分析</Cell>
+              </Row>
+              <Row>
+                <Cell>web-research-specialist</Cell>
+                <Cell>网络研究</Cell>
+                <Cell>技术方案调研、问题搜索</Cell>
+              </Row>
+            </Table>
+          </Tables>
+        </Section>
+        <Section number="3.6" level="3">
+          <Title>安装脚本设计</Title>
+          <Subsections>
+            <Section number="3.6.1" level="4">
+              <Title>全局初始化</Title>
+              <Content>
+                <Paragraph>setup-global.sh 面向新机器首次配置，安装顺序：</Paragraph>
+              </Content>
+              <CodeBlocks>
+                <CodeBlock language="text">Step 0: AI CLI 工具 (claude, codex, gemini)
+Step 1: 全局 CLAUDE.md
+Step 2: 插件安装 (claude-mem, superpowers, pyright-lsp, pinecone, commit-commands, code-review)
+Step 3: MCP 工具 (Codex MCP, Gemini MCP)
+Step 4: Codex &amp; Gemini 技能同步
+Step 5: OpenSpec 安装
+Step 6: 全局钩子
+Step 7: 验证</CodeBlock>
+              </CodeBlocks>
+            </Section>
+            <Section number="3.6.2" level="4">
+              <Title>项目部署</Title>
+              <Content>
+                <Paragraph>setup-claude-config.sh 面向具体项目配置，安装顺序：</Paragraph>
+              </Content>
+              <CodeBlocks>
+                <CodeBlock language="text">Step 1: 创建 .claude 目录结构
+Step 2: 安装 CLAUDE.md
+Step 3: 安装钩子 + 依赖
+Step 4: 选择性安装技能（支持逗号分隔多选）
+Step 5: 安装 skill-rules.json
+Step 6: 安装子代理
+Step 7: 配置 settings.json
+Step 8: OpenSpec 初始化
+Step 9: MCP 工具配置
+Step 10: 验证</CodeBlock>
+              </CodeBlocks>
+            </Section>
+            <Section number="3.6.3" level="4">
+              <Title>废弃清理</Title>
+              <Content>
+                <Paragraph>安装脚本内置自动清理逻辑：</Paragraph>
+                <Paragraph>- 检测并删除已废弃的 dev-workflow 技能</Paragraph>
+                <Paragraph>- 检测并删除已废弃的 .devos 目录</Paragraph>
+              </Content>
+            </Section>
+          </Subsections>
+        </Section>
+        <Section number="3.7" level="3">
+          <Title>部署设计</Title>
+          <Subsections>
+            <Section number="3.7.1" level="4">
+              <Title>源与部署的关系</Title>
+              <CodeBlocks>
+                <CodeBlock language="text">ontologyDevOS (git 源，唯一真相)
+    │
+    ├── git push ──→ 远程仓库 ──→ 其他机器 git clone
+    │
+    ├── setup-global.sh ──→ ~/.claude/ (本机全局)
+    │
+    └── setup-claude-config.sh ──→ 各项目/.claude/ (项目级)</CodeBlock>
+              </CodeBlocks>
+            </Section>
+            <Section number="3.7.2" level="4">
+              <Title>同步策略</Title>
+              <Content>
+                <Paragraph>- 源 → 全局：运行 setup-global.sh 重新部署</Paragraph>
+                <Paragraph>- 源 → 项目：运行 setup-claude-config.sh 重新部署</Paragraph>
+                <Paragraph>- 跨机器同步：git push + 远程机器 git pull + 重新运行安装脚本</Paragraph>
+                <Paragraph>- .claude/ 目录在 .gitignore 中，不会被 git 追踪（运行时配置）</Paragraph>
+              </Content>
+            </Section>
+            <Section number="3.7.3" level="4">
+              <Title>版本管理</Title>
+              <Content>
+                <Paragraph>- 所有模板文件通过 git 版本控制</Paragraph>
+                <Paragraph>- skill-rules.json 包含 version 字段，用于追踪配置版本</Paragraph>
+                <Paragraph>- 安装脚本内置备份机制（CLAUDE.md.backup, settings.json.backup）</Paragraph>
+              </Content>
+            </Section>
+          </Subsections>
+        </Section>
+        <Section number="3.8" level="3">
+          <Title>非功能性设计</Title>
+          <Subsections>
+            <Section number="3.8.1" level="4">
+              <Title>开放性设计</Title>
+              <Content>
+                <Paragraph>- 通过 MCP 协议提供标准化的工具接入方式，支持任意外部 AI 模型接入</Paragraph>
+                <Paragraph>- 技能系统支持自定义扩展，通过 skill-rules.json 注册新技能</Paragraph>
+                <Paragraph>- 子代理模板支持用户自定义，放置于 agents/ 目录即可生效</Paragraph>
+                <Paragraph>- 插件系统基于 Claude Code Marketplace，支持社区插件安装</Paragraph>
+              </Content>
+            </Section>
+            <Section number="3.8.2" level="4">
+              <Title>兼容性设计</Title>
+              <Content>
+                <Paragraph>- 安装脚本同时提供 .sh (macOS/Linux) 和 .ps1 (Windows) 版本</Paragraph>
+                <Paragraph>- 支持 macOS (Darwin) 和 Linux 平台</Paragraph>
+                <Paragraph>- 兼容 bash 和 zsh Shell 环境</Paragraph>
+                <Paragraph>- Node.js 18+ 和 Python 3.10+ 运行时兼容</Paragraph>
+              </Content>
+            </Section>
+            <Section number="3.8.3" level="4">
+              <Title>可靠性设计</Title>
+              <Content>
+                <Paragraph>- 安装脚本内置备份机制，覆盖前自动创建 .backup 文件</Paragraph>
+                <Paragraph>- 废弃配置自动检测与清理，防止残留配置导致冲突</Paragraph>
+                <Paragraph>- OpenSpec 归档流程确保变更历史完整保留</Paragraph>
+                <Paragraph>- 技能激活采用建议模式而非强制模式，避免误匹配</Paragraph>
+              </Content>
+            </Section>
+            <Section number="3.8.4" level="4">
+              <Title>安全性设计</Title>
+              <Content>
+                <Paragraph>- settings.json 定义工具权限白名单，控制可执行的命令范围</Paragraph>
+                <Paragraph>- Codex MCP 默认以只读沙箱模式运行，防止意外修改</Paragraph>
+                <Paragraph>- Gemini MCP 仅作为只读分析师使用</Paragraph>
+                <Paragraph>- .claude/ 目录在 .gitignore 中，防止敏感配置被提交到 git</Paragraph>
+              </Content>
+            </Section>
+            <Section number="3.8.5" level="4">
+              <Title>可维护性设计</Title>
+              <Content>
+                <Paragraph>- 配置即代码：所有配置通过 git 管理，支持版本回退</Paragraph>
+                <Paragraph>- 单一真相源：ontologyDevOS 项目是所有配置的唯一来源</Paragraph>
+                <Paragraph>- 自动化部署：脚本化安装避免手动配置的不一致</Paragraph>
+                <Paragraph>- 模块化技能：每个技能独立一个目录，包含 SKILL.md 和工具脚本</Paragraph>
+              </Content>
+            </Section>
+          </Subsections>
+        </Section>
+      </Subsections>
+    </Section>
+    <Section number="4" level="2">
+      <Title>变更设计</Title>
+      <Subsections>
+        <Section number="4.1" level="3">
+          <Title>当前版本</Title>
+          <Content>
+            <Paragraph>v1.0 初始版本，无变更记录。后续版本的变更将通过 OpenSpec 工作流管理，记录在 openspec/changes/archive/ 目录。</Paragraph>
+          </Content>
+        </Section>
+      </Subsections>
+    </Section>
+    <Section number="5" level="2">
+      <Title>附录</Title>
+      <Subsections>
+        <Section number="5.1" level="3">
+          <Title>文档双轨制</Title>
+          <Tables>
+            <Table>
+              <Row>
+                <Cell>目录</Cell>
+                <Cell>定位</Cell>
+                <Cell>视角</Cell>
+              </Row>
+              <Row>
+                <Cell>docs/plans/</Cell>
+                <Cell>框架性设计和架构方案</Cell>
+                <Cell>宏观：整体怎么设计、怎么拆分</Cell>
+              </Row>
+              <Row>
+                <Cell>openspec/changes/design.md</Cell>
+                <Cell>具体实现代码设计</Cell>
+                <Cell>微观：具体代码怎么写、用什么模式</Cell>
+              </Row>
+            </Table>
+          </Tables>
+        </Section>
+        <Section number="5.2" level="3">
+          <Title>OpenSpec 目录模型</Title>
+          <CodeBlocks>
+            <CodeBlock language="text">openspec/
+├── specs/                          ← 当前系统能力的完整规范（唯一真相）
+│   └── [capability]/
+│       ├── spec.md                 ← 该能力的当前需求规范
+│       └── design.md               ← 该能力的当前技术设计
+│
+└── changes/
+    ├── [active-change]/            ← 进行中的变更
+    │   ├── proposal.md
+    │   ├── tasks.md
+    │   └── specs/[capability]/
+    │       └── spec.md             ← delta 变更（增/改/删了什么）
+    │
+    └── archive/                    ← 已完成的变更历史
+        └── YYYY-MM-DD-[name]/
+            ├── proposal.md         ← 当时为什么要做这个变更
+            ├── design.md           ← 当时的技术设计决策
+            ├── tasks.md            ← 当时的任务清单（全部 [x]）
+            └── specs/[capability]/
+                └── spec.md         ← 当时变更的 delta</CodeBlock>
+          </CodeBlocks>
+        </Section>
+      </Subsections>
+    </Section>
+  </Sections>
+</DesignDocument>

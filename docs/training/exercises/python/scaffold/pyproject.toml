@@ -1,0 +1,8 @@
+[project]
+name = "log-alert-service"
+version = "1.0.0"
+description = "AI驱动开发培训 - 日志清洗与告警服务"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

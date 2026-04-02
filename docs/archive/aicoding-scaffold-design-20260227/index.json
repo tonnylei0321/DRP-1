@@ -1,0 +1,20 @@
+{
+  "title": "AI Coding 脚手架详细设计文档",
+  "description": "本文档描述 ontologyDevOS 项目作为 AI Coding 脚手架的整体架构设计。 ontologyDevOS 是 Claude Code 开发环境的配置源项目，用户克隆后运行安装脚本即可初始化一致的多 AI 协同开发环境。",
+  "author": "AI Coding Team",
+  "version": "1.0",
+  "doc_number": "AICODE-DESIGN-001",
+  "created_date": "2026-02-27",
+  "files": {
+    "markdown": "aicoding-scaffold-design.md",
+    "docx": "aicoding-scaffold-design.docx",
+    "xml": "aicoding-scaffold-design.xml"
+  },
+  "sections": [
+    "概述",
+    "整体设计",
+    "详细设计",
+    "变更设计",
+    "附录"
+  ]
+}
