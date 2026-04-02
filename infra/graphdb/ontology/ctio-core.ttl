@@ -4,7 +4,6 @@
 
 @prefix ctio:      <https://drp.example.com/ontology/ctio/> .
 @prefix owl:       <http://www.w3.org/2002/07/owl#> .
-@prefix rdf:       <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
 @prefix skos:      <http://www.w3.org/2004/02/skos/core#> .
@@ -13,7 +12,6 @@
 # ── FIBO 最小裁剪集前缀（FIBO 未加载时，类仍可作为 IRI 引用）──
 @prefix fibo-fbc-fas-fca: <https://spec.edmcouncil.org/fibo/ontology/FBC/FunctionalEntities/FinancialServicesEntities/> .
 @prefix fibo-be-le-lp:    <https://spec.edmcouncil.org/fibo/ontology/BE/LegalEntities/LegalPersons/> .
-@prefix fibo-fnd-acc-cur: <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/> .
 
 # ══════════════════════════════════════════════
 # 本体元数据
@@ -26,7 +24,7 @@ ctio: a owl:Ontology ;
     dcterms:created "2026-04-02"^^xsd:date .
 
 # ══════════════════════════════════════════════
-# 核心扩展类（共8个，全部通过 rdfs:subClassOf 挂载到 FIBO）
+# 核心扩展类（共8个：2个扩展 FIBO DepositAccount，6个扩展 owl:Thing）
 # ══════════════════════════════════════════════
 
 # 1. 银企直联账户（可通过 API 实时取数的账户）
