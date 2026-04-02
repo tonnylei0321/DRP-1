@@ -1,0 +1,13 @@
+{
+  "ontology-devos": {
+    "command": "python",
+    "args": [
+      "-u",
+      "${CLAUDE_PLUGIN_ROOT}/servers/ontology_mcp/server.py"
+    ],
+    "env": {
+      "ONTOLOGY_PROJECT_ROOT": "${CLAUDE_PROJECT_DIR}",
+      "PYTHONUNBUFFERED": "1"
+    }
+  }
+}

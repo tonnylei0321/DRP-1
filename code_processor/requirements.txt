@@ -1,0 +1,7 @@
+# Code Processor Dependencies
+
+# Java parsing
+javalang>=0.13.0
+
+# Progress bar (optional)
+tqdm>=4.65.0

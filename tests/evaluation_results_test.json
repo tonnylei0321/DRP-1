@@ -1,0 +1,117 @@
+{
+  "timestamp": "2026-02-06T09:59:12.103558",
+  "model_stats": {
+    "graph_rl": {
+      "correct": 3,
+      "total": 6,
+      "total_latency": 133.2947075366974
+    },
+    "graph_sft": {
+      "correct": 3,
+      "total": 6,
+      "total_latency": 2.5362489223480225
+    }
+  },
+  "task_stats": {
+    "NEIGHBOR": {
+      "graph_rl": {
+        "correct": 3,
+        "total": 3
+      },
+      "graph_sft": {
+        "correct": 3,
+        "total": 3
+      }
+    },
+    "PREDECESSOR": {
+      "graph_rl": {
+        "correct": 0,
+        "total": 3
+      },
+      "graph_sft": {
+        "correct": 0,
+        "total": 3
+      }
+    }
+  },
+  "results": [
+    {
+      "id": 1,
+      "task_type": "NEIGHBOR",
+      "expected": "<<<{'CodeClass'}>>>",
+      "graph_rl_response": "首先，用户的问题是：“找出节点 'PythonParser' 的所有邻居节点（前驱节点和后继节点）。”\n\n我需要理解图网络的结构。图网络是定向的（directed: true），所以有前驱和后继节点的概念。\n\n从给定的图网络信息中：\n\n- 节点列表：有13个节点，每个节点有id、labels、name和properties。\n\n- 边列表：有12条边，每条边是[起点, 关系, 终点]。\n\n具体边是：\n\n- [\"Config\", \"IS_A\", \"CodeClass\"]\n\n- [\"sdd_integration.linker.Link\", \"IS_A\", \"CodeClass\"]\n\n- [\"ontology_client.config.OntologyConfig\", \"IS_A\", \"CodeClass\"]\n\n- [\"ontology_client.client.BuildResult\", \"IS_A\", \"CodeClass\"]\n\n- [\"PythonParser\", \"IS_A\", \"CodeClass\"]  // 这里PythonParser是起点\n\n- [\"ParserFact",
+      "graph_rl_latency": 17.75,
+      "graph_rl_correct": true,
+      "graph_rl_match_detail": "精确匹配",
+      "graph_sft_response": "<<<{'CodeClass'}>>>",
+      "graph_sft_latency": 0.25,
+      "graph_sft_correct": true,
+      "graph_sft_match_detail": "精确匹配"
+    },
+    {
+      "id": 2,
+      "task_type": "NEIGHBOR",
+      "expected": "<<<{'文档架构代理'}>>>",
+      "graph_rl_response": "首先，我需要理解用户的问题：\"找出节点 'global/CLAUDE.md' 的所有邻居节点（前驱节点和后继节点）。\"\n\n根据规则，这个图网络是直接的（directed: true），所以邻居节点包括前驱（in-neighbors）和后继（out-neighbors）。\n\n回顾图网络的定义：\n- 节点有id、labels、name和properties。\n- 边（edges）是列表，每个边是三元组：[起点, 关系, 终点]\n\n用户指定了节点名称：'global/CLAUDE.md'。我需要找到这个节点的所有邻居节点。\n\n在图网络中，节点的名称是给定的。从图数据中，我可以看到：\n- 节点20的name是\"global/CLAUDE.md\"，id是20。\n\n现在，我需要找出这个节点的所有邻居。由于图是直接的（directed），邻居包括：\n- 前驱节点（in-neighbors）：那些有边指向这个节点的节点（即，边的终点是这个节点）。\n- 后继节点（out-neighbors）：那些从这个节点有边出发的节点（即，边的起点是这个节点）。\n\n所以，我需要遍历所有边，找到：\n1. 所有以 'gl",
+      "graph_rl_latency": 24.26,
+      "graph_rl_correct": true,
+      "graph_rl_match_detail": "精确匹配",
+      "graph_sft_response": "<<<{'文档架构代理'}>>>",
+      "graph_sft_latency": 0.48,
+      "graph_sft_correct": true,
+      "graph_sft_match_detail": "精确匹配"
+    },
+    {
+      "id": 3,
+      "task_type": "NEIGHBOR",
+      "expected": "<<<{'CodeMethod'}>>>",
+      "graph_rl_response": "首先，我需要理解用户的问题：\"找出节点 'OutputR' 的所有邻居节点（前驱节点和后继节点）。\"\n\n根据规则，这是一个关于图网络的查询。图网络是给定的JSON结构，我需要分析节点 'OutputR' 的邻居节点。\n\n关键点是：图是定向的（directed: true），所以邻居节点包括前驱（in-neighbors）和后继（out-neighbors）。\n\n在图中，节点的邻居取决于边的关系：\n- 对于有向图，前驱节点（in-neighbors）是那些有边指向该节点的节点。\n- 后继节点（out-neighbors）是那些有边从该节点指向的节点。\n\n用户指定了“前驱节点和后继节点”，所以我需要找到：\n- 所有指向 'OutputR' 的节点（前驱）\n- 所有从 'OutputR' 指向的节点（后继）\n\n现在，查看图网络的定义：\n- 节点列表：有35个节点，每个节点有id、labels、name和properties。\n- 边列表：有35条边，每条边是[起点, 关系, 终点]。\n\n具体到节点 'OutputR'：\n- 在节点列表中，id 33 的节点是：{\"id\": 33, \"labe",
+      "graph_rl_latency": 22.25,
+      "graph_rl_correct": true,
+      "graph_rl_match_detail": "精确匹配",
+      "graph_sft_response": "<<<{'CodeMethod'}>>>",
+      "graph_sft_latency": 0.34,
+      "graph_sft_correct": true,
+      "graph_sft_match_detail": "精确匹配"
+    },
+    {
+      "id": 4,
+      "task_type": "PREDECESSOR",
+      "expected": "<<<set()>>>",
+      "graph_rl_response": "首先，我需要理解这个图网络的结构。图网络是给定的JSON对象，描述了节点和边。\n\n关键点：\n- 图是定向的（directed: true）。\n- 节点有id、labels、name和properties。\n- 边是列表，每个边是三元组：[起点, 关系, 终点]。\n\n用户的问题是：“找出节点 'imports' 的所有前驱节点。”\n\n在图论中，前驱节点（predecessors）指的是在有向图中，指向当前节点的节点。也就是说，对于节点X，它的前驱节点是那些有边从X指向X的节点？不，等一下。\n\n澄清：\n- 在有向图中，如果边是 (A -> B)，那么A是B的前驱（predecessor），B是A的后继（successor）。\n- 所以，对于节点 \"imports\"，它的前驱节点是那些有边指向 \"imports\" 的节点。\n\n用户说：“节点 'imports' 的所有前驱节点。” 所以，我们需要找到所有节点Y，使得存在一条边 Y -> \"imports\"。\n\n在图中，节点是用name属性来标识的。例如，节点id=22的name是\"imports\"。\n\n查看图网络的定义：\n- 节点列表中，id",
+      "graph_rl_latency": 23.12,
+      "graph_rl_correct": false,
+      "graph_rl_match_detail": "不匹配",
+      "graph_sft_response": "<<<{'CodeEnum'}>>>",
+      "graph_sft_latency": 0.64,
+      "graph_sft_correct": false,
+      "graph_sft_match_detail": "不匹配"
+    },
+    {
+      "id": 5,
+      "task_type": "PREDECESSOR",
+      "expected": "<<<set()>>>",
+      "graph_rl_response": "首先，我需要理解图网络的结构。根据提供的JSON数据：\n\n- 图是定向的（directed: true）。\n- 节点有7个，每个节点有id、labels、name和properties。\n- 边（edges）列出了关系：每个边是[起点, 关系, 终点]。\n\n具体节点信息：\n- 节点1: id=1, labels=[\"Entity\"], name=\"BASE_PARSER\", properties={\"name\": \"BASE_PARSER\"}\n- 节点2: id=2, labels=[\"EntityType\"], name=\"CodeModule\", properties={\"name\": \"CodeModule\"}\n- 节点3: id=3, labels=[\"Entity\"], name=\"ontologyDevOS\", properties={\"name\": \"ontologyDevOS\"}\n- 节点4: id=4, labels=[\"Entity\"], name=\"code_processor\", properties={\"name\": \"code_processor\"}\n- 节",
+      "graph_rl_latency": 19.2,
+      "graph_rl_correct": false,
+      "graph_rl_match_detail": "不匹配",
+      "graph_sft_response": "<<<{'CodeModule'}>>>",
+      "graph_sft_latency": 0.39,
+      "graph_sft_correct": false,
+      "graph_sft_match_detail": "不匹配"
+    },
+    {
+      "id": 6,
+      "task_type": "PREDECESSOR",
+      "expected": "<<<set()>>>",
+      "graph_rl_response": "首先，我需要理解图网络的结构。用户提供的图网络信息是JSON格式的，描述了一个有向图。\n\n关键点：\n- 图是定向的（directed: true）\n- 节点（nodes）有15个，每个节点有id、标签、名称和属性。\n- 边（edges）有14条，每条边表示一个关系，格式是[\"起点\", \"关系\", \"终点\"]。这里的关系都是\"IS_A\"，表示\"是\"或\"属于\"。\n\n具体节点列表：\n- id 1: name: \"BackendImplementation\", labels: [\"Entity\"]\n- id 2: name: \"CodeModule\", labels: [\"EntityType\"]\n- id 3: name: \"ontologyDevOS\", labels: [\"Entity\"]\n- id 4: name: \"code_processor\", labels: [\"Entity\"]\n- id 5: name: \"ontology_client\", labels: [\"Entity\"]\n- id 6: name: \"plugins.ontology-devos.servers.on",
+      "graph_rl_latency": 26.71,
+      "graph_rl_correct": false,
+      "graph_rl_match_detail": "不匹配",
+      "graph_sft_response": "<<<{'code_processor'}>>>",
+      "graph_sft_latency": 0.44,
+      "graph_sft_correct": false,
+      "graph_sft_match_detail": "不匹配"
+    }
+  ]
+}

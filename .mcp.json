@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "ontology-devos": {
+      "type": "stdio",
+      "command": "/Users/work/iuapgit/ontology/venv/bin/python",
+      "args": [
+        "-u",
+        "/Users/work/iuapgit/ontologyDevOS/plugins/ontology-devos/servers/ontology_mcp/server.py"
+      ],
+      "env": {
+        "ONTOLOGY_PROJECT_ROOT": "/Users/work/iuapgit/ontologyDevOS",
+        "ONTOLOGY_PATH": "/Users/work/iuapgit/ontology",
+        "PYTHONPATH": "/Users/work/iuapgit/ontology:/Users/work/iuapgit/ontology/ontology_sdk/src",
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "ontology-devos",
+  "version": "0.1.0",
+  "description": "Code ontology + SDD context tools for Claude Code",
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json"
+}
