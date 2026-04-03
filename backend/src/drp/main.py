@@ -1,9 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from drp.auth.router import router as auth_router
 from drp.config import settings
+from drp.drill.router import router as drill_router
 from drp.mapping.router import router as mappings_router
+from drp.observability.health import router as health_router
+from drp.observability.tracing import TracingMiddleware
 from drp.tenants.router import router as tenants_router
 
 app = FastAPI(
@@ -20,18 +24,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(TracingMiddleware)
 
 
 app.include_router(auth_router)
 app.include_router(tenants_router)
 app.include_router(mappings_router)
-
-
-@app.get("/health", tags=["基础设施"])
-async def health_check() -> dict:
-    """服务健康检查端点。"""
-    return {
-        "status": "ok",
-        "version": "0.1.0",
-        "env": settings.app_env,
-    }
+app.include_router(drill_router)
+app.include_router(health_router)

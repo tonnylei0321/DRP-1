@@ -17,7 +17,10 @@ async def test_health_returns_200():
 
 @pytest.mark.asyncio
 async def test_health_response_schema():
-    """健康检查响应体应包含 status 和 version 字段。"""
+    """健康检查响应体应包含 status、version、env 字段。
+
+    增强版健康检查在外部服务不可用时返回 'degraded'，测试环境中此属正常行为。
+    """
     from drp.main import app
 
     async with AsyncClient(
@@ -26,6 +29,7 @@ async def test_health_response_schema():
         response = await client.get("/health")
 
     body = response.json()
-    assert body["status"] == "ok"
+    assert body["status"] in ("ok", "degraded")  # 测试环境无外部服务，可能为 degraded
     assert "version" in body
     assert "env" in body
+    assert "components" in body  # 增强版包含组件状态

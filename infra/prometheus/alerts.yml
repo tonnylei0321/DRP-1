@@ -1,0 +1,71 @@
+# 12.2 告警规则定义
+groups:
+  - name: drp_alerts
+    rules:
+      # ETL 失败率 > 10%（最近 15 分钟）
+      - alert: EtlHighFailureRate
+        expr: |
+          rate(drp_etl_job_failed_total[15m])
+          / (rate(drp_etl_job_total[15m]) + 0.001) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "ETL 失败率过高"
+          description: "ETL 任务失败率超过 10%，当前值: {{ $value | humanizePercentage }}"
+
+      # SPARQL 超时率 > 5%（P95 > 30 秒）
+      - alert: SparqlHighTimeoutRate
+        expr: |
+          histogram_quantile(0.95,
+            rate(drp_sparql_duration_seconds_bucket[5m])
+          ) > 30
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SPARQL P95 响应时间过高"
+          description: "SPARQL P95 响应时间 {{ $value }}s 超过 30 秒阈值"
+
+      # GraphDB 堆内存 > 80%
+      - alert: GraphDBHighHeapUsage
+        expr: |
+          jvm_memory_used_bytes{area="heap", instance=~"graphdb.*"}
+          / jvm_memory_max_bytes{area="heap", instance=~"graphdb.*"} > 0.8
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "GraphDB JVM 堆内存告警"
+          description: "GraphDB 堆内存使用率 {{ $value | humanizePercentage }}"
+
+      # Redis 内存占用 > 80%
+      - alert: RedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis 内存使用率过高"
+          description: "Redis 内存使用 {{ $value | humanizePercentage }}"
+
+      # 数据新鲜度：超过 90 分钟未同步
+      - alert: DataFreshnessStale
+        expr: |
+          time() - drp_etl_last_sync_timestamp_seconds > 5400
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "数据新鲜度告警"
+          description: "租户 {{ $labels.tenant_id }} 超过 90 分钟未完成增量同步"
+
+      # WebSocket 连接数 > 200
+      - alert: WebSocketHighConnections
+        expr: drp_websocket_connections_total > 200
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "WebSocket 连接数过多"
+          description: "当前 WebSocket 连接数 {{ $value }}"

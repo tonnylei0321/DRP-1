@@ -2,15 +2,17 @@ services:
   graphdb:
     image: ontotext/graphdb:10.7.0
     container_name: drp-graphdb
+    # 15.2 安全加固：生产环境删除此 ports 映射，仅通过内部网络 drp-net 访问
+    # 开发环境保留端口映射便于调试（生产环境使用 docker-compose.prod.yml 覆盖）
     ports:
-      - "7200:7200"
+      - "127.0.0.1:7200:7200"  # 绑定 localhost，禁止公网直接访问
     environment:
       GDB_HEAP_SIZE: "2g"
       GDB_MIN_MEM: "512m"
     volumes:
       - graphdb-data:/opt/graphdb/home
     networks:
-      - drp-net
+      - drp-internal  # 仅加入内部网络，不加入外部网络
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:7200/rest/repositories"]
       interval: 15s
@@ -29,14 +31,14 @@ services:
       - ./infra/graphdb/fibo:/fibo
     entrypoint: ["/bin/sh", "/init/01-create-repo.sh"]
     networks:
-      - drp-net
+      - drp-internal
     restart: "no"
 
   postgres:
     image: postgres:16-alpine
     container_name: drp-postgres
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"  # 绑定 localhost，禁止公网直接访问
     environment:
       POSTGRES_DB: drp
       POSTGRES_USER: drp
@@ -45,7 +47,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./infra/postgres/init:/docker-entrypoint-initdb.d
     networks:
-      - drp-net
+      - drp-internal
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U drp -d drp"]
       interval: 10s
@@ -57,12 +59,19 @@ services:
     image: redis:7-alpine
     container_name: drp-redis
     ports:
-      - "6379:6379"
-    command: redis-server --appendonly yes
+      - "127.0.0.1:6379:6379"  # 绑定 localhost，禁止公网直接访问
+    command: >
+      redis-server
+      --appendonly yes
+      --appendfsync everysec
+      --auto-aof-rewrite-percentage 100
+      --auto-aof-rewrite-min-size 64mb
+      --save 900 1
+      --save 300 10
     volumes:
       - redis-data:/data
     networks:
-      - drp-net
+      - drp-internal
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -71,8 +80,9 @@ services:
       start_period: 10s
 
 networks:
-  drp-net:
+  drp-internal:
     driver: bridge
+    internal: false  # 开发环境允许出站（用于拉取依赖）；生产环境设为 true 并单独配置出口网络
 
 volumes:
   graphdb-data:

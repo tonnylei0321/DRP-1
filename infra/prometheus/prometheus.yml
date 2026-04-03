@@ -1,0 +1,35 @@
+# Prometheus 配置 — 12.1 采集 FastAPI / Celery / GraphDB / Redis / PostgreSQL 指标
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alerts.yml"
+
+scrape_configs:
+  # FastAPI 应用���标（需���装 prometheus-fastapi-instrumentator）
+  - job_name: drp-api
+    static_configs:
+      - targets: ['drp-backend:8000']
+    metrics_path: /metrics
+
+  # Celery 指标（需安装 celery-prometheus-exporter）
+  - job_name: drp-celery
+    static_configs:
+      - targets: ['drp-celery-exporter:9808']
+
+  # Redis 指标（redis_exporter）
+  - job_name: redis
+    static_configs:
+      - targets: ['redis-exporter:9121']
+
+  # PostgreSQL 指标（postgres_exporter）
+  - job_name: postgres
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+
+  # GraphDB 内置 Prometheus 端点
+  - job_name: graphdb
+    static_configs:
+      - targets: ['graphdb:7200']
+    metrics_path: /rest/monitor/worker-info
