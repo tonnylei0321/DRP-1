@@ -24,14 +24,14 @@
 
 ## 4. 认证与权限系统（管理后台）
 
-- [ ] 4.1 实现本地账号认证（bcrypt + JWT，POST /auth/login）
-- [ ] 4.2 实现 SAML 2.0 SSO 接入（python3-saml，POST /auth/saml/callback）
-- [ ] 4.3 实现 OIDC 接入（authlib，GET /auth/oidc/callback）
-- [ ] 4.4 实现 LDAP/AD 认证（ldap3，作为降级兜底）
-- [ ] 4.5 实现 RBAC 数据模型（User、Group、Role、Permission 四层）
-- [ ] 4.6 实现权限中间件（FastAPI Depends，API 级别鉴权）
-- [ ] 4.7 实现密码安全策略（复杂度校验、过期提醒、连续失败锁定）
-- [ ] 4.8 实现审计日志写入（所有认证事件、权限变更、越权尝试）
+- [x] 4.1 实现本地账号认证（bcrypt + JWT，POST /auth/login）
+- [x] 4.2 实现 SAML 2.0 SSO 接入（python3-saml，POST /auth/saml/callback）
+- [x] 4.3 实现 OIDC 接入（authlib，GET /auth/oidc/callback）
+- [x] 4.4 实现 LDAP/AD 认证（ldap3，作为降级兜底）
+- [x] 4.5 实现 RBAC 数据模型（User、Group、Role、Permission 四层）
+- [x] 4.6 实现权限中间件（FastAPI Depends，API 级别鉴权）
+- [x] 4.7 实现密码安全策略（复杂度校验、过期提醒、连续失败锁定）
+- [x] 4.8 实现审计日志写入（所有认证事件、权限变更、越权尝试）
 
 ## 5. LLM 语义映射引擎
 

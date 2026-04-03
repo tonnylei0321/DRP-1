@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from drp.auth.router import router as auth_router
 from drp.config import settings
 from drp.tenants.router import router as tenants_router
 
@@ -20,6 +21,7 @@ app.add_middleware(
 )
 
 
+app.include_router(auth_router)
 app.include_router(tenants_router)
 
 
