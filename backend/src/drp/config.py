@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 60
 
+    # Claude / Anthropic API
+    claude_api_key: str = ""
+    anthropic_api_key: str = ""
+
     @property
     def postgres_dsn(self) -> str:
         """异步 PostgreSQL 连接字符串。"""

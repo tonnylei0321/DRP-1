@@ -35,13 +35,13 @@
 
 ## 5. LLM 语义映射引擎
 
-- [ ] 5.1 实现 DDL 解析器（支持 MySQL/PostgreSQL/Oracle DDL 语法，提取表/字段/类型/注释）
-- [ ] 5.2 实现 LLM 映射服务（调用 LLM API，输入 DDL + CTIO 本体上下文，输出字段映射建议）
-- [ ] 5.3 实现置信度评分算法（字段名��义、注释质量、值域推断、历史映射匹配）
-- [ ] 5.4 实现 MappingSpec.yaml 生成器（含 source_field、target、transform、confidence、auto_approved 字段）
-- [ ] 5.5 实现 MappingSpec → RML 确定性编译器
-- [ ] 5.6 实现历史映射存储与检索（PostgreSQL mapping_spec 表）
-- [ ] 5.7 实现映射 API（POST /mappings/generate、PUT /mappings/{id}/approve、PUT /mappings/{id}/reject）
+- [x] 5.1 实现 DDL 解析器（支持 MySQL/PostgreSQL/Oracle DDL 语法，提取表/字段/类型/注释）
+- [x] 5.2 实现 LLM 映射服务（调用 LLM API，输入 DDL + CTIO 本体上下文，输出字段映射建议）
+- [x] 5.3 实现置信度评分算法（字段名语义、注释质量、值域推断、历史映射匹配）
+- [x] 5.4 实现 MappingSpec.yaml 生成器（含 source_field、target、transform、confidence、auto_approved 字段）
+- [x] 5.5 实现 MappingSpec → RML 确定性编译器
+- [x] 5.6 实现历史映射存储与检索（PostgreSQL mapping_spec 表）
+- [x] 5.7 实现映射 API（POST /mappings/generate、PUT /mappings/{id}/approve、PUT /mappings/{id}/reject）
 
 ## 6. ETL 管道
 
