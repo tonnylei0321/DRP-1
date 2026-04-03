@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from drp.config import settings
+from drp.tenants.router import router as tenants_router
 
 app = FastAPI(
     title="DRP — 穿透式资金监管平台",
@@ -17,6 +18,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.include_router(tenants_router)
 
 
 @app.get("/health", tags=["基础设施"])

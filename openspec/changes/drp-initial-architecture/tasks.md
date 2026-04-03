@@ -17,10 +17,10 @@
 
 ## 3. 多租户基础层
 
-- [ ] 3.1 实现 TenantRepository 接口（GraphDB Named Graph CRUD）
-- [ ] 3.2 实现 SPARQL 查询代理层，自动注入 `FROM NAMED <urn:tenant:{id}>` 上下文
-- [ ] 3.3 实现租户 CRUD API（POST /tenants、GET /tenants/{id}、DELETE /tenants/{id}）
-- [ ] 3.4 编写多租户隔离集成测试，验证跨租户查询拦截
+- [x] 3.1 实现 TenantRepository 接口（GraphDB Named Graph CRUD）
+- [x] 3.2 实现 SPARQL 查询代理层，自动注入 `FROM NAMED <urn:tenant:{id}>` 上下文
+- [x] 3.3 实现租户 CRUD API（POST /tenants、GET /tenants/{id}、DELETE /tenants/{id}）
+- [x] 3.4 编写多租户隔离集成测试，验证跨租户查询拦截
 
 ## 4. 认证与权限系统（管理后台）
 
