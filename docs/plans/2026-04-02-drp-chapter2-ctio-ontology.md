@@ -1011,7 +1011,7 @@ import os
 import pytest
 import httpx
 
-GRAPHDB_URL = os.getenv("GRAPHDB_URL", "http://localhost:7200")
+GRAPHDB_URL = os.getenv("GRAPHDB_URL", "http://localhost:7201")
 REPO = os.getenv("GRAPHDB_REPOSITORY", "drp")
 SPARQL_ENDPOINT = f"{GRAPHDB_URL}/repositories/{REPO}"
 

@@ -70,7 +70,7 @@ services:
       GDB_HEAP_SIZE: "2g"
       GDB_MIN_MEM: "512m"
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:7200/rest/repositories"]
+      test: ["CMD", "curl", "-sf", "http://localhost:7201/rest/repositories"]
       interval: 15s
       timeout: 10s
       retries: 10
@@ -168,8 +168,8 @@ drp-redis      ... healthy
 - [ ] **Step 4: 验证服务端口**
 
 ```bash
-curl -sf http://localhost:7200/rest/repositories | head -c 100
-curl -sf http://localhost:6379 || redis-cli -p 6379 ping
+curl -sf http://localhost:7201/rest/repositories | head -c 100
+curl -sf http://localhost:6380 || redis-cli -p 6379 ping
 docker exec drp-postgres psql -U drp -c "\l"
 ```
 
@@ -321,7 +321,7 @@ docker compose -f docker-compose.dev.yml logs -f graphdb-init
 - [ ] **Step 6: 验证仓库创建成功**
 
 ```bash
-curl -sf http://localhost:7200/rest/repositories/drp | python3 -m json.tool | grep '"id"'
+curl -sf http://localhost:7201/rest/repositories/drp | python3 -m json.tool | grep '"id"'
 ```
 
 期望：
@@ -332,7 +332,7 @@ curl -sf http://localhost:7200/rest/repositories/drp | python3 -m json.tool | gr
 - [ ] **Step 7: 验证 FIBO 三元组已加载**
 
 ```bash
-curl -sf -X POST "http://localhost:7200/repositories/drp" \
+curl -sf -X POST "http://localhost:7201/repositories/drp" \
   -H "Content-Type: application/sparql-query" \
   -H "Accept: application/sparql-results+json" \
   -d 'SELECT (COUNT(*) AS ?count) WHERE { ?s ?p ?o }' \
@@ -701,7 +701,7 @@ class Settings(BaseSettings):
     app_port: int = 8000
 
     # GraphDB
-    graphdb_url: str = "http://localhost:7200"
+    graphdb_url: str = "http://localhost:7201"
     graphdb_repository: str = "drp"
     graphdb_username: str = "admin"
     graphdb_password: str = "root"
@@ -714,7 +714,7 @@ class Settings(BaseSettings):
     postgres_password: str = "drp_dev"
 
     # Redis
-    redis_url: str = "redis://localhost:6379/0"
+    redis_url: str = "redis://localhost:6380/0"
 
     # JWT
     jwt_secret_key: str = "change-this-in-production"
@@ -974,7 +974,7 @@ cat > .env.example << 'EOF'
 # ==============================
 
 # ------ GraphDB ------
-GRAPHDB_URL=http://localhost:7200
+GRAPHDB_URL=http://localhost:7201
 GRAPHDB_REPOSITORY=drp
 GRAPHDB_USERNAME=admin
 GRAPHDB_PASSWORD=root
@@ -987,7 +987,7 @@ POSTGRES_USER=drp
 POSTGRES_PASSWORD=drp_dev
 
 # ------ Redis ------
-REDIS_URL=redis://localhost:6379/0
+REDIS_URL=redis://localhost:6380/0
 
 # ------ JWT ------
 # 生产环境必须替换为���机强密钥: python3 -c "import secrets; print(secrets.token_hex(32))"

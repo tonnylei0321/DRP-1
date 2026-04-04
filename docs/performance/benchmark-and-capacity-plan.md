@@ -35,7 +35,7 @@ python scripts/benchmark/generate_test_data.py \
 curl -s -X POST -u admin:root \
   -H "Content-Type: application/x-trig" \
   --data-binary @/tmp/benchmark_data.trig \
-  "http://localhost:7200/repositories/drp/statements"
+  "http://localhost:7201/repositories/drp/statements"
 ```
 
 ---
@@ -107,7 +107,7 @@ python scripts/benchmark/generate_large_trig.py \
 time curl -s -X POST -u admin:root \
   -H "Content-Type: application/x-trig" \
   --data-binary @/tmp/bulk_load_test.trig \
-  "http://localhost:7200/repositories/drp/statements"
+  "http://localhost:7201/repositories/drp/statements"
 ```
 
 ### 基准测试结果（待填写）

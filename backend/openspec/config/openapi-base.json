@@ -1,0 +1,150 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "DRP — 穿透式资金监管平台",
+    "version": "0.1.0",
+    "description": "穿透式资金监管平台 API",
+    "contact": {
+      "name": "DRP 开发团队",
+      "email": "dev@drp.example.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "本地开发服务器"
+    },
+    {
+      "url": "https://api.drp.example.com",
+      "description": "生产服务器"
+    }
+  ],
+  "tags": [
+    {
+      "name": "租户管理",
+      "description": "租户创建、查询、删除等操作"
+    },
+    {
+      "name": "基础设施",
+      "description": "系统健康检查等基础设施接口"
+    }
+  ],
+  "paths": {},
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string",
+            "description": "错误详情"
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP 状态码"
+          },
+          "title": {
+            "type": "string",
+            "description": "错误标题"
+          },
+          "type": {
+            "type": "string",
+            "description": "错误类型 URI"
+          }
+        },
+        "required": ["detail", "status"],
+        "description": "标准错误响应"
+      },
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "loc": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "错误位置"
+          },
+          "msg": {
+            "type": "string",
+            "description": "错误消息"
+          },
+          "type": {
+            "type": "string",
+            "description": "错误类型"
+          }
+        },
+        "required": ["loc", "msg", "type"],
+        "description": "验证错误响应"
+      }
+    },
+    "responses": {
+      "HTTPValidationError": {
+        "description": "验证错误",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ValidationError"
+              }
+            }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "资源未找到",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "BadRequestError": {
+        "description": "请求错误",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "服务器内部错误",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT Bearer Token 认证"
+      },
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "API Key 认证"
+      }
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ]
+}

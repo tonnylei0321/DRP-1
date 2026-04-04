@@ -5,7 +5,7 @@ services:
     # 15.2 安全加固：生产环境删除此 ports 映射，仅通过内部网络 drp-net 访问
     # 开发环境保留端口映射便于调试（生产环境使用 docker-compose.prod.yml 覆盖）
     ports:
-      - "127.0.0.1:7200:7200"  # 绑定 localhost，禁止公网直接访问
+      - "127.0.0.1:7201:7200"  # 绑定 localhost，禁止公网直接访问
     environment:
       GDB_HEAP_SIZE: "2g"
       GDB_MIN_MEM: "512m"
@@ -38,7 +38,7 @@ services:
     image: postgres:16-alpine
     container_name: drp-postgres
     ports:
-      - "127.0.0.1:5432:5432"  # 绑定 localhost，禁止公网直接访问
+      - "127.0.0.1:5433:5432"  # 绑定 localhost，禁止公网直接访问
     environment:
       POSTGRES_DB: drp
       POSTGRES_USER: drp
@@ -59,7 +59,7 @@ services:
     image: redis:7-alpine
     container_name: drp-redis
     ports:
-      - "127.0.0.1:6379:6379"  # 绑定 localhost，禁止公网直接访问
+      - "127.0.0.1:6380:6379"  # 绑定 localhost，禁止公网直接访问
     command: >
       redis-server
       --appendonly yes

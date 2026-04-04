@@ -1,5 +1,6 @@
 // ============================================================
 // 央企穿透式资金监管 — GraphDB实体关系 + 7大领域 + 106指标
+// 集成后端 API（auth.js + api_client.js + data_adapter.js）
 // ============================================================
 
 // ── 7大监管领域定义 + 106个指标
@@ -133,9 +134,29 @@ var DOMAINS = [
    ]},
 ];
 
-// ── 为每个实体生成指标数据（模拟）
+// ── 指标缓存（5分钟TTL）
+var indicatorCache = {};
+var CACHE_TTL = 5 * 60 * 1000; // 5分钟
+
+// ── API 请求计数（用于状态栏加载指示）
+var _pendingRequests = 0;
+
+// ── 当前选中的指标 ID（用于穿透路径和报告下载）
+var selectedIndicatorId = null;
+
+// ── 穿透路径高亮节点
+var highlightedPathNodes = [];
+
+// ── 为每个实体生成指标数据（优先从缓存/后端获取，回退到本地模拟）
 function generateIndicators(node){
   if(node._indicators) return node._indicators;
+  // 检查缓存
+  var cached = indicatorCache[node.id];
+  if(cached && (Date.now() - cached.timestamp < CACHE_TTL)){
+    node._indicators = cached.data;
+    return cached.data;
+  }
+  // 回退到本地模拟生成
   var seed = node.id.length*17+Math.round(node.compliance*3);
   function rng(){seed=(seed*9301+49297)%233280;return seed/233280;}
   var isHi=node.risk==='hi', isMd=node.risk==='md';
@@ -144,7 +165,6 @@ function generateIndicators(node){
     var domData={score:0, indicators:[], alertCount:0};
     dom.indicators.forEach(function(ind){
       var val, status='normal';
-      // Generate realistic values based on risk
       var base=rng();
       if(ind.unit==='%'){
         if(ind.direction==='up') val=isHi?(40+base*40):(isMd?(60+base*30):(75+base*20));
@@ -174,34 +194,27 @@ function generateIndicators(node){
       } else {
         val=isHi?'\u5f85\u6574\u6539':(isMd?'\u5173\u6ce8':'\u5408\u89c4');
       }
-      // Determine status: 红=低于阈值, 黄=阈值±10%, 绿=高于阈值10%+
-      // direction: 'up'=越高越好(用threshold[0]作为阈值), 'down'=越低越好(用threshold[1]作为阈值), 'mid'=区间
       if(typeof val==='number'){
         var th=null;
         if(ind.direction==='up' && ind.threshold[0]!==null) th=ind.threshold[0];
         else if(ind.direction==='down' && ind.threshold[1]!==null) th=ind.threshold[1];
-        else if(ind.direction==='mid' && ind.threshold[0]!==null) th=ind.threshold[0]; // use lower bound
-
+        else if(ind.direction==='mid' && ind.threshold[0]!==null) th=ind.threshold[0];
         if(th!==null && th!==0){
           if(ind.direction==='up'){
-            // up: 高于阈值好. 红:<阈值, 黄:阈值~阈值*1.1, 绿:>阈值*1.1
             if(val < th) status='danger';
             else if(val < th*1.1) status='warn';
             else status='normal';
           } else if(ind.direction==='down'){
-            // down: 低于阈值好. 红:>阈值, 黄:阈值*0.9~阈值, 绿:<阈值*0.9
             if(val > th) status='danger';
             else if(val > th*0.9) status='warn';
             else status='normal';
           } else {
-            // mid: 在区间内好
             var lo=ind.threshold[0]||0, hi=ind.threshold[1]||100;
             if(val<lo||val>hi) status='danger';
             else if(val<lo*1.1||val>hi*0.9) status='warn';
             else status='normal';
           }
         } else if(ind.threshold[1]!==null && ind.threshold[1]===0){
-          // threshold is 0 (e.g. 超限额担保笔数 should be 0)
           if(val>0) status='danger';
           else status='normal';
         }
@@ -209,12 +222,10 @@ function generateIndicators(node){
       if(typeof val==='string'){
         status=val==='\u5f85\u6574\u6539'?'danger':(val==='\u5173\u6ce8'?'warn':'normal');
       }
-      // Extra risk injection for high-risk entities
       if(isHi&&rng()>0.6&&status==='normal') status='danger';
       else if(isHi&&rng()>0.4&&status==='normal') status='warn';
       if(isMd&&rng()>0.75&&status==='normal') status='danger';
       else if(isMd&&rng()>0.5&&status==='normal') status='warn';
-
       if(status==='danger') domData.alertCount++;
       domData.indicators.push({
         id:ind.id, name:ind.name, unit:ind.unit,
@@ -222,7 +233,6 @@ function generateIndicators(node){
         status:status, threshold:ind.threshold, direction:ind.direction
       });
     });
-    // Domain score
     var total=domData.indicators.length;
     var ok=domData.indicators.filter(function(x){return x.status==='normal';}).length;
     var warn=domData.indicators.filter(function(x){return x.status==='warn';}).length;
@@ -233,8 +243,11 @@ function generateIndicators(node){
   return result;
 }
 
-// ── 组织架构（同前，精简）
-var ORG={id:'group',name:'中央企业集团',level:0,type:'集团',city:'北京',cash:4868000,debt:3421000,asset:18624000,guarantee:1286000,compliance:92.4,risk:'lo',
+// ── 组织架构（初始为 null，由 loadOrgTree() 异步赋值）
+var ORG = null;
+
+// ── 硬编码回退数据（后端不可用时使用）
+var ORG_FALLBACK={id:'group',name:'中央企业集团',level:0,type:'集团',city:'北京',cash:4868000,debt:3421000,asset:18624000,guarantee:1286000,compliance:92.4,risk:'lo',
 children:[
   {id:'east_group',name:'华东子集团',level:1,type:'二级子集团',city:'上海',cash:824000,debt:682000,asset:2840000,guarantee:456000,compliance:68.2,risk:'hi',
    children:[
@@ -291,11 +304,11 @@ var REL_TYPES={
 };
 
 // ── 全局状态
-var drillPath=[ORG], currentNode=ORG, selectedNodeId=null;
+var drillPath=[], currentNode=null, selectedNodeId=null;
 var graphNodes=[], graphEdges=[];
 var hoveredNodeId=null, dragNode=null, dragOffX=0, dragOffY=0;
 var canvasW=0, canvasH=0;
-var expandedDomains={}; // 右侧面板展开状态
+var expandedDomains={};
 
 // ── 工具
 function fmtMoney(v){if(v>=10000)return(v/10000).toFixed(1)+'\u4ebf';return v.toFixed(0)+'\u4e07';}
@@ -304,12 +317,216 @@ function riskGlow(r){return r==='hi'?'rgba(255,32,32,':r==='md'?'rgba(255,170,0,
 function riskLabel(r){return r==='hi'?'\u9ad8\u98ce\u9669':r==='md'?'\u4e2d\u98ce\u9669':'\u4f4e\u98ce\u9669';}
 function flatAll(n){var a=[n];if(n.children)n.children.forEach(function(c){a=a.concat(flatAll(c));});return a;}
 function sumField(n,f){if(!n.children||!n.children.length)return n[f]||0;var s=0;n.children.forEach(function(c){s+=sumField(c,f);});return s;}
-function findNode(id){var r=null;function s(n){if(n.id===id){r=n;return;}if(n.children)n.children.forEach(s);}s(ORG);return r;}
+function findNode(id){if(!ORG)return null;var r=null;function s(n){if(n.id===id){r=n;return;}if(n.children)n.children.forEach(s);}s(ORG);return r;}
 
-// ── 构建图数据
+// ── 通知
+function showNotif(msg, duration){
+  var n=document.getElementById('notif');if(!n)return;
+  n.textContent=msg;n.style.display='block';
+  setTimeout(function(){n.style.display='none';},duration||3000);
+}
+
+// ── 状态栏管理（9.10）
+function setStatusConnected(){
+  var el=document.querySelector('#sb .sbi:first-child .sbv');
+  if(el){el.innerHTML='\u25cf \u5df2\u8fde\u63a5';el.className='sbv g';}
+}
+function setStatusDisconnected(){
+  var el=document.querySelector('#sb .sbi:first-child .sbv');
+  if(el){el.innerHTML='\u25cf \u5df2\u65ad\u5f00';el.className='sbv';el.style.color='var(--danger)';}
+}
+function setStatusLoading(){
+  var el=document.querySelector('#sb .sbi:first-child .sbv');
+  if(el){el.innerHTML='\u25cf \u52a0\u8f7d\u4e2d...';el.className='sbv';el.style.color='var(--warn)';}
+}
+function apiStart(){_pendingRequests++;if(_pendingRequests===1)setStatusLoading();}
+function apiEnd(err){
+  _pendingRequests=Math.max(0,_pendingRequests-1);
+  if(_pendingRequests===0){
+    if(err&&(err.status==='network_error'||err.status===502))setStatusDisconnected();
+    else setStatusConnected();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// 后端集成函数
+// ══════════════════════════════════════════════════════════════
+
+// ── 9.1 登录/登出处理
+function showLoginPage(){
+  var lp=document.getElementById('login-page');if(lp)lp.style.display='flex';
+  var lb=document.getElementById('logout-btn');if(lb)lb.style.display='none';
+  var app=document.getElementById('app');if(app)app.style.display='none';
+}
+function hideLoginPage(){
+  var lp=document.getElementById('login-page');if(lp)lp.style.display='none';
+  var lb=document.getElementById('logout-btn');if(lb)lb.style.display='inline-block';
+  var app=document.getElementById('app');if(app)app.style.display='grid';
+}
+async function handleLogin(){
+  var email=document.getElementById('login-email').value.trim();
+  var pwd=document.getElementById('login-password').value;
+  var errEl=document.getElementById('login-error');
+  var btn=document.getElementById('login-btn');
+  if(!email||!pwd){if(errEl){errEl.textContent='请输入邮箱和密码';errEl.style.display='block';}return;}
+  if(errEl)errEl.style.display='none';
+  if(btn){btn.disabled=true;btn.textContent='登录中...';}
+  try{
+    await Auth.login(email,pwd);
+    hideLoginPage();
+    await initApp();
+  }catch(e){
+    if(errEl){errEl.textContent=(e&&e.status===401)?'邮箱或密码错误':(e&&e.detail||'登录失败');errEl.style.display='block';}
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='登 录';}
+  }
+}
+function handleLogout(){
+  Auth.logout();
+  ORG=null;currentNode=null;drillPath=[];indicatorCache={};
+  showLoginPage();
+}
+
+// ── 9.2 加载组织架构
+async function loadOrgTree(rootId, maxDepth){
+  var tree=document.getElementById('tree');
+  if(tree&&!rootId)tree.innerHTML='<div class="tgrp" style="padding:20px 11px;text-align:center;line-height:1.8;color:var(--text)">\u52a0\u8f7d\u4e2d...</div>';
+  apiStart();
+  try{
+    var params={max_depth:maxDepth||2};
+    if(rootId)params.root_id=rootId;
+    var data=await ApiClient.get('/org/tree',params);
+    var adapted=DataAdapter.adaptOrgTree(data);
+    apiEnd();
+    return adapted;
+  }catch(err){
+    apiEnd(err);
+    console.error('[DRP] loadOrgTree failed:',err);
+    if(!rootId&&tree){
+      tree.innerHTML='<div class="tgrp" style="padding:20px 11px;text-align:center;line-height:1.8;color:var(--danger)">\u52a0\u8f7d\u5931\u8d25<br><button class="abtn w" onclick="retryLoadOrgTree()" style="margin-top:8px">\u91cd\u8bd5</button></div>';
+    }
+    throw err;
+  }
+}
+async function retryLoadOrgTree(){
+  try{
+    var data=await loadOrgTree();
+    ORG=data;currentNode=ORG;drillPath=[ORG];
+    renderAll();
+  }catch(e){/* 错误已在 loadOrgTree 中处理 */}
+}
+
+// ── 9.3 加载指标数据（含5分钟缓存）
+async function loadIndicators(entityId){
+  // 检查缓存
+  var cached=indicatorCache[entityId];
+  if(cached&&(Date.now()-cached.timestamp<CACHE_TTL)){
+    return cached.data;
+  }
+  apiStart();
+  try{
+    var data=await ApiClient.get('/indicators/'+encodeURIComponent(entityId));
+    var adapted=DataAdapter.adaptIndicators(data,DOMAINS);
+    // 写入缓存
+    indicatorCache[entityId]={data:adapted,timestamp:Date.now()};
+    // 同步到节点
+    var node=findNode(entityId);
+    if(node)node._indicators=adapted;
+    apiEnd();
+    return adapted;
+  }catch(err){
+    apiEnd(err);
+    console.error('[DRP] loadIndicators failed for',entityId,':',err);
+    throw err;
+  }
+}
+
+// ── 9.6 加载实体关系
+async function loadRelations(entityId){
+  apiStart();
+  try{
+    var data=await ApiClient.get('/org/'+encodeURIComponent(entityId)+'/relations');
+    var adapted=DataAdapter.adaptRelations(data);
+    apiEnd();
+    return adapted;
+  }catch(err){
+    apiEnd(err);
+    console.error('[DRP] loadRelations failed for',entityId,':',err);
+    throw err;
+  }
+}
+
+// ── 9.7 穿透路径查询与高亮
+async function loadDrillPath(indicatorId){
+  apiStart();
+  try{
+    var data=await ApiClient.get('/drill/path/'+encodeURIComponent(indicatorId));
+    var adapted=DataAdapter.adaptDrillPath(data);
+    apiEnd();
+    return adapted;
+  }catch(err){
+    apiEnd(err);
+    console.error('[DRP] loadDrillPath failed for',indicatorId,':',err);
+    throw err;
+  }
+}
+function animatePathHighlight(pathSteps){
+  highlightedPathNodes=[];
+  if(!pathSteps||!pathSteps.length){showNotif('该指标暂无穿透路径数据');return;}
+  var i=0;
+  function step(){
+    if(i>=pathSteps.length)return;
+    highlightedPathNodes.push(pathSteps[i].nodeId);
+    i++;
+    setTimeout(step,400);
+  }
+  step();
+  // 5秒后清除高亮
+  setTimeout(function(){highlightedPathNodes=[];},pathSteps.length*400+5000);
+}
+
+// ── 9.9 溯源报告下载
+async function downloadReport(indicatorId){
+  if(!indicatorId){showNotif('请先选中一个指标');return;}
+  var btn=document.querySelector('.abtn-report');
+  if(btn){btn.disabled=true;btn.textContent='\u751f\u6210\u4e2d...';}
+  apiStart();
+  try{
+    var blob=await ApiClient.download('/drill/report/'+encodeURIComponent(indicatorId));
+    var ext=(blob.type&&blob.type.indexOf('pdf')>=0)?'pdf':'json';
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download='drill_report_'+indicatorId+'.'+ext;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    apiEnd();
+  }catch(err){
+    apiEnd(err);
+    showNotif('报告下载失败: '+(err&&err.detail||'未知错误'));
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='\u98ce\u9669\u62a5\u544a';}
+  }
+}
+
+// ── 9.11 加载租户名称
+async function loadTenantName(){
+  var tenantId=Auth.getTenantId();
+  if(!tenantId)return;
+  try{
+    var data=await ApiClient.get('/tenants/'+encodeURIComponent(tenantId));
+    var el=document.getElementById('sb-tenant');
+    if(el&&data&&data.name){el.textContent=data.name+' \u00b7';el.style.display='inline';}
+  }catch(e){
+    console.error('[DRP] loadTenantName failed:',e);
+  }
+}
+
+// ── 构建图数据（9.6: 优先使用后端关系数据，回退到 parent-child 推导）
+var _backendEdges = null; // 后端加载的关系数据缓存
 function buildGraphData(){
   graphNodes=[];graphEdges=[];
   var n=currentNode;
+  if(!n)return;
   var nodeR=n.children&&n.children.length?Math.min(32,Math.max(22,500/n.children.length)):28;
   graphNodes.push({id:n.id,data:n,x:canvasW/2,y:canvasH/2,r:42,fixed:true,isCenter:true,vx:0,vy:0});
   if(!n.children||!n.children.length)return;
@@ -319,15 +536,37 @@ function buildGraphData(){
     var angle=(i/count)*Math.PI*2-Math.PI/2;
     var hasKids=c.children&&c.children.length;
     graphNodes.push({id:c.id,data:c,x:canvasW/2+Math.cos(angle)*radius+(Math.random()-0.5)*30,y:canvasH/2+Math.sin(angle)*radius+(Math.random()-0.5)*30,r:hasKids?nodeR+4:nodeR,fixed:false,isCenter:false,vx:0,vy:0});
-    graphEdges.push({source:n.id,target:c.id,type:'hasSubsidiary'});
-    if(c.cash>50000) graphEdges.push({source:c.id,target:n.id,type:'fundFlow'});
-    if(c.guarantee>100000) graphEdges.push({source:n.id,target:c.id,type:'guarantee'});
   });
-  // Cross relationships
-  var kids=n.children;
-  for(var i=0;i<kids.length;i++){
-    if(kids[i].type.indexOf('\u5883\u5916')>=0||kids[i].id.indexOf('overseas')>=0||kids[i].id.indexOf('hk')>=0||kids[i].id.indexOf('sg')>=0){
-      graphEdges.push({source:kids[i].id,target:n.id,type:'fxExposure'});
+
+  // 使用后端关系数据（如果有），否则回退到 parent-child 推导
+  if(_backendEdges&&_backendEdges.length>0){
+    // 确保所有节点都有 hasSubsidiary 边
+    var nodeIds={};graphNodes.forEach(function(gn){nodeIds[gn.id]=true;});
+    var hasSubEdges={};
+    _backendEdges.forEach(function(e){
+      if(nodeIds[e.source]&&nodeIds[e.target]){
+        graphEdges.push(e);
+        if(e.type==='hasSubsidiary')hasSubEdges[e.source+'->'+e.target]=true;
+      }
+    });
+    // 补充缺失的 hasSubsidiary 边
+    n.children.forEach(function(c){
+      if(!hasSubEdges[n.id+'->'+c.id]&&!hasSubEdges[c.id+'->'+n.id]){
+        graphEdges.push({source:n.id,target:c.id,type:'hasSubsidiary'});
+      }
+    });
+  }else{
+    // 回退：从 parent-child 推导关系
+    n.children.forEach(function(c){
+      graphEdges.push({source:n.id,target:c.id,type:'hasSubsidiary'});
+      if(c.cash>50000) graphEdges.push({source:c.id,target:n.id,type:'fundFlow'});
+      if(c.guarantee>100000) graphEdges.push({source:n.id,target:c.id,type:'guarantee'});
+    });
+    var kids=n.children;
+    for(var i=0;i<kids.length;i++){
+      if(kids[i].type.indexOf('\u5883\u5916')>=0||kids[i].id.indexOf('overseas')>=0||kids[i].id.indexOf('hk')>=0||kids[i].id.indexOf('sg')>=0){
+        graphEdges.push({source:kids[i].id,target:n.id,type:'fxExposure'});
+      }
     }
   }
 }
@@ -366,8 +605,6 @@ function drawDomainPetals(ctx,gn){
   var ind=generateIndicators(d);
   var cx=gn.x,cy=gn.y,r=gn.r;
   var isHover=(hoveredNodeId===gn.id),isSel=(selectedNodeId===gn.id);
-
-  // 7 petals around the node
   DOMAINS.forEach(function(dom,i){
     var domData=ind[dom.id];
     var angle=(i/7)*Math.PI*2-Math.PI/2;
@@ -375,27 +612,14 @@ function drawDomainPetals(ctx,gn){
     var petalDist=r+petalR+3;
     var px=cx+Math.cos(angle)*petalDist;
     var py=cy+Math.sin(angle)*petalDist;
-    var score=domData.score;
     var alerts=domData.alertCount;
-
-    // Petal color: green=no alerts, yellow=only warns, red=has danger
     var col=alerts>0?'#ff4444':(domData.indicators.some(function(x){return x.status==='warn';}))?'#ffbb33':'#33ffbe';
     var alpha=isHover||isSel?0.6:0.3;
-
-    // Petal circle
-    ctx.beginPath();ctx.arc(px,py,petalR,0,Math.PI*2);
-    ctx.fillStyle=col.replace('#','rgba(').replace(/(..)(..)(..)$/,function(_,r,g,b){
-      return parseInt(r,16)+','+parseInt(g,16)+','+parseInt(b,16)+','+alpha+')';
-    });
-    // Simpler: use hex to rgba
     var cr=parseInt(col.slice(1,3),16),cg=parseInt(col.slice(3,5),16),cb=parseInt(col.slice(5,7),16);
-    ctx.fillStyle='rgba('+cr+','+cg+','+cb+','+alpha+')';
-    ctx.fill();
+    ctx.beginPath();ctx.arc(px,py,petalR,0,Math.PI*2);
+    ctx.fillStyle='rgba('+cr+','+cg+','+cb+','+alpha+')';ctx.fill();
     ctx.strokeStyle='rgba('+cr+','+cg+','+cb+','+(isHover||isSel?0.8:0.4)+')';
-    ctx.lineWidth=alerts>0?1.5:0.8;
-    ctx.stroke();
-
-    // Alert badge
+    ctx.lineWidth=alerts>0?1.5:0.8;ctx.stroke();
     if(alerts>0){
       ctx.beginPath();ctx.arc(px+petalR*0.6,py-petalR*0.6,4,0,Math.PI*2);
       ctx.fillStyle='#ff2020';ctx.fill();
@@ -403,8 +627,6 @@ function drawDomainPetals(ctx,gn){
       ctx.textAlign='center';ctx.textBaseline='middle';
       ctx.fillText(alerts>9?'9+':alerts,px+petalR*0.6,py-petalR*0.6);
     }
-
-    // Domain initial
     if(petalR>=6){
       ctx.font=(isHover?'bold ':'')+Math.max(8,petalR*0.75)+'px Share Tech Mono';
       ctx.fillStyle='rgba('+cr+','+cg+','+cb+','+(isHover?1:0.85)+')';
@@ -418,12 +640,10 @@ function drawDomainPetals(ctx,gn){
 function drawGraph(){
   var canvas=document.getElementById('graph-canvas');if(!canvas)return;
   var ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvasW,canvasH);
-
   // Grid
   ctx.strokeStyle='rgba(0,100,165,.05)';ctx.lineWidth=0.5;
   for(var gx=0;gx<canvasW;gx+=50){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,canvasH);ctx.stroke();}
   for(var gy=0;gy<canvasH;gy+=50){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(canvasW,gy);ctx.stroke();}
-
   // Edges
   graphEdges.forEach(function(e){
     var src=graphNodes.find(function(n){return n.id===e.source;});
@@ -431,13 +651,14 @@ function drawGraph(){
     if(!src||!tgt)return;
     var rel=REL_TYPES[e.type]||REL_TYPES['hasSubsidiary'];
     var isHL=(hoveredNodeId&&(e.source===hoveredNodeId||e.target===hoveredNodeId));
+    // 穿透路径高亮
+    var isPath=highlightedPathNodes.indexOf(e.source)>=0&&highlightedPathNodes.indexOf(e.target)>=0;
     var mx=(src.x+tgt.x)/2,my=(src.y+tgt.y)/2;
     var dx=tgt.x-src.x,dy=tgt.y-src.y;
     var nx=-dy*0.12,ny=dx*0.12;
     ctx.beginPath();ctx.moveTo(src.x,src.y);ctx.quadraticCurveTo(mx+nx,my+ny,tgt.x,tgt.y);
-    ctx.strokeStyle=isHL?rel.color.replace(/[\d.]+\)$/,'0.75)'):rel.color;
-    ctx.lineWidth=isHL?2:1;ctx.setLineDash(rel.dash);ctx.stroke();ctx.setLineDash([]);
-    // Arrow
+    ctx.strokeStyle=isPath?'rgba(255,255,0,0.9)':isHL?rel.color.replace(/[\d.]+\)$/,'0.75)'):rel.color;
+    ctx.lineWidth=isPath?3:isHL?2:1;ctx.setLineDash(rel.dash);ctx.stroke();ctx.setLineDash([]);
     var t=0.82;
     var ax=(1-t)*(1-t)*src.x+2*(1-t)*t*(mx+nx)+t*t*tgt.x;
     var ay=(1-t)*(1-t)*src.y+2*(1-t)*t*(my+ny)+t*t*tgt.y;
@@ -446,62 +667,46 @@ function drawGraph(){
     var by=(1-t2)*(1-t2)*src.y+2*(1-t2)*t2*(my+ny)+t2*t2*tgt.y;
     var aA=Math.atan2(ay-by,ax-bx);
     ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax-Math.cos(aA-0.4)*6,ay-Math.sin(aA-0.4)*6);ctx.lineTo(ax-Math.cos(aA+0.4)*6,ay-Math.sin(aA+0.4)*6);ctx.closePath();
-    ctx.fillStyle=isHL?rel.color.replace(/[\d.]+\)$/,'0.75)'):rel.color;ctx.fill();
+    ctx.fillStyle=isPath?'rgba(255,255,0,0.9)':isHL?rel.color.replace(/[\d.]+\)$/,'0.75)'):rel.color;ctx.fill();
     if(isHL){ctx.font='10px Noto Sans SC';ctx.fillStyle=rel.color.replace(/[\d.]+\)$/,'0.95)');ctx.textAlign='center';ctx.fillText(rel.label,mx+nx*0.5,my+ny*0.5);}
   });
-
   // Nodes
   graphNodes.forEach(function(gn){
     var d=gn.data,col=riskColor(d.risk),glow=riskGlow(d.risk);
     var isHover=(hoveredNodeId===gn.id),isSel=(selectedNodeId===gn.id);
     var hasKids=d.children&&d.children.length;
-
-    // Outer glow
+    var isPathNode=highlightedPathNodes.indexOf(gn.id)>=0;
     var grad=ctx.createRadialGradient(gn.x,gn.y,0,gn.x,gn.y,gn.r*2.5);
-    grad.addColorStop(0,glow+(isHover?0.15:0.06)+')');grad.addColorStop(1,glow+'0)');
+    grad.addColorStop(0,glow+(isHover||isPathNode?0.15:0.06)+')');grad.addColorStop(1,glow+'0)');
     ctx.fillStyle=grad;ctx.beginPath();ctx.arc(gn.x,gn.y,gn.r*2.5,0,Math.PI*2);ctx.fill();
-
-    // Main circle
     ctx.beginPath();ctx.arc(gn.x,gn.y,gn.r,0,Math.PI*2);
     ctx.fillStyle=glow+(isHover?0.25:gn.isCenter?0.2:0.12)+')';ctx.fill();
-    ctx.strokeStyle=glow+(isHover||isSel?0.85:0.45)+')';ctx.lineWidth=isSel?2.5:isHover?2:1;ctx.stroke();
-
-    // Selection ring
+    ctx.strokeStyle=isPathNode?'rgba(255,255,0,0.9)':glow+(isHover||isSel?0.85:0.45)+')';
+    ctx.lineWidth=isPathNode?3:isSel?2.5:isHover?2:1;ctx.stroke();
     if(isSel){ctx.beginPath();ctx.arc(gn.x,gn.y,gn.r+5,0,Math.PI*2);ctx.strokeStyle=glow+'0.25)';ctx.lineWidth=1;ctx.stroke();}
-
-    // High risk pulse
     if(d.risk==='hi'&&!gn.isCenter){
       var pulse=0.2+Math.sin(Date.now()/400)*0.15;
       ctx.beginPath();ctx.arc(gn.x,gn.y,gn.r+3,0,Math.PI*2);ctx.strokeStyle='rgba(255,32,32,'+pulse+')';ctx.lineWidth=1.5;ctx.stroke();
     }
-
-    // Domain petals
     drawDomainPetals(ctx,gn);
-
-    // Expand indicator
     if(hasKids&&!gn.isCenter){
       ctx.beginPath();ctx.arc(gn.x,gn.y-gn.r-2,5,0,Math.PI*2);ctx.fillStyle='rgba(0,216,255,0.15)';ctx.fill();ctx.strokeStyle='rgba(0,216,255,0.4)';ctx.lineWidth=0.8;ctx.stroke();
       ctx.font='bold 7px Share Tech Mono';ctx.fillStyle='#00d8ff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('+',gn.x,gn.y-gn.r-2);
     }
-
-    // Name + value
     ctx.font=(gn.isCenter?'600 14px':'11px')+' Noto Sans SC';ctx.fillStyle=isHover||isSel?'#fff':col;
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText(d.name.length>5?d.name.substring(0,5)+'..':d.name,gn.x,gn.y-3);
     ctx.font='9px Share Tech Mono';ctx.fillStyle=isHover?'rgba(255,255,255,0.8)':'rgba(140,200,224,0.7)';
     ctx.fillText(fmtMoney(d.asset),gn.x,gn.y+8);
   });
-
   // Legend
   var lx=10,ly=canvasH-100;
   ctx.font='10px Noto Sans SC';ctx.textAlign='left';
-  // Relation legend
   Object.keys(REL_TYPES).forEach(function(k,i){
     var rel=REL_TYPES[k];ctx.beginPath();ctx.moveTo(lx,ly+i*15);ctx.lineTo(lx+20,ly+i*15);
     ctx.strokeStyle=rel.color;ctx.lineWidth=2;ctx.setLineDash(rel.dash);ctx.stroke();ctx.setLineDash([]);
     ctx.fillStyle=rel.color.replace(/[\d.]+\)$/,'0.85)');ctx.fillText(rel.label,lx+24,ly+i*15+4);
   });
-  // Domain legend
   var dx=canvasW-160,dy=canvasH-100;
   ctx.font='10px Noto Sans SC';
   DOMAINS.forEach(function(dom,i){
@@ -518,20 +723,72 @@ function renderBreadcrumb(){
     h+='<span class="bc-item'+(i===drillPath.length-1?' bc-active':'')+'" onclick="drillTo('+i+')">'+node.name+'</span>';
   });el.innerHTML=h;
 }
-function drillTo(idx){drillPath=drillPath.slice(0,idx+1);currentNode=drillPath[idx];selectedNodeId=null;expandedDomains={};renderAll();}
-function drillInto(node){if(!node||!node.children||!node.children.length)return;drillPath.push(node);currentNode=node;selectedNodeId=null;expandedDomains={};renderAll();}
+function drillTo(idx){
+  drillPath=drillPath.slice(0,idx+1);currentNode=drillPath[idx];selectedNodeId=null;expandedDomains={};
+  // 面包屑回退使用内存缓存，不重新请求
+  _backendEdges=null;
+  renderAll();
+  // 异步加载关系数据
+  loadRelations(currentNode.id).then(function(edges){_backendEdges=edges;buildGraphData();}).catch(function(){_backendEdges=null;});
+}
 
-// ── KPI
+// ── 9.5 穿透式钻取（异步）
+async function drillInto(node){
+  if(!node)return;
+  var hasKids=(node.children&&node.children.length)||(node.has_children);
+  if(!hasKids)return;
+
+  // 如果子节点已加载（内存中有数据），直接使用
+  if(node.children&&node.children.length){
+    drillPath.push(node);currentNode=node;selectedNodeId=null;expandedDomains={};
+    _backendEdges=null;
+    renderAll();
+    // 异步加载关系
+    loadRelations(node.id).then(function(edges){_backendEdges=edges;buildGraphData();}).catch(function(){_backendEdges=null;});
+    return;
+  }
+
+  // 需要从后端加载子实体
+  showNotif('\u6b63\u5728\u52a0\u8f7d\u4e0b\u7ea7\u5b9e\u4f53...',2000);
+  try{
+    var results=await Promise.allSettled([
+      loadOrgTree(node.id,1),
+      loadRelations(node.id)
+    ]);
+    var orgResult=results[0];
+    var relResult=results[1];
+
+    // org/tree 为必需，失败则整体失败
+    if(orgResult.status==='rejected'){
+      showNotif('\u7a7f\u900f\u67e5\u8be2\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5');
+      return;
+    }
+    var subTree=orgResult.value;
+    // 将子节点挂载到当前节点
+    if(subTree&&subTree.children){
+      node.children=subTree.children;
+    }
+
+    // relations 为可选，失败则降级
+    _backendEdges=(relResult.status==='fulfilled')?relResult.value:null;
+
+    drillPath.push(node);currentNode=node;selectedNodeId=null;expandedDomains={};
+    renderAll();
+  }catch(e){
+    showNotif('\u7a7f\u900f\u67e5\u8be2\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5');
+  }
+}
+
+// ── 9.8 KPI 栏（基于后端数据计算）
 function renderKPI(){
+  if(!currentNode)return;
   var n=currentNode;
   var all=flatAll(n);var totalAsset=sumField(n,'asset')||n.asset;var totalDebt=sumField(n,'debt')||n.debt;
   var totalCash=sumField(n,'cash')||n.cash;var totalGuar=sumField(n,'guarantee')||n.guarantee;
   var avgComp=0;all.forEach(function(x){avgComp+=x.compliance;});avgComp/=all.length;
   var hiRisk=all.filter(function(x){return x.risk==='hi';}).length;
   var debtRatio=totalAsset?(totalDebt/totalAsset*100).toFixed(1):'0';
-  // Count total alerts across all domains for all entities
   var totalAlerts=0;all.forEach(function(x){var ind=generateIndicators(x);DOMAINS.forEach(function(dom){totalAlerts+=ind[dom.id].alertCount;});});
-
   var kpis=[
     {label:'\u73b0\u91d1\u603b\u989d',val:fmtMoney(totalCash),cls:'g',delta:'\u5b9e\u65f6\u5f52\u96c6'},
     {label:'\u8d44\u4ea7\u89c4\u6a21',val:fmtMoney(totalAsset),cls:'b',delta:'L'+(n.level+1)+' \u5c42\u7ea7'},
@@ -546,6 +803,7 @@ function renderKPI(){
 // ── 左侧树
 function buildTree(){
   var tree=document.getElementById('tree');if(!tree)return;tree.innerHTML='';
+  if(!currentNode)return;
   var n=currentNode;
   if(!n.children||!n.children.length){tree.innerHTML='<div class="tgrp" style="padding:20px 11px;text-align:center;line-height:1.8">\u672b\u7ea7\u5355\u4f4d</div>';return;}
   var groups=[{label:'\u26a0 \u9ad8\u98ce\u9669',fn:function(c){return c.risk==='hi';}},{label:'\u25b2 \u4e2d\u98ce\u9669',fn:function(c){return c.risk==='md';}},{label:'\u25cf \u6b63\u5e38',fn:function(c){return c.risk==='lo';}}];
@@ -556,10 +814,19 @@ function buildTree(){
       var el=document.createElement('div');el.className='titem'+(e.risk==='hi'?' br':'')+(selectedNodeId===e.id?' sel':'');el.id='ti-'+e.id;
       var dotCls=e.risk==='hi'?'dr':e.risk==='md'?'da':'dc';
       var ind=generateIndicators(e);var redCount=0,yellowCount=0;DOMAINS.forEach(function(dom){ind[dom.id].indicators.forEach(function(x){if(x.status==='danger')redCount++;if(x.status==='warn')yellowCount++;});});
-      var hasKids=e.children&&e.children.length;
+      var hasKids=(e.children&&e.children.length)||(e.has_children);
       var tagHtml=redCount>0?'<span style="color:var(--danger);font-weight:600">'+redCount+'\u7ea2</span>':(yellowCount>0?'<span style="color:var(--warn)">'+yellowCount+'\u9ec4</span>':'<span style="color:var(--a2)">\u7eff</span>');
       el.innerHTML='<div class="tdot '+dotCls+'"></div><div class="tlbl">'+e.name+(hasKids?' \u25b6':'')+'</div><div class="ttag">'+tagHtml+'</div><div class="trsk r'+e.risk+'">'+(e.risk==='hi'?'\u9ad8':e.risk==='md'?'\u4e2d':'\u4f4e')+'</div>';
-      el.onclick=function(){selectedNodeId=e.id;expandedDomains={};renderDetail(e);buildTree();};
+      el.onclick=function(){
+        selectedNodeId=e.id;expandedDomains={};selectedIndicatorId=null;
+        renderDetail(e);buildTree();
+        // 异步加载后端指标
+        loadIndicators(e.id).then(function(adapted){
+          e._indicators=adapted;renderDetail(e);buildTree();
+          // 更新七瓣花
+          buildGraphData();
+        }).catch(function(){/* 回退到本地模拟 */});
+      };
       el.ondblclick=function(){if(hasKids)drillInto(e);};
       tree.appendChild(el);
     });
@@ -568,22 +835,23 @@ function buildTree(){
 }
 function filterTree(v){v=v.toLowerCase();document.querySelectorAll('.titem').forEach(function(el){var l=(el.querySelector('.tlbl')||{}).textContent||'';el.style.display=(!v||l.toLowerCase().indexOf(v)>=0)?'':'none';});}
 
-// ── 右侧详情：7大领域 + 指标明细
+// ── 右侧详情：7大领域 + 指标明细（9.7: 点击异常指标触发穿透路径）
 function renderDetail(node){
-  var n=node||currentNode;
+  if(!node)node=currentNode;
+  if(!node)return;
+  var n=node;
   var ind=generateIndicators(n);
   var ib=n.risk==='hi';
 
   var h='<div class="dsec"><div class="dlbl">'+n.type+' \u00b7 L'+(n.level+1)+' \u00b7 '+n.city+'</div>';
   h+='<div class="dtitle'+(ib?' br':'')+'">'+n.name+'</div></div>';
 
-  // 7 Domain panels
   DOMAINS.forEach(function(dom){
     var dd=ind[dom.id];
     var isExpanded=expandedDomains[dom.id];
-    var scoreColor=dangerCount===0&&warnCount===0?'var(--a2)':dangerCount>0?'var(--danger)':'var(--warn)';
     var dangerCount=dd.indicators.filter(function(x){return x.status==='danger';}).length;
     var warnCount=dd.indicators.filter(function(x){return x.status==='warn';}).length;
+    var scoreColor=dangerCount===0&&warnCount===0?'var(--a2)':dangerCount>0?'var(--danger)':'var(--warn)';
 
     h+='<div class="dom-panel" style="border-bottom:1px solid var(--b1)">';
     h+='<div class="dom-head" onclick="toggleDomain(\''+dom.id+'\')" style="padding:5px 11px;display:flex;align-items:center;gap:6px;cursor:pointer;transition:background .1s;'+(isExpanded?'background:rgba(0,216,255,.03)':'')+'">';
@@ -600,13 +868,16 @@ function renderDetail(node){
 
     if(isExpanded){
       h+='<div style="padding:0 11px 6px">';
-      // Sort: danger first, then warn, then normal
       var sorted=dd.indicators.slice().sort(function(a,b){var o={danger:0,warn:1,normal:2};return(o[a.status]||2)-(o[b.status]||2);});
       sorted.forEach(function(indicator){
         var ic=indicator.status==='danger'?'var(--danger)':indicator.status==='warn'?'var(--warn)':'var(--a2)';
         var bg=indicator.status==='danger'?'rgba(255,68,68,.06)':indicator.status==='warn'?'rgba(255,187,51,.05)':'transparent';
         var badge=indicator.status==='danger'?'<span style="font-family:var(--mono);font-size:8px;color:var(--danger);border:1px solid var(--danger);padding:0 3px;margin-left:4px;font-weight:600">\u7ea2</span>':(indicator.status==='warn'?'<span style="font-family:var(--mono);font-size:8px;color:var(--warn);border:1px solid rgba(255,187,51,.5);padding:0 3px;margin-left:4px">\u9ec4</span>':'<span style="font-family:var(--mono);font-size:8px;color:var(--a2);border:1px solid rgba(51,255,190,.3);padding:0 3px;margin-left:4px">\u7eff</span>');
-        h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(12,32,56,.4);background:'+bg+'">';
+        var isClickable=(indicator.status==='danger'||indicator.status==='warn');
+        var selStyle=(selectedIndicatorId===indicator.id)?'outline:1px solid var(--acc);':'';
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(12,32,56,.4);background:'+bg+';'+selStyle+(isClickable?'cursor:pointer':'')+'"';
+        if(isClickable) h+=' onclick="onIndicatorClick(\''+indicator.id+'\')"';
+        h+='>';
         h+='<span style="font-size:10px;color:'+ic+'">'+indicator.name+badge+'</span>';
         h+='<span style="font-family:var(--mono);font-size:10px;color:'+ic+';font-weight:600">'+indicator.value+(indicator.unit?' '+indicator.unit:'')+'</span>';
         h+='</div>';
@@ -616,16 +887,30 @@ function renderDetail(node){
     h+='</div>';
   });
 
-  // Actions
-  var hasKids=n.children&&n.children.length;
+  // Actions（9.9: 风险报告按钮）
+  var hasKids=(n.children&&n.children.length)||(n.has_children);
   h+='<div class="arow">';
   if(hasKids) h+='<button class="abtn g" onclick="drillInto(findNode(\''+n.id+'\'))">\u94bb\u5165\u4e0b\u7ea7</button>';
   h+='<button class="abtn g" onclick="expandAllDomains()">\u5c55\u5f00\u5168\u90e8</button>';
-  h+='<button class="abtn w" onclick="doAct(\'\u98ce\u9669\u62a5\u544a\')">\u98ce\u9669\u62a5\u544a</button>';
+  h+='<button class="abtn w abtn-report" onclick="downloadReport(selectedIndicatorId)"'+(selectedIndicatorId?'':' disabled style="opacity:0.4;cursor:not-allowed"')+'>\u98ce\u9669\u62a5\u544a</button>';
   h+='<button class="abtn g" onclick="doAct(\'\u5bfc\u51fa\')">\u5bfc\u51fa</button>';
   h+='</div>';
 
   document.getElementById('rs').innerHTML=h;
+}
+
+// ── 9.7 指标点击 → 穿透路径查询
+function onIndicatorClick(indicatorId){
+  selectedIndicatorId=indicatorId;
+  var node=selectedNodeId?findNode(selectedNodeId):currentNode;
+  renderDetail(node);
+  // 异步加载穿透路径
+  loadDrillPath(indicatorId).then(function(steps){
+    animatePathHighlight(steps);
+  }).catch(function(err){
+    if(err&&err.status===404){showNotif('该指标暂无穿透路径数据');}
+    else{showNotif('穿透路径查询失败');}
+  });
 }
 
 function toggleDomain(domId){
@@ -638,7 +923,7 @@ function expandAllDomains(){
   var node=selectedNodeId?findNode(selectedNodeId):currentNode;
   renderDetail(node);
 }
-function doAct(name){var n=document.getElementById('notif');n.textContent='\u25b6 '+name+' \u2014 \u6267\u884c\u4e2d...';n.style.display='block';setTimeout(function(){n.style.display='none';},1600);}
+function doAct(name){showNotif('\u25b6 '+name+' \u2014 \u6267\u884c\u4e2d...',1600);}
 
 // ── Ticker + Clock
 function buildTicker(){
@@ -658,13 +943,30 @@ function setupGraphEvents(){
     var tip=document.getElementById('graph-tip');
     if(gn&&tip){tip.style.display='block';var rect=canvas.getBoundingClientRect();tip.style.left=(ev.clientX-rect.left+14)+'px';tip.style.top=(ev.clientY-rect.top-10)+'px';
       var d=gn.data;var ind=generateIndicators(d);var alerts=0;DOMAINS.forEach(function(dom){alerts+=ind[dom.id].alertCount;});
-      tip.innerHTML='<b>'+d.name+'</b><br>'+d.type+' \u00b7 '+d.city+' \u00b7 '+riskLabel(d.risk)+'<br>\u8d44\u4ea7: '+fmtMoney(d.asset)+' \u00b7 \u73b0\u91d1: '+fmtMoney(d.cash)+(alerts>0?'<br><span style="color:#ff2020">\u26a0 '+alerts+'\u9879\u6307\u6807\u5f02\u5e38</span>':'')+(d.children&&d.children.length?'<br><span style="color:#00d8ff">\u53cc\u51fb\u94bb\u5165 ('+d.children.length+'\u4e2a\u4e0b\u7ea7)</span>':'');
+      var hasKids=(d.children&&d.children.length)||(d.has_children);
+      tip.innerHTML='<b>'+d.name+'</b><br>'+d.type+' \u00b7 '+d.city+' \u00b7 '+riskLabel(d.risk)+'<br>\u8d44\u4ea7: '+fmtMoney(d.asset)+' \u00b7 \u73b0\u91d1: '+fmtMoney(d.cash)+(alerts>0?'<br><span style="color:#ff2020">\u26a0 '+alerts+'\u9879\u6307\u6807\u5f02\u5e38</span>':'')+(hasKids?'<br><span style="color:#00d8ff">\u53cc\u51fb\u94bb\u5165 ('+((d.children&&d.children.length)||'?')+'\u4e2a\u4e0b\u7ea7)</span>':'');
     }else if(tip){tip.style.display='none';}
   });
   canvas.addEventListener('mousedown',function(ev){var gn=getNodeAt(ev.clientX,ev.clientY);if(gn&&!gn.isCenter){dragNode=gn;var rect=canvas.getBoundingClientRect();dragOffX=ev.clientX-rect.left-gn.x;dragOffY=ev.clientY-rect.top-gn.y;}});
   canvas.addEventListener('mouseup',function(){if(dragNode){dragNode.fixed=false;dragNode=null;}});
-  canvas.addEventListener('click',function(ev){var gn=getNodeAt(ev.clientX,ev.clientY);if(gn){selectedNodeId=gn.id;expandedDomains={};renderDetail(gn.data);buildTree();}});
-  canvas.addEventListener('dblclick',function(ev){var gn=getNodeAt(ev.clientX,ev.clientY);if(gn&&gn.data.children&&gn.data.children.length)drillInto(gn.data);});
+  canvas.addEventListener('click',function(ev){
+    var gn=getNodeAt(ev.clientX,ev.clientY);
+    if(gn){
+      selectedNodeId=gn.id;expandedDomains={};selectedIndicatorId=null;
+      renderDetail(gn.data);buildTree();
+      // 异步加载后端指标
+      loadIndicators(gn.data.id).then(function(adapted){
+        gn.data._indicators=adapted;renderDetail(gn.data);buildTree();buildGraphData();
+      }).catch(function(){/* 回退到本地模拟 */});
+    }
+  });
+  canvas.addEventListener('dblclick',function(ev){
+    var gn=getNodeAt(ev.clientX,ev.clientY);
+    if(gn){
+      var hasKids=(gn.data.children&&gn.data.children.length)||(gn.data.has_children);
+      if(hasKids)drillInto(gn.data);
+    }
+  });
   canvas.addEventListener('mouseleave',function(){hoveredNodeId=null;dragNode=null;var tip=document.getElementById('graph-tip');if(tip)tip.style.display='none';});
 }
 
@@ -672,8 +974,47 @@ function setupGraphEvents(){
 function renderAll(){
   var canvas=document.getElementById('graph-canvas');
   if(canvas){var rect=canvas.parentElement.getBoundingClientRect();canvasW=rect.width;canvasH=rect.height;canvas.width=canvasW;canvas.height=canvasH;}
+  if(!currentNode)return;
   renderBreadcrumb();renderKPI();buildTree();buildGraphData();renderDetail(currentNode);
 }
 function animate(){simStep();drawGraph();requestAnimationFrame(animate);}
-window.addEventListener('resize',function(){clearTimeout(window._rt);window._rt=setTimeout(function(){var canvas=document.getElementById('graph-canvas');if(canvas){var rect=canvas.parentElement.getBoundingClientRect();canvasW=rect.width;canvasH=rect.height;canvas.width=canvasW;canvas.height=canvasH;}buildGraphData();},150);});
-window.addEventListener('load',function(){buildTicker();setInterval(tickClock,1000);tickClock();renderAll();setupGraphEvents();animate();});
+window.addEventListener('resize',function(){clearTimeout(window._rt);window._rt=setTimeout(function(){var canvas=document.getElementById('graph-canvas');if(canvas){var rect=canvas.parentElement.getBoundingClientRect();canvasW=rect.width;canvasH=rect.height;canvas.width=canvasW;canvas.height=canvasH;}if(currentNode)buildGraphData();},150);});
+
+// ══════════════════════════════════════════════════════════════
+// 应用初始化
+// ══════════════════════════════════════════════════════════════
+
+// 初始化应用（登录成功后调用）
+async function initApp(){
+  hideLoginPage();
+  buildTicker();setInterval(tickClock,1000);tickClock();
+
+  // 9.11 加载租户名称
+  loadTenantName();
+
+  // 9.2 加载组织架构
+  try{
+    var data=await loadOrgTree();
+    ORG=data;
+  }catch(e){
+    // 后端不可用，使用回退数据
+    console.warn('[DRP] 后端不可用，使用本地回退数据');
+    ORG=ORG_FALLBACK;
+  }
+  currentNode=ORG;drillPath=[ORG];
+  renderAll();setupGraphEvents();animate();
+
+  // 异步加载关系数据
+  loadRelations(ORG.id).then(function(edges){_backendEdges=edges;buildGraphData();}).catch(function(){_backendEdges=null;});
+}
+
+// 9.1 window.onload: 先检查认证，通过后再初始化
+window.addEventListener('load',function(){
+  if(Auth.checkAuth()){
+    initApp();
+  }else{
+    showLoginPage();
+    // 仍然启动时钟和 ticker
+    buildTicker();setInterval(tickClock,1000);tickClock();
+  }
+});

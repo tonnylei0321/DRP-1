@@ -31,7 +31,7 @@ curl -s http://localhost:8000/health | jq .
 
 # 2.4 记录基准数据量（用于 RPO 验证）
 export BASELINE_TRIPLES=$(curl -s -u admin:root \
-  "http://localhost:7200/repositories/drp/size" | jq .)
+  "http://localhost:7201/repositories/drp/size" | jq .)
 echo "基准三元组数: ${BASELINE_TRIPLES}"
 ```
 
@@ -57,7 +57,7 @@ docker start drp-graphdb
 
 # ── 验证 RTO ──
 RECOVERY_START=$(date +%s)
-until curl -sf http://localhost:7200/rest/repositories > /dev/null; do sleep 5; done
+until curl -sf http://localhost:7201/rest/repositories > /dev/null; do sleep 5; done
 RECOVERY_END=$(date +%s)
 echo "GraphDB 服务恢复耗时: $((RECOVERY_END - RECOVERY_START)) 秒"
 
@@ -66,7 +66,7 @@ echo "GraphDB 服务恢复耗时: $((RECOVERY_END - RECOVERY_START)) 秒"
 
 # ── 验证 RPO ──
 RESTORED_TRIPLES=$(curl -s -u admin:root \
-  "http://localhost:7200/repositories/drp/size" | jq .)
+  "http://localhost:7201/repositories/drp/size" | jq .)
 echo "恢复后三元组数: ${RESTORED_TRIPLES}（基准: ${BASELINE_TRIPLES}）"
 ```
 
@@ -149,14 +149,14 @@ LATEST_BACKUP=$(ls -t /backups/graphdb/graphdb_drp_*.trig.gz | head -1)
 
 # 清空所有数据
 curl -s -X DELETE -u admin:root \
-  "http://localhost:7200/repositories/drp/statements"
+  "http://localhost:7201/repositories/drp/statements"
 
 # 从备份恢复
 gzip -dc "${LATEST_BACKUP}" | curl -s -X POST \
   -u admin:root \
   -H "Content-Type: application/x-trig" \
   --data-binary @- \
-  "http://localhost:7200/repositories/drp/statements"
+  "http://localhost:7201/repositories/drp/statements"
 
 # 记录恢复耗时
 echo "全量恢复耗时: $(date -u)"

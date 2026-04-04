@@ -5,7 +5,7 @@
 
 #### Scenario: 启动开发环境
 - **WHEN** 开发者执行 `docker compose -f docker-compose.dev.yml up -d`
-- **THEN** GraphDB（端口 7200）、PostgreSQL（端口 5432）、Redis（端口 6379）全部启动就绪
+- **THEN** GraphDB（端口 7201）、PostgreSQL（端口 5433）、Redis（端口 6380）全部启动就绪
 - **AND** GraphDB 自动加载 FIBO + CTIO 本体
 - **AND** PostgreSQL 自动执行初始化 DDL 脚本
 

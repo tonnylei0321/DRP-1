@@ -6,8 +6,8 @@
 
 ## 任务
 
-- [ ] 1. 后端：新增 Pydantic Schema 与组织架构 API
-  - [ ] 1.1 创建后端响应 Schema（OrgNodeResponse、IndicatorResponse、RelationResponse）
+- [x] 1. 后端：新增 Pydantic Schema 与组织架构 API
+  - [x] 1.1 创建后端响应 Schema（OrgNodeResponse、IndicatorResponse、RelationResponse）
     - 在 `backend/src/drp/` 下合适位置新增 Pydantic v2 模型
     - `OrgNodeResponse`：包含 id、name、level、type、city、cash、debt、asset、guarantee、compliance、risk、has_children、children（递归）
     - `IndicatorResponse`：包含 id、name、domain、unit、value、threshold、direction
@@ -15,7 +15,7 @@
     - 所有缺失字段提供合理默认值
     - _需求: 13.1, 13.2, 13.3_
 
-  - [ ] 1.2 实现 `GET /org/tree` API 端点
+  - [x] 1.2 实现 `GET /org/tree` API 端点
     - 在 `backend/src/drp/` 下新增 `org/router.py`（或扩展已有路由）
     - 支持 `max_depth`（默认2，范围1-6）和 `root_id`（可选）查询参数
     - `root_id` 参数校验：仅允许字母数字下划线和连字符，防止 SPARQL 注入
@@ -25,7 +25,7 @@
     - SPARQL 失败时返回 HTTP 500 + `{"detail": "数据查询失败，请稍后重试"}`
     - _需求: 13.1, 13.4, 13.5_
 
-  - [ ] 1.3 实现 `GET /org/{entity_id}/relations` API 端点
+  - [x] 1.3 实现 `GET /org/{entity_id}/relations` API 端点
     - 在 `org/router.py` 中新增关系查询端点
     - `entity_id` 参数校验：仅允许字母数字下划线和连字符
     - 返回指定实体与同级实体之间的关系列表
@@ -45,8 +45,8 @@
     - 验证返回树中所有叶节点 level 不超过根节点 level + max_depth
     - **验证需求: 13.1**
 
-- [ ] 2. 后端：新增指标 API 端点
-  - [ ] 2.1 实现 `GET /indicators/{entity_id}` API 端点
+- [x] 2. 后端：新增指标 API 端点
+  - [x] 2.1 实现 `GET /indicators/{entity_id}` API 端点
     - 在 `backend/src/drp/indicators/` 下扩展或新增路由
     - `entity_id` 参数校验：仅允许字母数字下划线和连字符
     - 通过 SPARQL 查询实体关联的 RegulatoryIndicator
@@ -61,7 +61,7 @@
     - 验证域名映射正确性
     - _需求: 13.2, 13.5_
 
-- [ ] 3. 后端：注册新路由到 main.py
+- [x] 3. 后端：注册新路由到 main.py
   - 将 org router 和 indicators 新端点注册到 `backend/src/drp/main.py`
   - 确保 CORS 配置允许前端域名访问
   - _需求: 13.1, 13.2, 13.3, 13.4_
@@ -72,11 +72,11 @@
   - 验证均返回 HTTP 401
   - **验证需求: 13.4**
 
-- [ ] 4. 检查点 — 后端 API 就绪
+- [x] 4. 检查点 — 后端 API 就绪
   - 确保所有后端测试通过，ask the user if questions arise.
 
-- [ ] 5. 前端：实现 auth.js 认证模块
-  - [ ] 5.1 创建 `auth.js` 模块
+- [x] 5. 前端：实现 auth.js 认证模块
+  - [x] 5.1 创建 `auth.js` 模块
     - 实现 `Auth` 对象：checkAuth()、login()、logout()、getToken()、getTenantId()、isTokenExpired()
     - TOKEN_KEY = 'drp_access_token'，TENANT_KEY = 'drp_tenant_id'
     - login() 调用 `POST /auth/login`，成功后存储 access_token 到 localStorage
@@ -97,8 +97,8 @@
     - 测试登录成功/失败、token 过期检测、logout 清除、401 时的行为
     - _需求: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
 
-- [ ] 6. 前端：实现 api_client.js 客户端模块
-  - [ ] 6.1 创建 `api_client.js` 模块
+- [x] 6. 前端：实现 api_client.js 客户端模块
+  - [x] 6.1 创建 `api_client.js` 模块
     - 实现 `ApiClient` 对象：request()、get()、post()、download()
     - BASE_URL 默认 `http://localhost:8000`，TIMEOUT = 15000
     - 使用原生 fetch API + AbortController 实现超时
@@ -125,8 +125,8 @@
     - 测试 401 重定向、网络超时、正常 GET/POST 请求、download 方法
     - _需求: 1.3, 1.4, 1.5_
 
-- [ ] 7. 前端：实现 data_adapter.js 数据适配层
-  - [ ] 7.1 创建 `data_adapter.js` 模块
+- [x] 7. 前端：实现 data_adapter.js 数据适配层
+  - [x] 7.1 创建 `data_adapter.js` 模块
     - 实现 `DataAdapter` 对象：adaptOrgTree()、adaptIndicators()、adaptRelations()、adaptDrillPath()、computeStatus()
     - adaptOrgTree()：递归转换后端组织架构数据，补充缺失字段默认值（risk→'lo'、compliance→0、children→[]）
     - adaptIndicators()：按7大领域分组，计算每个指标的 status（红/黄/绿），计算领域 score 和 alertCount
@@ -163,11 +163,11 @@
     - 测试各种边界数据转换：空数组、缺失字段、非法 type 值、空 IRI
     - _需求: 11.2, 11.3, 11.4, 11.5_
 
-- [ ] 8. 检查点 — 前端模块就绪
+- [x] 8. 检查点 — 前端模块就绪
   - 确保所有前端模块测试通过，ask the user if questions arise.
 
-- [ ] 9. 前端：prototype_app.js 集成改造
-  - [ ] 9.1 集成 auth.js — 登录流程
+- [x] 9. 前端：prototype_app.js 集成改造
+  - [x] 9.1 集成 auth.js — 登录流程
     - 在 HTML 中引入 auth.js、api_client.js、data_adapter.js（`<script>` 标签）
     - window.onload 中先调用 Auth.checkAuth()，通过后再执行 renderAll()
     - 新增登录页 UI（Login_Page）：邮箱 + 密码输入框 + 登录按钮
@@ -176,7 +176,7 @@
     - 状态栏显示当前租户名称（通过 `GET /tenants/{tenant_id}` 获取）
     - _需求: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 9.1, 9.3_
 
-  - [ ] 9.2 集成组织架构数据加载
+  - [x] 9.2 集成组织架构数据加载
     - 新增 `loadOrgTree()` 异步函数，调用 `GET /org/tree?max_depth=2`
     - 通过 DataAdapter.adaptOrgTree() 转换数据
     - 替换硬编码 `ORG` 变量，触发 renderAll() 重新渲染
@@ -184,7 +184,7 @@
     - 加载失败显示错误提示 + 重试按钮（需求 3.5）
     - _需求: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-  - [ ] 9.3 集成指标数据加载（含缓存）
+  - [x] 9.3 集成指标数据加载（含缓存）
     - 新增 `loadIndicators(entity_id)` 异步函数，调用 `GET /indicators/{entity_id}`
     - 实现 5 分钟内存缓存（indicatorCache，以 entity_id 为键）
     - 通过 DataAdapter.adaptIndicators() 转换数据
@@ -199,7 +199,7 @@
     - 验证 5 分钟内缓存命中，超过 5 分钟缓存未命中
     - **验证需求: 4.6**
 
-  - [ ] 9.5 集成穿透式钻取
+  - [x] 9.5 集成穿透式钻取
     - 改造 `drillInto()` 为异步函数
     - 双击实体时调用后端获取子实体列表（`GET /org/tree?root_id={id}&max_depth=1`）
     - 并行请求关系数据（`GET /org/{id}/relations`），使用 Promise.allSettled
@@ -209,7 +209,7 @@
     - 失败时保持当前视图 + 通知提示（需求 5.6）
     - _需求: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
 
-  - [ ] 9.6 集成实体关系图谱数据
+  - [x] 9.6 集成实体关系图谱数据
     - 新增 `loadRelations(entity_id)` 异步函数
     - 通过 DataAdapter.adaptRelations() 转换数据
     - 替换 buildGraphData() 中硬编码的关系生成逻辑
@@ -217,20 +217,20 @@
     - 关系加载失败时回退到 parent-child 控股关系推导（需求 6.5）
     - _需求: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-  - [ ] 9.7 集成穿透路径查询与高亮
+  - [x] 9.7 集成穿透路径查询与高亮
     - 点击异常指标时调用 `GET /drill/path/{indicator_id}`
     - 通过 DataAdapter.adaptDrillPath() 转换路径数据
     - 按步骤顺序动画高亮路径节点和边
     - 空结果时显示通知"该指标暂无穿透路径数据"
     - _需求: 7.1, 7.2, 7.3, 7.4_
 
-  - [ ] 9.8 集成 KPI 栏实时数据
+  - [x] 9.8 集成 KPI 栏实时数据
     - 基于后端返回的实体数据计算 KPI 栏 6 个指标
     - 穿透钻取切换层级时重新计算 KPI
     - 保留现有 renderKPI() 函数，仅替换数据来源
     - _需求: 8.1, 8.2, 8.3_
 
-  - [ ] 9.9 集成溯源报告下载
+  - [x] 9.9 集成溯源报告下载
     - 改造"风险报告"按钮：未选中指标时置灰不可点击
     - 选中指标后点击调用 `GET /drill/report/{indicator_id}`
     - 通过 ApiClient.download() 获取 Blob，触发浏览器下载
@@ -239,7 +239,7 @@
     - 失败时恢复按钮 + 通知提示
     - _需求: 12.1, 12.2, 12.3, 12.4, 12.5_
 
-  - [ ] 9.10 集成加载状态与错误处理
+  - [x] 9.10 集成加载状态与错误处理
     - API 请求进行中：状态栏"本体引擎"旁显示加载动画
     - 所有请求完成无错误：恢复"● 已连接"（绿色）
     - 后端不可达：变更为"● 已断开"（红色）
@@ -247,13 +247,13 @@
     - console.error 输出详细错误日志
     - _需求: 10.1, 10.2, 10.3, 10.4, 10.5_
 
-  - [ ] 9.11 集成多租户支持
+  - [x] 9.11 集成多租户支持
     - 登录成功后从 JWT 提取 tenant_id 存储到全局状态
     - 状态栏显示租户名称（调用 `GET /tenants/{tenant_id}`）
     - HTTP 403 时显示"租户信息无效，请重新登录"并重定向登录页
     - _需求: 9.1, 9.2, 9.3, 9.4_
 
-- [ ] 10. 检查点 — 前端集成完成
+- [x] 10. 检查点 — 前端集成完成
   - 确保所有前端集成改造完成，ask the user if questions arise.
 
 - [ ] 11. 冒烟测试

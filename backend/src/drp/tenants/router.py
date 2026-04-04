@@ -15,6 +15,14 @@ def _get_service(session: AsyncSession = Depends(get_session)) -> TenantService:
     return TenantService(session=session)
 
 
+@router.get("", response_model=list[TenantResponse])
+async def list_tenants(
+    service: TenantService = Depends(_get_service),
+) -> list[TenantResponse]:
+    """列出所有激活租户。"""
+    return await service.list_tenants()
+
+
 @router.post("", status_code=HTTPStatus.CREATED, response_model=TenantResponse)
 async def create_tenant(
     data: TenantCreate,

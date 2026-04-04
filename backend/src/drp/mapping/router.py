@@ -22,6 +22,25 @@ router = APIRouter(prefix="/mappings", tags=["语义映射"])
 _repo = MappingRepository()
 
 
+@router.get(
+    "",
+    response_model=list[MappingItemResponse],
+    dependencies=[Depends(require_permission("mapping:read"))],
+)
+async def list_mappings(
+    session: AsyncSession = Depends(get_session),
+    current_user: TokenPayload = Depends(get_current_user),
+) -> list[MappingItemResponse]:
+    """列出当前租户的所有映射规范。"""
+    from sqlalchemy import select as sa_select
+    from drp.mapping.models import MappingSpec as MappingSpecModel
+    q = sa_select(MappingSpecModel).order_by(MappingSpecModel.created_at.desc())
+    if current_user.tenant_id:
+        q = q.where(MappingSpecModel.tenant_id == uuid.UUID(current_user.tenant_id))
+    result = await session.execute(q)
+    return [MappingItemResponse.model_validate(m) for m in result.scalars()]
+
+
 @router.post(
     "/generate",
     response_model=GenerateMappingResponse,

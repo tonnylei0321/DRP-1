@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Treasury Vanguard Omnis — Global Liquidity Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;700;900&family=Barlow+Condensed:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#020810;--bg2:#050e1c;--panel:#071525;--b1:#0c2038;--b2:#14304e;
+  --acc:#00d8ff;--a2:#00ffb3;--warn:#ffaa00;--danger:#ff2020;--purple:#a855f7;--gold:#ffd060;
+  --muted:#22445e;--text:#6aafc8;--hi:#cde8f8;
+  --mono:'Share Tech Mono',monospace;--orb:'Orbitron',sans-serif;--cond:'Barlow Condensed',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--cond);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,200,255,.013) 2px,rgba(0,200,255,.013) 3px);}
+
+#app{display:grid;grid-template-rows:42px 1fr 20px;height:100vh;}
+#main{display:grid;grid-template-columns:185px 1fr 272px;overflow:hidden;}
+
+/* ══ TOPBAR ══ */
+#topbar{background:rgba(3,9,20,.98);border-bottom:1px solid var(--b2);display:flex;align-items:center;padding:0 14px;gap:12px;z-index:300;}
+.logo-wrap{display:flex;align-items:center;gap:8px;white-space:nowrap;flex-shrink:0;}
+.logo-emblem{width:34px;height:34px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(0,216,255,.6));}
+.logo-text{display:flex;flex-direction:column;justify-content:center;line-height:1.1;}
+.logo-top{font-family:var(--orb);font-weight:400;font-size:8px;color:var(--hi);letter-spacing:4px;text-transform:uppercase;opacity:.85;}
+.logo-mid{font-family:var(--orb);font-weight:900;font-size:13px;color:var(--acc);letter-spacing:3px;text-transform:uppercase;text-shadow:0 0 18px rgba(0,216,255,.55);}
+.logo-bot{font-family:var(--orb);font-weight:700;font-size:13px;color:#ff6a2a;letter-spacing:3px;text-transform:uppercase;text-shadow:0 0 18px rgba(255,100,40,.55);}
+.logo b{color:var(--hi);font-weight:300;}
+.sep{width:1px;height:15px;background:var(--b2);}
+.tg{display:flex;align-items:center;gap:4px;}
+.tl{font-family:var(--mono);font-size:7.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.tv{font-family:var(--mono);font-size:9.5px;color:var(--a2);}
+.tv.w{color:var(--warn);}
+.tv.r{color:var(--danger);animation:bk .9s infinite;}
+.tv.g{color:var(--gold);}
+@keyframes bk{0%,100%{opacity:1}50%{opacity:.25}}
+.ldot{width:6px;height:6px;border-radius:50%;background:var(--a2);box-shadow:0 0 8px var(--a2);animation:bk 2s ease-in-out infinite;}
+#tbr{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.bbadge{font-family:var(--mono);font-size:7.5px;padding:2px 8px;border:1px solid var(--danger);color:var(--danger);background:rgba(255,32,32,.06);letter-spacing:.8px;animation:bk 1.2s infinite;}
+
+/* ══ LEFT ══ */
+#left{background:rgba(4,11,22,.97);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden;}
+.ph{background:rgba(3,8,18,.95);border-bottom:1px solid var(--b1);padding:5px 9px;display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.pt{font-family:var(--orb);font-weight:600;font-size:7.5px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+.pbdg{margin-left:auto;font-family:var(--mono);font-size:6.5px;color:var(--acc);border:1px solid rgba(0,216,255,.22);padding:1px 4px;}
+.psrch{padding:4px 7px;border-bottom:1px solid var(--b1);flex-shrink:0;}
+.psrch input{width:100%;background:rgba(2,7,17,.8);border:1px solid var(--b1);color:var(--text);padding:3px 6px;font-family:var(--mono);font-size:8px;outline:none;}
+.psrch input:focus{border-color:var(--acc);}
+.tabs{display:flex;border-bottom:1px solid var(--b1);flex-shrink:0;}
+.tab{flex:1;text-align:center;padding:3px 2px;font-family:var(--mono);font-size:7px;color:var(--muted);cursor:pointer;border-right:1px solid var(--b1);transition:all .12s;}
+.tab:last-child{border-right:none;}
+.tab:hover{color:var(--text);}
+.tab.on{color:var(--acc);border-bottom:1.5px solid var(--acc);}
+.tree{overflow-y:auto;flex:1;}
+.tree::-webkit-scrollbar{width:2px;}
+.tree::-webkit-scrollbar-thumb{background:var(--b2);}
+.tgrp{padding:4px 9px 2px;font-family:var(--mono);font-size:6.5px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;}
+.titem{padding:3.5px 9px 3.5px 11px;display:flex;align-items:center;gap:4px;cursor:pointer;transition:background .1s;position:relative;}
+.titem:hover{background:rgba(0,216,255,.035);}
+.titem.sel{background:rgba(0,216,255,.08);}
+.titem.sel::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--acc);box-shadow:0 0 7px var(--acc);}
+.titem.br{background:rgba(255,32,32,.04);}
+.titem.br.sel{background:rgba(255,32,32,.09);}
+.titem.br::before{background:var(--danger)!important;box-shadow:0 0 7px var(--danger)!important;}
+.tdot{width:4.5px;height:4.5px;border-radius:50%;flex-shrink:0;}
+.dc{background:var(--acc);box-shadow:0 0 4px var(--acc);}
+.dg{background:var(--a2);box-shadow:0 0 4px var(--a2);}
+.da{background:var(--warn);box-shadow:0 0 4px var(--warn);}
+.dr{background:var(--danger);box-shadow:0 0 4px var(--danger);animation:bk .8s infinite;}
+.dp{background:var(--purple);box-shadow:0 0 4px var(--purple);}
+.dgo{background:var(--gold);box-shadow:0 0 4px var(--gold);}
+.tlbl{font-size:9.5px;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ttag{font-family:var(--mono);font-size:6.5px;color:var(--muted);flex-shrink:0;}
+.trsk{font-family:var(--mono);font-size:6.5px;flex-shrink:0;}
+.rlo{color:var(--a2);}.rmd{color:var(--warn);}.rhi{color:var(--danger);animation:bk .8s infinite;}
+
+/* ══ CENTER MAP ══ */
+#center{position:relative;overflow:hidden;background:var(--bg);cursor:crosshair;}
+#map-canvas{position:absolute;inset:0;display:block;}
+#arc-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;}
+#node-layer{position:absolute;inset:0;pointer-events:none;z-index:10;}
+#hud-layer{position:absolute;inset:0;pointer-events:none;z-index:20;}
+#scan{position:absolute;left:0;right:0;height:80px;pointer-events:none;z-index:5;background:linear-gradient(0deg,transparent,rgba(0,180,255,.025) 50%,transparent);animation:scan 5s linear infinite;}
+@keyframes scan{from{top:-80px}to{top:100%}}
+
+#mtb{position:absolute;top:8px;left:8px;z-index:50;display:flex;gap:3px;flex-wrap:wrap;max-width:380px;pointer-events:all;}
+.mbtn{background:rgba(3,9,20,.9);border:1px solid var(--b2);color:var(--muted);font-family:var(--mono);font-size:7.5px;padding:2.5px 8px;cursor:pointer;letter-spacing:.7px;transition:all .13s;backdrop-filter:blur(4px);}
+.mbtn:hover,.mbtn.on{color:var(--acc);border-color:var(--acc);}
+.mbtn.br{color:rgba(255,32,32,.6);}.mbtn.br:hover,.mbtn.br.on{color:var(--danger);border-color:var(--danger);}
+.mbtn.go{color:rgba(255,208,96,.55);}.mbtn.go:hover,.mbtn.go.on{color:var(--gold);border-color:var(--gold);}
+
+/* Region cluster labels */
+.region-label{position:absolute;font-family:var(--orb);font-size:7px;color:rgba(0,216,255,.18);letter-spacing:2px;text-transform:uppercase;pointer-events:none;z-index:4;}
+
+#mapinfo{position:absolute;bottom:24px;left:8px;font-family:var(--mono);font-size:7.5px;color:var(--muted);letter-spacing:.4px;pointer-events:none;z-index:50;}
+#ticker-wrap{position:absolute;bottom:0;left:185px;right:272px;height:20px;background:rgba(2,7,18,.92);border-top:1px solid var(--b1);overflow:hidden;z-index:50;}
+#ticker{white-space:nowrap;display:inline-block;animation:tks 80s linear infinite;}
+@keyframes tks{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tk{display:inline-block;font-family:var(--mono);font-size:7.5px;color:var(--muted);padding:3px 14px 3px 0;}
+.tku{color:var(--a2);}.tkd{color:var(--danger);}.tkn{color:var(--text);margin-right:4px;}
+
+/* ══ TACTICAL NODES ══ */
+.tac{position:absolute;transform:translate(-50%,-50%);pointer-events:all;cursor:pointer;z-index:15;}
+.tac-core{width:8px;height:8px;border-radius:50%;border:1.5px solid;position:relative;transition:all .18s;}
+.tac.ok   .tac-core{background:rgba(0,216,255,.18);border-color:var(--acc);box-shadow:0 0 6px rgba(0,216,255,.3);}
+.tac.warn .tac-core{background:rgba(255,170,0,.18);border-color:var(--warn);box-shadow:0 0 6px rgba(255,170,0,.3);}
+.tac.br   .tac-core{background:rgba(255,32,32,.28);border-color:var(--danger);animation:bn .85s ease-in-out infinite;}
+.tac.gold .tac-core{background:rgba(255,208,96,.18);border-color:var(--gold);box-shadow:0 0 6px rgba(255,208,96,.3);}
+@keyframes bn{0%,100%{box-shadow:0 0 5px rgba(255,32,32,.5);transform:scale(1);}50%{box-shadow:0 0 20px rgba(255,32,32,.95);transform:scale(1.3);}}
+.tac-ring{position:absolute;border-radius:50%;border:1px solid;top:50%;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;opacity:0;pointer-events:none;}
+.tac.sel .tac-ring{animation:rp 1.6s ease-out infinite;}
+.tac.ok   .tac-ring{border-color:var(--acc);}
+.tac.warn .tac-ring{border-color:var(--warn);}
+.tac.br   .tac-ring{border-color:var(--danger);}
+.tac.gold .tac-ring{border-color:var(--gold);}
+@keyframes rp{0%{width:14px;height:14px;opacity:.65}100%{width:34px;height:34px;opacity:0}}
+.tac-lbl{position:absolute;top:11px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:6.5px;white-space:nowrap;background:rgba(2,7,18,.82);border:1px solid;padding:1px 3px;pointer-events:none;letter-spacing:.3px;}
+.tac.ok   .tac-lbl{color:var(--acc);border-color:rgba(0,216,255,.15);}
+.tac.warn .tac-lbl{color:var(--warn);border-color:rgba(255,170,0,.15);}
+.tac.br   .tac-lbl{color:var(--danger);border-color:rgba(255,32,32,.3);}
+.tac.gold .tac-lbl{color:var(--gold);border-color:rgba(255,208,96,.2);}
+.tac-wico{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:8px;display:none;pointer-events:none;animation:bk .65s infinite;color:var(--danger);}
+.tac.br .tac-wico{display:block;}
+
+/* ══ HUD PANEL ══ */
+.hud{position:absolute;pointer-events:all;min-width:168px;max-width:200px;background:rgba(2,8,20,.94);border:1px solid;backdrop-filter:blur(12px);animation:hin .16s ease-out forwards;z-index:25;}
+@keyframes hin{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.hud.ok  {border-color:rgba(0,216,255,.4);box-shadow:0 0 16px rgba(0,216,255,.09),inset 0 0 20px rgba(0,216,255,.022);}
+.hud.warn{border-color:rgba(255,170,0,.4);box-shadow:0 0 14px rgba(255,170,0,.07);}
+.hud.br  {border-color:rgba(255,32,32,.65);animation:hin .16s ease-out forwards,hbr 1s ease-in-out infinite .16s;}
+.hud.gold{border-color:rgba(255,208,96,.4);box-shadow:0 0 14px rgba(255,208,96,.08);}
+@keyframes hbr{0%,100%{box-shadow:0 0 12px rgba(255,32,32,.18),inset 0 0 16px rgba(255,32,32,.04);}50%{box-shadow:0 0 32px rgba(255,32,32,.42),inset 0 0 24px rgba(255,32,32,.09);}}
+.hud::before,.hud::after{content:'';position:absolute;width:7px;height:7px;border-style:solid;}
+.hud.ok  ::before,.hud.ok  ::after{border-color:var(--acc);}
+.hud.warn::before,.hud.warn::after{border-color:var(--warn);}
+.hud.br  ::before,.hud.br  ::after{border-color:var(--danger);}
+.hud.gold::before,.hud.gold::after{border-color:var(--gold);}
+.hud::before{top:-1px;left:-1px;border-width:1.5px 0 0 1.5px;}
+.hud::after{bottom:-1px;right:-1px;border-width:0 1.5px 1.5px 0;}
+.hh{padding:4px 7px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:4px;}
+.hh-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;}
+.hud.ok  .hh-dot{background:var(--acc);box-shadow:0 0 4px var(--acc);}
+.hud.warn .hh-dot{background:var(--warn);box-shadow:0 0 4px var(--warn);}
+.hud.br  .hh-dot{background:var(--danger);box-shadow:0 0 6px var(--danger);animation:bk .65s infinite;}
+.hud.gold .hh-dot{background:var(--gold);box-shadow:0 0 4px var(--gold);}
+.hh-type{font-family:var(--mono);font-size:6px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;}
+.hh-name{font-family:var(--orb);font-weight:600;font-size:9px;color:var(--hi);letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hud.br .hh-name{color:var(--danger);text-shadow:0 0 9px rgba(255,32,32,.45);}
+.hud.gold .hh-name{color:var(--gold);}
+.hh-x{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted);cursor:pointer;line-height:1;padding:0 1px;}
+.hh-x:hover{color:var(--hi);}
+.hb{padding:4px 7px;border-bottom:1px solid rgba(255,255,255,.04);}
+.hb-lbl{font-family:var(--mono);font-size:6.5px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;}
+.hb-val{font-family:var(--orb);font-weight:700;font-size:14px;letter-spacing:.4px;font-variant-numeric:tabular-nums;margin-top:1px;}
+.hud.ok  .hb-val{color:var(--a2);text-shadow:0 0 10px rgba(0,255,179,.28);}
+.hud.warn .hb-val{color:var(--warn);text-shadow:0 0 8px rgba(255,170,0,.28);}
+.hud.br  .hb-val{color:var(--danger);text-shadow:0 0 12px rgba(255,32,32,.5);}
+.hud.gold .hb-val{color:var(--gold);text-shadow:0 0 10px rgba(255,208,96,.3);}
+.hb-sub{font-family:var(--mono);font-size:7px;color:var(--muted);margin-top:1px;}
+.halt{margin:3px 7px;padding:3px 5px;background:rgba(255,32,32,.07);border:1px solid rgba(255,32,32,.32);border-left:3px solid var(--danger);}
+.halt-ico{font-family:var(--mono);font-size:7.5px;color:var(--danger);font-weight:bold;margin-bottom:1px;}
+.halt-msg{font-size:8px;color:rgba(255,108,108,.9);line-height:1.4;}
+.hkv{padding:1.5px 7px;display:flex;justify-content:space-between;border-bottom:1px solid rgba(12,32,56,.65);}
+.hk{font-family:var(--mono);font-size:7px;color:var(--muted);}
+.hv{font-family:var(--mono);font-size:8px;text-align:right;}
+.hv.g{color:var(--a2);}.hv.a{color:var(--warn);}.hv.r{color:var(--danger);}.hv.b{color:var(--acc);}.hv.go{color:var(--gold);}
+.hacts{padding:3px 7px;display:flex;gap:3px;flex-wrap:wrap;}
+.ha{font-family:var(--mono);font-size:6.5px;letter-spacing:.4px;padding:2px 5px;border:1px solid;background:transparent;cursor:pointer;transition:all .13s;}
+.ha.g{border-color:rgba(0,255,179,.2);color:var(--a2);}.ha.g:hover{background:rgba(0,255,179,.06);}
+.ha.r{border-color:rgba(255,32,32,.28);color:var(--danger);}.ha.r:hover{background:rgba(255,32,32,.06);}
+.ha.w{border-color:rgba(255,170,0,.2);color:var(--warn);}
+.ha.d{border-color:rgba(20,48,78,.8);color:var(--muted);}.ha.d:hover{color:var(--text);}
+.hconn{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:22;}
+
+/* ══ RIGHT ══ */
+#right{background:rgba(4,11,22,.97);border-left:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden;}
+.rs{overflow-y:auto;flex:1;}
+.rs::-webkit-scrollbar{width:2px;}
+.rs::-webkit-scrollbar-thumb{background:var(--b2);}
+.dsec{border-bottom:1px solid var(--b1);padding:6px 9px;}
+.dlbl{font-family:var(--mono);font-size:7px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px;}
+.dtitle{font-family:var(--orb);font-weight:700;font-size:12.5px;color:var(--hi);letter-spacing:.4px;line-height:1.2;}
+.dtitle.br{color:var(--danger);text-shadow:0 0 10px rgba(255,32,32,.4);}
+.dfibo{font-family:var(--mono);font-size:7px;color:var(--acc);margin-top:2px;}
+.dcoord{font-family:var(--mono);font-size:6.5px;color:var(--muted);margin-top:1px;}
+.kv2{padding:2px 0;display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid rgba(12,32,56,.55);}
+.kk{font-family:var(--mono);font-size:7.5px;color:var(--muted);}
+.kval{font-family:var(--mono);font-size:8.5px;color:var(--hi);text-align:right;}
+.kval.g{color:var(--a2);}.kval.a{color:var(--warn);}.kval.r{color:var(--danger);}.kval.b{color:var(--acc);}.kval.p{color:var(--purple);}.kval.go{color:var(--gold);}
+.grow{display:flex;gap:4px;padding:5px 9px;border-bottom:1px solid var(--b1);}
+.gg{flex:1;text-align:center;}
+.ggl{font-family:var(--mono);font-size:6px;color:var(--muted);margin-bottom:2px;letter-spacing:.4px;}
+.ggv{font-family:var(--orb);font-weight:600;font-size:10.5px;}
+.ggbar{height:2px;background:var(--b2);margin-top:2px;border-radius:1px;}
+.ggfill{height:2px;border-radius:1px;transition:width .5s;}
+.swrap{padding:5px 9px 6px;border-bottom:1px solid var(--b1);}
+.arow{display:flex;flex-wrap:wrap;gap:3px;padding:5px 9px;border-bottom:1px solid var(--b1);}
+.abtn{font-family:var(--cond);font-size:8.5px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;padding:2.5px 6px;border:1px solid var(--b2);background:transparent;color:var(--text);cursor:pointer;transition:all .13s;}
+.abtn:hover{border-color:var(--acc);color:var(--acc);}
+.abtn.g{border-color:rgba(0,255,179,.26);color:var(--a2);}
+.abtn.w{border-color:rgba(255,170,0,.26);color:var(--warn);}
+.abtn.r{border-color:rgba(255,32,32,.26);color:var(--danger);}
+.lki{padding:3px 9px;display:flex;align-items:center;gap:4px;cursor:pointer;transition:background .11s;}
+.lki:hover{background:rgba(0,216,255,.03);}
+.lkarr{font-family:var(--mono);font-size:7.5px;color:var(--acc);}
+.lkd{font-size:8.5px;color:var(--text);flex:1;}
+.lkt{font-family:var(--mono);font-size:6.5px;color:var(--muted);}
+.ali{padding:3.5px 9px;display:flex;gap:5px;border-bottom:1px solid var(--b1);cursor:pointer;transition:background .11s;}
+.ali:hover{background:rgba(0,0,0,.16);}
+.alico{font-family:var(--mono);font-size:6.5px;padding:1px 3px;flex-shrink:0;margin-top:1px;}
+.alico.r{color:var(--danger);border:1px solid var(--danger);}
+.alico.w{color:var(--warn);border:1px solid var(--warn);}
+.altxt{font-size:8.5px;color:var(--text);line-height:1.5;flex:1;}
+.altm{font-family:var(--mono);font-size:6.5px;color:var(--muted);margin-top:1px;}
+
+/* ══ STATUS BAR ══ */
+#sb{background:rgba(3,8,18,.98);border-top:1px solid var(--b1);display:flex;align-items:center;padding:0 11px;gap:13px;z-index:300;}
+.sbi{display:flex;align-items:center;gap:3px;font-family:var(--mono);font-size:7px;color:var(--muted);}
+.sbv{color:var(--text);}.sbv.g{color:var(--a2);}
+#notif{position:fixed;top:46px;left:50%;transform:translateX(-50%);background:rgba(4,11,22,.96);border:1px solid var(--a2);color:var(--a2);font-family:var(--mono);font-size:8.5px;padding:4px 14px;z-index:9999;display:none;letter-spacing:1px;}
+
+/* ══ LANGUAGE SWITCHER ══ */
+#lang-switcher{display:flex;align-items:center;gap:2px;flex-shrink:0;}
+.lang-btn{
+  font-family:var(--mono);font-size:8px;padding:2px 6px;cursor:pointer;
+  border:1px solid var(--b2);background:transparent;color:var(--muted);
+  transition:all .15s;letter-spacing:.5px;position:relative;
+}
+.lang-btn:hover{color:var(--text);border-color:rgba(0,216,255,.3);}
+.lang-btn.active{color:var(--acc);border-color:var(--acc);background:rgba(0,216,255,.07);}
+.lang-btn.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:var(--acc);}
+/* CJK font override when Chinese or Japanese is active */
+body.lang-zh{font-family:'Microsoft YaHei','PingFang SC','Hiragino Sans GB',sans-serif;}
+body.lang-zh .pt,.lang-zh .tl,.lang-zh .tlbl,.lang-zh .dtitle,.lang-zh .dlbl,
+body.lang-zh .ggl,.lang-zh .hh-type,.lang-zh .hb-lbl,.lang-zh .hk{font-family:'Microsoft YaHei','PingFang SC',sans-serif;}
+body.lang-ja{font-family:'Yu Gothic','Meiryo','Hiragino Kaku Gothic Pro',sans-serif;}
+body.lang-ja .pt,.lang-ja .tl,.lang-ja .tlbl,.lang-ja .dtitle,.lang-ja .dlbl,
+body.lang-ja .ggl,.lang-ja .hh-type,.lang-ja .hb-lbl,.lang-ja .hk{font-family:'Yu Gothic','Meiryo',sans-serif;}
+body.lang-de .logo-top,body.lang-fr .logo-top{letter-spacing:2px;}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="topbar">
+  <div class="logo-wrap">
+    <!-- Vanguard Omnis Emblem SVG -->
+    <svg class="logo-emblem" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="wing-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#00d8ff"/>
+          <stop offset="100%" stop-color="#0090cc"/>
+        </linearGradient>
+        <linearGradient id="center-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#00ffb3"/>
+          <stop offset="100%" stop-color="#00d8ff"/>
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="1.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <!-- Left wing -->
+      <path d="M40,14 L8,22 L14,34 L22,28 L18,42 L28,36 L24,50 L40,40 Z"
+        fill="url(#wing-grad)" opacity=".92" filter="url(#glow)"/>
+      <!-- Right wing (mirror) -->
+      <path d="M40,14 L72,22 L66,34 L58,28 L62,42 L52,36 L56,50 L40,40 Z"
+        fill="url(#wing-grad)" opacity=".92" filter="url(#glow)"/>
+      <!-- Wing highlights -->
+      <path d="M40,14 L10,21 L15,30 L40,40 Z" fill="rgba(0,255,200,.18)"/>
+      <path d="M40,14 L70,21 L65,30 L40,40 Z" fill="rgba(0,255,200,.18)"/>
+      <!-- Outer shield -->
+      <path d="M40,26 L52,32 L52,46 L40,54 L28,46 L28,32 Z"
+        fill="none" stroke="url(#center-grad)" stroke-width="1.2" opacity=".9" filter="url(#glow)"/>
+      <!-- Inner decorative diamond -->
+      <path d="M40,30 L46,38 L40,46 L34,38 Z"
+        fill="none" stroke="#00d8ff" stroke-width="1" opacity=".8"/>
+      <!-- Center compass point -->
+      <circle cx="40" cy="38" r="2.5" fill="url(#center-grad)" filter="url(#glow)"/>
+      <!-- Cardinal spokes -->
+      <line x1="40" y1="31" x2="40" y2="45" stroke="#00ffb3" stroke-width=".6" opacity=".7"/>
+      <line x1="33" y1="38" x2="47" y2="38" stroke="#00ffb3" stroke-width=".6" opacity=".7"/>
+      <!-- Diagonal accents on wings -->
+      <line x1="16" y1="26" x2="24" y2="30" stroke="#00d8ff" stroke-width=".7" opacity=".5"/>
+      <line x1="64" y1="26" x2="56" y2="30" stroke="#00d8ff" stroke-width=".7" opacity=".5"/>
+      <line x1="20" y1="34" x2="27" y2="36" stroke="#00d8ff" stroke-width=".7" opacity=".4"/>
+      <line x1="60" y1="34" x2="53" y2="36" stroke="#00d8ff" stroke-width=".7" opacity=".4"/>
+      <!-- Bottom anchor bar -->
+      <rect x="28" y="54" width="24" height="2" rx="1" fill="url(#center-grad)" opacity=".7"/>
+      <rect x="32" y="57" width="16" height="1.2" rx=".6" fill="#00d8ff" opacity=".4"/>
+      <!-- Top feather tips -->
+      <path d="M40,10 L42,15 L40,14 L38,15 Z" fill="#00ffb3" opacity=".8" filter="url(#glow)"/>
+    </svg>
+    <div class="logo-text">
+      <div class="logo-top">TREASURY</div>
+      <div class="logo-mid">VANGUARD</div>
+      <div class="logo-bot">OMNIS</div>
+    </div>
+  </div>
+  <div class="sep"></div>
+  <div class="ldot"></div><div class="tl" style="margin-left:2px" data-key="live">LIVE</div>
+  <div class="sep"></div>
+  <div class="tg"><div class="tl">FIBO</div><div class="tv">v2025/Q4</div></div>
+  <div class="sep"></div>
+  <div class="tg"><div class="tl" data-key="globalAum">GLOBAL AUM</div><div class="tv">$18.64B</div></div>
+  <div class="sep"></div>
+  <div class="tg"><div class="tl" data-key="var95">VaR 95%</div><div class="tv w">$84.2M</div></div>
+  <div class="sep"></div>
+  <div class="tg"><div class="tl" data-key="lcr">LCR</div><div class="tv">138%</div></div>
+  <div class="sep"></div>
+  <div class="tg"><div class="tl" data-key="hubs">HUBS</div><div class="tv g">24</div></div>
+  <div class="sep"></div>
+  <div class="tg"><div class="tl" data-key="breaches">BREACHES</div><div class="tv r">6</div></div>
+  <div id="tbr">
+    <div class="bbadge" id="breach-badge">⚠ VANGUARD OMNIS — CRITICAL: CNH REPATRIATION · GBP BUFFER · MENA HEDGE · PBOC CAP</div>
+    <div class="sep"></div>
+    <div id="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('en',this)">EN</button>
+      <button class="lang-btn" onclick="setLang('de',this)">DE</button>
+      <button class="lang-btn" onclick="setLang('fr',this)">FR</button>
+      <button class="lang-btn" onclick="setLang('zh',this)">中文</button>
+      <button class="lang-btn" onclick="setLang('ja',this)">日本語</button>
+    </div>
+    <div class="sep"></div>
+    <div class="tg"><div class="tl" id="lbl-utc">UTC</div><div class="tv" id="clock">--:--:--</div></div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="left">
+    <div class="ph"><div class="pt" data-key="globalMatrix">Global Matrix</div><div class="pbdg">36 NODES</div></div>
+    <div class="psrch"><input id="srch" data-key-placeholder="searchEntities" placeholder="SEARCH ENTITIES..." oninput="filterTree(this.value)"></div>
+    <div class="tabs">
+      <div class="tab on" onclick="sw('all',this)" data-key="tabAll">ALL</div>
+      <div class="tab" onclick="sw('apac',this)">APAC</div>
+      <div class="tab" onclick="sw('amer',this)">AMER</div>
+      <div class="tab" onclick="sw('emea',this)">EMEA</div>
+      <div class="tab" onclick="sw('risk',this)" data-key="tabRisk">RISK</div>
+    </div>
+    <div class="tree" id="tree"></div>
+  </div>
+
+  <div id="center">
+    <canvas id="map-canvas"></canvas>
+    <svg id="arc-svg"></svg>
+    <div id="scan"></div>
+    <div id="node-layer"></div>
+    <div id="hud-layer"></div>
+    <div id="mtb">
+      <button class="mbtn on"  onclick="setLyr('all',this)"    data-key="layerAll">ALL LAYERS</button>
+      <button class="mbtn"     onclick="setLyr('cash',this)"   data-key="layerCash">CASH FLOW</button>
+      <button class="mbtn"     onclick="setLyr('inst',this)"   data-key="layerInst">INSTRUMENTS</button>
+      <button class="mbtn go"  onclick="setLyr('hub',this)"    data-key="layerHub">HUB NODES</button>
+      <button class="mbtn br"  onclick="setLyr('breach',this)" data-key="layerBreach">BREACHES</button>
+    </div>
+    <div id="mapinfo">LAT -- · LON -- · <span data-key="nodesActive">36 STRATEGIC NODES ACTIVE</span></div>
+    <div id="ticker-wrap"><div id="ticker"></div></div>
+  </div>
+
+  <div id="right">
+    <div class="ph"><div class="pt" data-key="warRoom">War Room Inspector</div><div class="pbdg" id="rpb">LIVE</div></div>
+    <div class="rs" id="rs">
+      <div style="padding:20px 9px;text-align:center;font-family:var(--mono);font-size:8px;color:var(--muted);line-height:1.8;" data-key="selectPrompt">
+        SELECT ANY NODE<br>24 FINANCIAL CENTERS<br>36 STRATEGIC ENTITIES<br>ACROSS 6 CONTINENTS
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="sb">
+  <div class="sbi" data-key="sbOntology">ONTOLOGY <span class="sbv g" style="margin-left:3px">● CONNECTED</span></div>
+  <div class="sbi">PROJECTION <span class="sbv" style="margin-left:3px">NAT. EARTH II</span></div>
+  <div class="sbi" data-key="sbTimezone">TIMEZONES <span class="sbv" style="margin-left:3px">UTC-5 → UTC+10</span></div>
+  <div class="sbi"><span data-key="sbCursor">CURSOR</span> <span class="sbv" style="margin-left:3px" id="sb-coord">--</span></div>
+  <div class="sbi" style="margin-left:auto">TVO · FIBO OWL/RDF · D3 GEO · <span class="sbv" id="sbtime">--:--</span></div>
+</div>
+</div>
+<div id="notif"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script>
+// ════════════════════════════════════════════════════════
+// 36 GLOBAL STRATEGIC ENTITIES — full financial center matrix
+// ════════════════════════════════════════════════════════
+const ENT = [
+// ─── ASIA-PACIFIC ───────────────────────────────────────
+{id:'tokyo',      n:'OpCo Japan',         t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'APAC', city:'Tokyo, JP',        lat:35.68, lon:139.69, dot:'dc', tag:'Sub',   risk:'lo', val:'¥4.2B',   sfx:'Cash',     ccy:'JPY',
+ kv:[['City','Tokyo, Japan'],['Cash','¥4.2B'],['Debt','¥1.8B'],['Net','¥2.4B'],['FX Risk','JPY/USD'],['LCR','148%'],['Rating','AA-'],['Hedge','78%']],kvc:[null,'g',null,'g','a','g','g','g'],
+ gauges:[{l:'CASH',v:'¥4.2B',p:70,c:'g'},{l:'HEDGE',v:'78%',p:78,c:'g'},{l:'LCR',v:'148%',p:74,c:'g'}],
+ acts:[['ACCOUNTS','g'],['HEDGE RPT','d'],['REPORT','d']],lks:[['→','JPY Main — MUFG','holdsAccount'],['→','USD/JPY Fwd','hasHedge']],
+ spark:[3.8,3.9,4.0,3.95,4.1,4.15,4.2],alerts:[]},
+
+{id:'seoul',      n:'OpCo Korea',         t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'APAC', city:'Seoul, KR',         lat:37.57, lon:126.98, dot:'dc', tag:'Sub',   risk:'lo', val:'₩3.1T',   sfx:'Cash',     ccy:'KRW',
+ kv:[['City','Seoul, Korea'],['Cash','₩3.1T'],['Debt','₩1.2T'],['Net','₩1.9T'],['FX Risk','KRW/USD'],['LCR','152%'],['Rating','AA'],['Hedge','82%']],kvc:[null,'g',null,'g','a','g','g','g'],
+ gauges:[{l:'CASH',v:'₩3.1T',p:72,c:'g'},{l:'HEDGE',v:'82%',p:82,c:'g'},{l:'LCR',v:'152%',p:76,c:'g'}],
+ acts:[['ACCOUNTS','g'],['FX EXPOSURE','d'],['REPORT','d']],lks:[['→','KRW Account — Kookmin','holdsAccount']],
+ spark:[2.8,2.85,2.9,2.95,3.0,3.05,3.1],alerts:[]},
+
+{id:'shanghai',   n:'OpCo China',         t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'APAC', city:'Shanghai, CN',      lat:31.22, lon:121.47, dot:'dr', tag:'Sub',   risk:'hi', val:'¥2.8B',   sfx:'Cash',     ccy:'CNH',
+ kv:[['City','Shanghai, China'],['Cash','¥2.8B'],['Debt','¥1.2B'],['Net','¥1.6B'],['FX Risk','CNH RESTRICTED'],['PBOC Limit','92% UTIL'],['Repatriation','BLOCKED'],['NDF','ACTIVE']],kvc:[null,'g',null,'g','r','r','r','a'],
+ gauges:[{l:'CASH',v:'¥2.8B',p:40,c:'g'},{l:'REPATRIATION',v:'BLOCKED',p:100,c:'r'},{l:'PBOC',v:'92%',p:92,c:'r'}],
+ acts:[['PBOC REPORT','w'],['NDF HEDGE','d'],['REPATRIATE','r'],['ESCALATE','r']],lks:[['→','CNH Acct BOC','holdsAccount'],['→','USD/CNH NDF','hasHedge']],
+ spark:[2.2,2.4,2.5,2.6,2.65,2.75,2.8],alerts:['CNH repatriation BLOCKED — PBOC approval required','PBOC FX limit 92% — cap imminent']},
+
+{id:'singapore',  n:'OpCo APAC Hub',      t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'APAC', city:'Singapore',         lat:1.29,  lon:103.85, dot:'dgo',tag:'Hub',   risk:'md', val:'$1.44B',  sfx:'Cash',     ccy:'USD',
+ kv:[['City','Singapore'],['Cash','$1.44B'],['Debt','$620M'],['Net','$820M'],['FX Risk','Multi-CCY'],['LCR','134%'],['MAS 610','DUE 3D'],['Hedge','58%']],kvc:[null,'g',null,'g','a','g','a','a'],
+ gauges:[{l:'CASH',v:'$1.44B',p:60,c:'g'},{l:'HEDGE',v:'58%',p:58,c:'a'},{l:'MAS',v:'DUE 3D',p:90,c:'a'}],
+ acts:[['ACCOUNTS','g'],['FX EXPOSURE','w'],['MAS REPORT','w'],['SWEEP','d']],lks:[['→','USD/SGD Swap','hasHedge'],['→','AUD Bond','hasAsset']],
+ spark:[1.2,1.25,1.3,1.32,1.38,1.41,1.44],alerts:['MAS 610 regulatory filing due in 3 days']},
+
+{id:'mumbai',     n:'OpCo India',         t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'APAC', city:'Mumbai, IN',        lat:19.08, lon:72.88,  dot:'dc', tag:'Sub',   risk:'lo', val:'₹48.2B',  sfx:'Cash',     ccy:'INR',
+ kv:[['City','Mumbai, India'],['Cash','₹48.2B'],['Debt','₹18B'],['Net','₹30.2B'],['FX Risk','INR/USD'],['LCR','145%'],['Rating','BBB+'],['Hedge','72%']],kvc:[null,'g',null,'g','a','g','a','g'],
+ gauges:[{l:'CASH',v:'₹48.2B',p:62,c:'g'},{l:'HEDGE',v:'72%',p:72,c:'g'},{l:'LCR',v:'145%',p:72,c:'g'}],
+ acts:[['ACCOUNTS','g'],['RBI REPORT','d'],['REPORT','d']],lks:[['→','INR Account — SBI','holdsAccount']],
+ spark:[44,45,46,46.5,47,47.5,48.2],alerts:[]},
+
+{id:'sydney',     n:'OpCo Australia',     t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'APAC', city:'Sydney, AU',        lat:-33.87,lon:151.21, dot:'dc', tag:'Sub',   risk:'lo', val:'A$2.1B',  sfx:'Cash',     ccy:'AUD',
+ kv:[['City','Sydney, Australia'],['Cash','A$2.1B'],['Debt','A$800M'],['Net','A$1.3B'],['FX Risk','AUD/USD'],['LCR','141%'],['Rating','AA'],['Hedge','75%']],kvc:[null,'g',null,'g','a','g','g','g'],
+ gauges:[{l:'CASH',v:'A$2.1B',p:66,c:'g'},{l:'HEDGE',v:'75%',p:75,c:'g'},{l:'LCR',v:'141%',p:70,c:'g'}],
+ acts:[['ACCOUNTS','g'],['FX EXPOSURE','d'],['APRA REPORT','d']],lks:[['→','AUD Bond 2026','holdsAsset']],
+ spark:[1.9,1.92,1.95,1.98,2.0,2.05,2.1],alerts:[]},
+
+{id:'almaty',     n:'Caspian Hub',        t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'APAC', city:'Almaty, KZ',        lat:43.24, lon:76.89,  dot:'da', tag:'Hub',   risk:'md', val:'$280M',   sfx:'Cash',     ccy:'USD',
+ kv:[['City','Almaty, Kazakhstan'],['Cash','$280M'],['Debt','$90M'],['Net','$190M'],['FX Risk','KZT/USD'],['LCR','122%'],['Corridor','CIPS Active'],['Hedge','44%']],kvc:[null,'g',null,'g','a','a','b','a'],
+ gauges:[{l:'CASH',v:'$280M',p:35,c:'g'},{l:'HEDGE',v:'44%',p:44,c:'a'},{l:'LCR',v:'122%',p:61,c:'a'}],
+ acts:[['ACCOUNTS','g'],['CORRIDOR RPT','d'],['FX HEDGE','w']],lks:[['→','KZT Account','holdsAccount']],
+ spark:[240,248,255,260,268,274,280],alerts:[]},
+
+// ─── WESTERN ASIA / MENA ──────────────────────────────────
+{id:'dubai',      n:'OpCo MENA',          t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'EMEA', city:'Dubai, UAE',        lat:25.20, lon:55.27,  dot:'dr', tag:'Sub',   risk:'hi', val:'$380M',   sfx:'Cash',     ccy:'USD',
+ kv:[['City','Dubai, UAE'],['Cash','$380M'],['Debt','$200M'],['Net','$180M'],['FX Risk','USD Pegged'],['LCR','108%'],['Hedge','35% ⚠'],['Rating','BBB+']],kvc:[null,'g',null,'g',null,'a','r','a'],
+ gauges:[{l:'CASH',v:'$380M',p:30,c:'a'},{l:'HEDGE',v:'35%',p:35,c:'r'},{l:'LCR',v:'108%',p:54,c:'a'}],
+ acts:[['ACCOUNTS','g'],['URGENT HEDGE','r'],['ESCALATE','r']],lks:[['→','AED Account','holdsAccount'],['→','USD/AED NDF','hasHedge']],
+ spark:[0.32,0.33,0.35,0.37,0.36,0.38,0.38],alerts:['MENA hedge ratio critically low at 35%','LCR at minimum regulatory threshold 108%']},
+
+{id:'riyadh',     n:'Saudi Hub',          t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'EMEA', city:'Riyadh, SA',        lat:24.69, lon:46.72,  dot:'da', tag:'Hub',   risk:'md', val:'SAR 1.2B',sfx:'Cash',     ccy:'SAR',
+ kv:[['City','Riyadh, Saudi Arabia'],['Cash','SAR 1.2B'],['Debt','SAR 420M'],['Net','SAR 780M'],['FX Risk','SAR/USD'],['LCR','128%'],['Vision 2030','ACTIVE'],['Hedge','55%']],kvc:[null,'g',null,'g',null,'a','b','a'],
+ gauges:[{l:'CASH',v:'SAR 1.2B',p:58,c:'g'},{l:'HEDGE',v:'55%',p:55,c:'a'},{l:'LCR',v:'128%',p:64,c:'a'}],
+ acts:[['ACCOUNTS','g'],['SAMA REPORT','d'],['FX EXPOSURE','w']],lks:[['→','SAR Account — Al Rajhi','holdsAccount']],
+ spark:[1.05,1.08,1.1,1.12,1.15,1.18,1.2],alerts:[]},
+
+{id:'telaviv',    n:'Israel Hub',         t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'EMEA', city:'Tel Aviv, IL',      lat:32.09, lon:34.79,  dot:'da', tag:'Hub',   risk:'md', val:'₪580M',   sfx:'Cash',     ccy:'ILS',
+ kv:[['City','Tel Aviv, Israel'],['Cash','₪580M'],['Debt','₪210M'],['Net','₪370M'],['FX Risk','ILS/USD'],['LCR','132%'],['Tech Exposure','HIGH'],['Hedge','61%']],kvc:[null,'g',null,'g','a','a','a','a'],
+ gauges:[{l:'CASH',v:'₪580M',p:55,c:'g'},{l:'HEDGE',v:'61%',p:61,c:'a'},{l:'LCR',v:'132%',p:66,c:'a'}],
+ acts:[['ACCOUNTS','g'],['FX EXPOSURE','w'],['REPORT','d']],lks:[['→','ILS Account — Bank Hapoalim','holdsAccount']],
+ spark:[520,530,545,552,558,570,580],alerts:[]},
+
+// ─── EUROPE ──────────────────────────────────────────────
+{id:'london',     n:'HoldCo Group',       t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'EMEA', city:'London, UK',        lat:51.50, lon:-0.12,  dot:'dgo',tag:'HoldCo',risk:'lo', val:'$18.64B', sfx:'AUM',      ccy:'USD',
+ kv:[['City','London, UK'],['Type','Holding Co'],['AUM','$18.64B'],['Debt','$5.2B'],['Net Cash','$13.44B'],['LCR','138%'],['VaR Util','78%'],['Rating','A/A2']],kvc:[null,null,'g',null,'g','g','a','g'],
+ gauges:[{l:'LCR',v:'138%',p:69,c:'g'},{l:'LEVERAGE',v:'3.8%',p:38,c:'g'},{l:'VAR',v:'78%',p:78,c:'a'}],
+ acts:[['CONSOLIDATE','g'],['BOARD RPT','d'],['STRESS TEST','w'],['EXPORT','d']],lks:[['→','OpCo Europe','hasSubsidiary'],['→','OpCo Americas','hasSubsidiary'],['→','FinCo Cayman','hasSPV'],['→','EMTN Program','issues']],
+ spark:[17.2,17.5,17.8,17.9,18.2,18.4,18.64],alerts:[]},
+
+{id:'amsterdam',  n:'OpCo Europe',        t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'EMEA', city:'Amsterdam, NL',     lat:52.37, lon:4.90,   dot:'dc', tag:'Sub',   risk:'md', val:'€940M',   sfx:'Cash',     ccy:'EUR',
+ kv:[['City','Amsterdam, NL'],['Cash','€940M'],['Debt','€500M'],['Net','€440M'],['FX Risk','EUR/USD HIGH'],['LCR','128%'],['Hedge','61%'],['Rating','A-']],kvc:[null,'g',null,'a','a','a','a','a'],
+ gauges:[{l:'CASH',v:'€940M',p:55,c:'g'},{l:'HEDGE',v:'61%',p:61,c:'a'},{l:'LCR',v:'128%',p:64,c:'a'}],
+ acts:[['ACCOUNTS','g'],['HEDGE REVIEW','w'],['EMIR FILE','d'],['REPORT','d']],lks:[['→','EUR Pool DB','holdsAccount'],['→','EUR Bond 2028','hasDebt'],['→','EUR/USD Fwd','hasHedge']],
+ spark:[0.82,0.85,0.88,0.9,0.92,0.93,0.94],alerts:['EUR/USD hedge ratio 61% below 65% threshold']},
+
+{id:'frankfurt',  n:'EUR Pool — DB',      t:'BankAccount',   f:'FIBO-FBC:PoolingAccount',         region:'EMEA', city:'Frankfurt, DE',     lat:50.11, lon:8.68,   dot:'dg', tag:'Acct',  risk:'lo', val:'€720M',   sfx:'Balance',  ccy:'EUR',
+ kv:[['City','Frankfurt, Germany'],['Balance','€720,000,000'],['Pool Members','4'],['Bank','Deutsche Bank'],['Type','Notional Pool'],['Rate','3.62%'],['Sweep','Nightly'],['Headroom','€340M']],kvc:[null,'a',null,null,null,'b','g','g'],
+ gauges:[{l:'BALANCE',v:'€720M',p:55,c:'g'},{l:'POOL UTIL',v:'68%',p:68,c:'a'},{l:'HEADROOM',v:'€340M',p:48,c:'g'}],
+ acts:[['REBALANCE','g'],['POOL RPT','d'],['SWEEP','d']],lks:[['←','OpCo Europe','isHeldBy'],['→','Deutsche Bank','bookedAt']],
+ spark:[680,690,700,705,710,715,720],alerts:[]},
+
+{id:'paris',      n:'EUR Bond 2028',      t:'Bond',          f:'FIBO-SEC:FixedRateBond',          region:'EMEA', city:'Paris, FR',         lat:48.86, lon:2.35,   dot:'da', tag:'Bond',  risk:'md', val:'€496.4M', sfx:'MTM',      ccy:'EUR',
+ kv:[['City','Paris / Euronext'],['Notional','€500,000,000'],['Coupon','3.25%'],['Maturity','15 Apr 2028'],['ISIN','XS1234567890'],['MTM','€496.4M'],['Spread','T+82bps'],['Duration','2.1Y']],kvc:[null,null,'a',null,null,'a',null,null],
+ gauges:[{l:'MTM',v:'€496M',p:99,c:'g'},{l:'COVERAGE',v:'4.2x',p:84,c:'g'},{l:'DURATION',v:'2.1Y',p:42,c:'g'}],
+ acts:[['COUPON SCHED','g'],['MTM RPT','d'],['HEDGE','w']],lks:[['←','FinCo Cayman','issuedBy'],['→','EUR/USD Fwd','hedgedBy']],
+ spark:[502,501,500,499,498,497,496.4],alerts:[]},
+
+{id:'warsaw',     n:'CEE Hub',            t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'EMEA', city:'Warsaw, PL',        lat:52.23, lon:21.01,  dot:'da', tag:'Hub',   risk:'md', val:'PLN 880M',sfx:'Cash',     ccy:'PLN',
+ kv:[['City','Warsaw, Poland'],['Cash','PLN 880M'],['Debt','PLN 320M'],['Net','PLN 560M'],['FX Risk','PLN/EUR'],['LCR','126%'],['NBP Rate','5.75%'],['Hedge','52%']],kvc:[null,'g',null,'g','a','a','b','a'],
+ gauges:[{l:'CASH',v:'PLN 880M',p:52,c:'g'},{l:'HEDGE',v:'52%',p:52,c:'a'},{l:'LCR',v:'126%',p:63,c:'a'}],
+ acts:[['ACCOUNTS','g'],['NBP REPORT','d'],['FX HEDGE','w']],lks:[['→','PLN Account — PKO','holdsAccount']],
+ spark:[800,820,835,848,855,868,880],alerts:[]},
+
+{id:'london_acct',n:'GBP Sweep — HSBC',  t:'BankAccount',   f:'FIBO-FBC:SweepAccount',           region:'EMEA', city:'London, UK',        lat:51.48, lon:-0.32,  dot:'dr', tag:'Acct',  risk:'hi', val:'£48.2M',  sfx:'Balance ⚠',ccy:'GBP',
+ kv:[['Currency','GBP'],['Balance','£48,200,000'],['Min Buffer','£50,000,000'],['ALERT','BELOW MINIMUM'],['Bank','HSBC'],['Rate','5.12%'],['Sweep','PAUSED'],['Shortfall','£1.8M']],kvc:[null,'r','a','r',null,'b','r','r'],
+ gauges:[{l:'BALANCE',v:'£48M',p:10,c:'r'},{l:'VS MIN',v:'-£1.8M',p:96,c:'r'},{l:'SWEEP',v:'PAUSED',p:100,c:'r'}],
+ acts:[['TRANSFER IN','r'],['OVERRIDE','w'],['ESCALATE','r']],lks:[['←','OpCo Europe','isHeldBy'],['→','HSBC','bookedAt']],
+ spark:[80,72,65,58,54,50,48.2],alerts:['CRITICAL: GBP balance £48.2M below minimum buffer £50M']},
+
+// ─── AFRICA ───────────────────────────────────────────────
+{id:'johannesburg',n:'South Africa Hub',  t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'EMEA', city:'Johannesburg, ZA',  lat:-26.20,lon:28.04,  dot:'da', tag:'Hub',   risk:'md', val:'ZAR 4.8B',sfx:'Cash',     ccy:'ZAR',
+ kv:[['City','Johannesburg, SA'],['Cash','ZAR 4.8B'],['Debt','ZAR 1.6B'],['Net','ZAR 3.2B'],['FX Risk','ZAR/USD'],['LCR','124%'],['SARB Rate','8.25%'],['Hedge','48%']],kvc:[null,'g',null,'g','a','a','b','a'],
+ gauges:[{l:'CASH',v:'ZAR 4.8B',p:58,c:'g'},{l:'HEDGE',v:'48%',p:48,c:'a'},{l:'LCR',v:'124%',p:62,c:'a'}],
+ acts:[['ACCOUNTS','g'],['SARB REPORT','d'],['FX EXPOSURE','w']],lks:[['→','ZAR Account — Nedbank','holdsAccount']],
+ spark:[4.2,4.3,4.4,4.5,4.6,4.7,4.8],alerts:[]},
+
+{id:'lagos',       n:'West Africa Hub',   t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'EMEA', city:'Lagos, NG',         lat:6.52,  lon:3.38,   dot:'da', tag:'Hub',   risk:'md', val:'NGN 18B', sfx:'Cash',     ccy:'NGN',
+ kv:[['City','Lagos, Nigeria'],['Cash','NGN 18B'],['Debt','NGN 6B'],['Net','NGN 12B'],['FX Risk','NGN/USD VOLATILE'],['LCR','118%'],['CBN Rate','26.25%'],['Hedge','38%']],kvc:[null,'g',null,'g','r','a','r','r'],
+ gauges:[{l:'CASH',v:'NGN 18B',p:45,c:'g'},{l:'HEDGE',v:'38%',p:38,c:'r'},{l:'CBN RATE',v:'26.25%',p:80,c:'a'}],
+ acts:[['ACCOUNTS','g'],['CBN REPORT','d'],['FX HEDGE','w'],['ESCALATE','w']],lks:[['→','NGN Account — UBA','holdsAccount']],
+ spark:[15,15.5,16,16.5,17,17.5,18],alerts:[]},
+
+{id:'cairo',       n:'MENA Africa Hub',   t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'EMEA', city:'Cairo, EG',         lat:30.06, lon:31.25,  dot:'da', tag:'Hub',   risk:'md', val:'EGP 2.4B',sfx:'Cash',     ccy:'EGP',
+ kv:[['City','Cairo, Egypt'],['Cash','EGP 2.4B'],['Debt','EGP 820M'],['Net','EGP 1.58B'],['FX Risk','EGP/USD'],['LCR','121%'],['CBE Rate','27.25%'],['Hedge','42%']],kvc:[null,'g',null,'g','a','a','b','a'],
+ gauges:[{l:'CASH',v:'EGP 2.4B',p:48,c:'g'},{l:'HEDGE',v:'42%',p:42,c:'a'},{l:'LCR',v:'121%',p:60,c:'a'}],
+ acts:[['ACCOUNTS','g'],['CBE REPORT','d'],['FX HEDGE','w']],lks:[['→','EGP Account — NBE','holdsAccount']],
+ spark:[2.0,2.1,2.15,2.2,2.28,2.35,2.4],alerts:[]},
+
+// ─── THE AMERICAS ─────────────────────────────────────────
+{id:'newyork',     n:'OpCo Americas',     t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'AMER', city:'New York, US',      lat:40.71, lon:-74.01, dot:'dgo',tag:'Hub',   risk:'lo', val:'$3.84B',  sfx:'Cash',     ccy:'USD',
+ kv:[['City','New York, USA'],['Cash','$3.84B'],['Debt','$1.2B'],['Net','$2.64B'],['FX Risk','USD Primary'],['LCR','155%'],['Rating','A+'],['Hedge','72%']],kvc:[null,'g',null,'g',null,'g','g','a'],
+ gauges:[{l:'CASH',v:'$3.84B',p:72,c:'g'},{l:'HEDGE',v:'72%',p:72,c:'a'},{l:'LCR',v:'155%',p:77,c:'g'}],
+ acts:[['ACCOUNTS','g'],['HEDGES','d'],['PAYMENT','g'],['REPORT','d']],lks:[['→','USD Main JPM','holdsAccount'],['→','USD Revolver','hasFacility'],['→','USD IRS 5Y','hasHedge']],
+ spark:[3.4,3.5,3.6,3.65,3.72,3.78,3.84],alerts:[]},
+
+{id:'chicago',     n:'USD IRS 5Y',        t:'IRS',           f:'FIBO-DER:InterestRateSwap',       region:'AMER', city:'Chicago, US',       lat:41.88, lon:-87.63, dot:'dp', tag:'IRS',   risk:'md', val:'-$2.4M',  sfx:'MTM',      ccy:'USD',
+ kv:[['City','Chicago — CBOT'],['Notional','$300,000,000'],['Pay','Fixed 4.12%'],['Receive','SOFR+42bps'],['Maturity','Jun 2029'],['MTM','($2.4M)'],['DV01','$142K'],['CSA','Active']],kvc:[null,null,null,'b',null,'r',null,'g'],
+ gauges:[{l:'MTM',v:'-$2.4M',p:60,c:'r'},{l:'DV01',v:'$142K',p:50,c:'a'},{l:'CSA',v:'82%',p:82,c:'a'}],
+ acts:[['RISK RPT','g'],['NOVATE','d'],['UNWIND','w']],lks:[['←','OpCo Americas','ownedBy'],['→','JPMorgan','counterpartyIs'],['→','SOFR ON','referencedRate']],
+ spark:[-1.8,-2.0,-2.1,-2.2,-2.3,-2.35,-2.4],alerts:[]},
+
+{id:'toronto',     n:'Canada Hub',        t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'AMER', city:'Toronto, CA',       lat:43.65, lon:-79.38, dot:'dc', tag:'Hub',   risk:'lo', val:'C$1.8B',  sfx:'Cash',     ccy:'CAD',
+ kv:[['City','Toronto, Canada'],['Cash','C$1.8B'],['Debt','C$620M'],['Net','C$1.18B'],['FX Risk','CAD/USD'],['LCR','146%'],['Rating','AA-'],['Hedge','74%']],kvc:[null,'g',null,'g','a','g','g','g'],
+ gauges:[{l:'CASH',v:'C$1.8B',p:64,c:'g'},{l:'HEDGE',v:'74%',p:74,c:'g'},{l:'LCR',v:'146%',p:73,c:'g'}],
+ acts:[['ACCOUNTS','g'],['BOC REPORT','d'],['FX HEDGE','d']],lks:[['→','CAD Account — RBC','holdsAccount']],
+ spark:[1.6,1.65,1.68,1.7,1.74,1.77,1.8],alerts:[]},
+
+{id:'newyork_acct',n:'USD Main — JPM',    t:'BankAccount',   f:'FIBO-FBC:DemandDepositAccount',   region:'AMER', city:'New York, US',      lat:40.74, lon:-74.50, dot:'dg', tag:'Acct',  risk:'lo', val:'$924.1M', sfx:'Balance',  ccy:'USD',
+ kv:[['Currency','USD'],['Balance','$924,100,000'],['Available','$910M'],['Bank','JPMorgan'],['Sweep','Active'],['Rate','5.28%'],['24H Net','+$4.1M'],['Type','Current']],kvc:[null,'g','g',null,'g','b','g',null],
+ gauges:[{l:'BALANCE',v:'$924M',p:62,c:'g'},{l:'INFLOW',v:'+$12M',p:55,c:'g'},{l:'OUTFLOW',v:'-$8M',p:40,c:'a'}],
+ acts:[['WIRE','g'],['SWEEP','d'],['FORECAST','d']],lks:[['←','OpCo Americas','isHeldBy'],['→','JPMorgan','bookedAt']],
+ spark:[900,905,910,908,915,920,924],alerts:[]},
+
+{id:'cayman',      n:'FinCo Cayman',      t:'SPV',           f:'FIBO-BE:SpecialPurposeVehicle',   region:'AMER', city:'Cayman Islands',    lat:19.32, lon:-81.38, dot:'dp', tag:'SPV',   risk:'lo', val:'$4.5B',   sfx:'Debt',     ccy:'USD',
+ kv:[['City','Grand Cayman'],['Type','SPV/FinCo'],['Bonds','$2.2B'],['CP Program','$800M'],['EMTN','€1.5B'],['Total Debt','$4.5B'],['Guarantee','HoldCo'],['Coverage','3.2x']],kvc:[null,null,'a','a','a','a','g','g'],
+ gauges:[{l:'UTILISATION',v:'62%',p:62,c:'a'},{l:'COVERAGE',v:'3.2x',p:80,c:'g'},{l:'MATURITY',v:'2.1Y',p:42,c:'g'}],
+ acts:[['DEBT SCHED','g'],['MTM RPT','d'],['RATING CALL','d']],lks:[['→','EUR Bond 2028','issues'],['→','USCP Program','issues'],['→','EMTN Program','issues'],['←','HoldCo','guaranteedBy']],
+ spark:[4.1,4.2,4.25,4.3,4.35,4.42,4.5],alerts:[]},
+
+{id:'mexicocity',  n:'Mexico Hub',        t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'AMER', city:'Mexico City, MX',   lat:19.43, lon:-99.13, dot:'da', tag:'Hub',   risk:'md', val:'MXN 8.4B',sfx:'Cash',     ccy:'MXN',
+ kv:[['City','Mexico City, Mexico'],['Cash','MXN 8.4B'],['Debt','MXN 3.2B'],['Net','MXN 5.2B'],['FX Risk','MXN/USD'],['LCR','125%'],['Banxico Rate','10.5%'],['Hedge','56%']],kvc:[null,'g',null,'g','a','a','b','a'],
+ gauges:[{l:'CASH',v:'MXN 8.4B',p:58,c:'g'},{l:'HEDGE',v:'56%',p:56,c:'a'},{l:'LCR',v:'125%',p:62,c:'a'}],
+ acts:[['ACCOUNTS','g'],['BANXICO RPT','d'],['FX HEDGE','w']],lks:[['→','MXN Account — Banorte','holdsAccount']],
+ spark:[7.5,7.6,7.8,7.9,8.0,8.2,8.4],alerts:[]},
+
+{id:'saopaulo',    n:'Brazil Hub',        t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'AMER', city:'São Paulo, BR',     lat:-23.55,lon:-46.63, dot:'da', tag:'Hub',   risk:'md', val:'BRL 9.8B', sfx:'Cash',    ccy:'BRL',
+ kv:[['City','São Paulo, Brazil'],['Cash','BRL 9.8B'],['Debt','BRL 3.6B'],['Net','BRL 6.2B'],['FX Risk','BRL/USD'],['LCR','122%'],['Selic Rate','10.5%'],['Hedge','52%']],kvc:[null,'g',null,'g','a','a','b','a'],
+ gauges:[{l:'CASH',v:'BRL 9.8B',p:56,c:'g'},{l:'HEDGE',v:'52%',p:52,c:'a'},{l:'LCR',v:'122%',p:61,c:'a'}],
+ acts:[['ACCOUNTS','g'],['BCB REPORT','d'],['FX HEDGE','w']],lks:[['→','BRL Account — Itaú','holdsAccount']],
+ spark:[8.8,9.0,9.2,9.3,9.5,9.65,9.8],alerts:[]},
+
+{id:'buenosaires', n:'Cone Sur Hub',      t:'LegalEntity',   f:'FIBO-BE:LegalEntity',             region:'AMER', city:'Buenos Aires, AR',  lat:-34.60,lon:-58.38, dot:'dr', tag:'Hub',   risk:'hi', val:'ARS 280B',sfx:'Cash',     ccy:'ARS',
+ kv:[['City','Buenos Aires, Argentina'],['Cash','ARS 280B'],['Debt','ARS 95B'],['Net','ARS 185B'],['FX Risk','ARS CONTROLS'],['LCR','112%'],['BCRA Rate','38%'],['Hedge','22% ⚠']],kvc:[null,'g',null,'g','r','a','r','r'],
+ gauges:[{l:'CASH',v:'ARS 280B',p:40,c:'a'},{l:'HEDGE',v:'22%',p:22,c:'r'},{l:'FX CTRL',v:'ACTIVE',p:100,c:'r'}],
+ acts:[['ACCOUNTS','g'],['BCRA REPORT','d'],['ESCALATE','r'],['FX HEDGE','r']],lks:[['→','ARS Account — Banco Nación','holdsAccount']],
+ spark:[220,230,240,252,260,270,280],alerts:['Argentina FX controls active — repatriation restricted','ARS hedge ratio 22% critically below 50% threshold']},
+
+// ─── RATES & INSTRUMENTS ──────────────────────────────────
+{id:'sofr_node',   n:'SOFR ON',           t:'BenchmarkRate', f:'FIBO-IND:InterestRate',           region:'AMER', city:'FRBNY, New York',   lat:40.76, lon:-73.97, dot:'dc', tag:'Rate',  risk:'lo', val:'5.30%',   sfx:'Rate',     ccy:'USD',
+ kv:[['Value','5.30%'],['Prev','5.30%'],['Δ','0.00bps'],['Type','Overnight RFR'],['Admin','FRBNY'],['CCY','USD'],['IOSCO','Compliant'],['30D Avg','5.30%']],kvc:['b',null,'g',null,null,null,'g','b'],
+ gauges:[{l:'RATE',v:'5.30%',p:53,c:'b'},{l:'30D AVG',v:'5.30%',p:53,c:'b'},{l:'VS PREV',v:'Flat',p:50,c:'g'}],
+ acts:[['HISTORY','g'],['LINKED TRADES','d'],['SCENARIO','d']],lks:[['←','USD IRS 5Y','referencedBy']],
+ spark:[5.31,5.30,5.30,5.30,5.30,5.30,5.30],alerts:[]},
+
+{id:'euribor_node',n:'EURIBOR 3M',        t:'BenchmarkRate', f:'FIBO-IND:InterestRate',           region:'EMEA', city:'EMMI, Brussels',    lat:50.85, lon:4.35,   dot:'dc', tag:'Rate',  risk:'lo', val:'3.65%',   sfx:'Rate',     ccy:'EUR',
+ kv:[['Value','3.65%'],['Prev','3.67%'],['Δ','-2bps'],['Type','Term Rate'],['Admin','EMMI'],['CCY','EUR'],['IOSCO','Compliant'],['vs SOFR','-165bps']],kvc:['b',null,'g',null,null,null,'g','g'],
+ gauges:[{l:'RATE',v:'3.65%',p:37,c:'b'},{l:'3M TREND',v:'↓-15bps',p:35,c:'g'},{l:'VS SOFR',v:'-165bps',p:25,c:'g'}],
+ acts:[['HISTORY','g'],['LINKED TRADES','d'],['SCENARIO','d']],lks:[['←','EUR Bond 2028','referencedBy']],
+ spark:[3.82,3.78,3.75,3.72,3.69,3.67,3.65],alerts:[]},
+
+{id:'jpm_node',    n:'JPMorgan',          t:'Counterparty',  f:'FIBO-BE:CreditInstitution',       region:'AMER', city:'New York, US',      lat:40.755,lon:-73.98, dot:'dr', tag:'Bank',  risk:'lo', val:'$2.45B',  sfx:'Exposure', ccy:'USD',
+ kv:[['Type','Global Bank'],['S&P Rating','A+'],["Moody's",'A1'],['Exposure','$2.45B'],['ISDA','Signed'],['CSA','Active'],['Limit Util','72%'],['Products','8']],kvc:[null,'g','g',null,'g','g','a',null],
+ gauges:[{l:'EXPOSURE',v:'$2.45B',p:72,c:'a'},{l:'LIMIT',v:'$3.4B',p:72,c:'a'},{l:'RATING',v:'A+',p:85,c:'g'}],
+ acts:[['EXPOSURE RPT','g'],['LIMITS','w'],['KYC','d']],lks:[['←','USD Main JPM','hostsAccount'],['←','USD IRS 5Y','isCounterparty']],
+ spark:[2.1,2.2,2.28,2.32,2.38,2.42,2.45],alerts:[]},
+
+{id:'db_node',     n:'Deutsche Bank',     t:'Counterparty',  f:'FIBO-BE:CreditInstitution',       region:'EMEA', city:'Frankfurt, DE',     lat:50.09, lon:8.65,   dot:'dr', tag:'Bank',  risk:'md', val:'€1.1B',   sfx:'Exposure', ccy:'EUR',
+ kv:[['Type','Global Bank'],['S&P Rating','BBB+'],["Moody's",'Baa1'],['Exposure','€1.1B'],['ISDA','Signed'],['CSA','Active'],['Limit Util','88%'],['Products','5']],kvc:[null,'a','a',null,'g','g','r',null],
+ gauges:[{l:'EXPOSURE',v:'€1.1B',p:88,c:'r'},{l:'LIMIT',v:'€1.25B',p:88,c:'r'},{l:'RATING',v:'BBB+',p:60,c:'a'}],
+ acts:[['EXPOSURE RPT','g'],['LIMIT BREACH','r'],['REVIEW','w']],lks:[['←','EUR Pool DB','hostsAccount'],['←','EUR/USD Fwd','isCounterparty']],
+ spark:[0.9,0.95,1.0,1.02,1.05,1.08,1.1],alerts:['Deutsche Bank exposure 88% of limit — approaching breach']},
+
+{id:'ndf_shanghai',n:'USD/CNH NDF',       t:'NDF',           f:'FIBO-DER:NonDeliverableForward',  region:'APAC', city:'Shanghai / HK',     lat:31.23, lon:121.55, dot:'dr', tag:'NDF',   risk:'hi', val:'-$264K',  sfx:'MTM',      ccy:'USD',
+ kv:[['Notional','$120,000,000'],['Pair','USD/CNH'],['Strike','7.2400'],['Fixing','7.2618'],['Expiry','31 Mar 2026'],['MTM','-$264K'],['Purpose','CNH Hedge'],['PBOC','REQUIRED']],kvc:[null,null,null,null,null,'r',null,'r'],
+ gauges:[{l:'MTM P&L',v:'-$264K',p:55,c:'r'},{l:'FIXING',v:'218pts',p:70,c:'a'},{l:'DAYS',v:'7D',p:95,c:'a'}],
+ acts:[['ROLL NDF','w'],['UNWIND','r'],['PBOC CHECK','d']],lks:[['←','OpCo China','ownedBy'],['→','Bank of China','counterpartyIs']],
+ spark:[-0.1,-0.15,-0.2,-0.22,-0.25,-0.26,-0.264],alerts:['NDF MTM loss $264K — monitor CNH fixing divergence']},
+
+{id:'emtn_prog',   n:'EMTN Program',      t:'Program',       f:'FIBO-SEC:MediumTermNote',         region:'EMEA', city:'London / LuxSE',    lat:51.52, lon:-0.08,  dot:'dp', tag:'EMTN',  risk:'lo', val:'€800M',   sfx:'Drawn',    ccy:'EUR',
+ kv:[['Program Size','€2,000,000,000'],['Drawn','€800M'],['Available','€1,200M'],['Listing','LSE/LuxSE'],['Rating','A/A2'],['Arranger','Barclays/DB'],['Avg Tenor','3.4Y'],['Next Issuance','TBD']],kvc:[null,'a','g',null,'g',null,null,null],
+ gauges:[{l:'UTILISATION',v:'40%',p:40,c:'g'},{l:'AVAILABLE',v:'€1.2B',p:60,c:'g'},{l:'AVG TENOR',v:'3.4Y',p:68,c:'g'}],
+ acts:[['NEW TRANCHE','g'],['PROGRAM RPT','d'],['INVESTOR CALL','d']],lks:[['←','FinCo Cayman','issuedUnder'],['→','EUR Bond 2028','comprises']],
+ spark:[700,720,740,760,775,790,800],alerts:[]},
+
+{id:'uscp_prog',   n:'USCP Program',      t:'CP',            f:'FIBO-SEC:CommercialPaper',        region:'AMER', city:'New York, US',      lat:40.73, lon:-74.08, dot:'da', tag:'CP',    risk:'lo', val:'$185M',   sfx:'Outstanding',ccy:'USD',
+ kv:[['Program Size','$500,000,000'],['Outstanding','$185M'],['Available','$315M'],['Tenor','30-270 days'],['Rating','A-1/P-1'],['Dealers','Citi, JPM'],['All-in Rate','5.38%'],['Next Roll','12 Apr']],kvc:[null,'a','g',null,'g',null,'a',null],
+ gauges:[{l:'UTILISATION',v:'37%',p:37,c:'g'},{l:'AVG TENOR',v:'62D',p:23,c:'g'},{l:'ALL-IN',v:'5.38%',p:54,c:'a'}],
+ acts:[['ISSUE CP','g'],['ROLL','d'],['REPORT','d']],lks:[['←','FinCo Cayman','issuedBy'],['→','JPMorgan','dealer']],
+ spark:[160,165,170,175,180,182,185],alerts:[]},
+
+{id:'fx_eur_usd',  n:'EUR/USD Fwd',       t:'FXForward',     f:'FIBO-DER:FXForwardContract',      region:'EMEA', city:'London, UK',        lat:51.51, lon:0.05,   dot:'da', tag:'FX Fwd',risk:'md', val:'+$1.02M', sfx:'MTM',      ccy:'USD',
+ kv:[['Notional','$240,000,000'],['Pair','EUR/USD'],['Strike','1.0842'],['Spot Ref','1.0837'],['Expiry','28 Mar 2026'],['MTM','+$1.02M'],['Hedge Ratio','61%'],['Counterparty','Deutsche Bank']],kvc:[null,null,null,null,null,'g','a',null],
+ gauges:[{l:'HEDGE RATIO',v:'61%',p:61,c:'a'},{l:'MTM P&L',v:'+$1.0M',p:60,c:'g'},{l:'DAYS TO EXP',v:'4D',p:98,c:'r'}],
+ acts:[['ROLL FWD','g'],['INCREASE','w'],['CLOSE OUT','r']],lks:[['→','EUR Bond 2028','hedges'],['←','OpCo Europe','ownedBy']],
+ spark:[0.2,-0.1,0.5,0.7,0.9,0.95,1.02],alerts:['EUR/USD Fwd expiring in 4 days — roll decision required']},
+
+{id:'revolver_ny', n:'USD Revolver',      t:'CreditFacility',f:'FIBO-FBC:RevolverFacility',       region:'AMER', city:'New York, US',      lat:40.72, lon:-74.15, dot:'dg', tag:'RCF',   risk:'lo', val:'$1.5B',   sfx:'Available',ccy:'USD',
+ kv:[['Facility','$1,500,000,000'],['Drawn','$0'],['Available','$1,500,000,000'],['Expiry','Jun 2027'],['Margin','SOFR+85bps'],['Arrangers','JPM, BofA, Citi'],['Rating Trigger','BBB-'],['Status','UNDRAWN']],kvc:[null,'g','g',null,'b',null,null,'g'],
+ gauges:[{l:'DRAWN',v:'0%',p:1,c:'g'},{l:'AVAILABLE',v:'$1.5B',p:100,c:'g'},{l:'EXPIRY',v:'2.2Y',p:44,c:'g'}],
+ acts:[['DRAW DOWN','g'],['FACILITY RPT','d'],['REFINANCE','d']],lks:[['←','OpCo Americas','hasFacility'],['→','JPMorgan','leadArranger']],
+ spark:[0,0,0,0,0,0,0],alerts:[]},
+];
+
+// ── ARCS (key connections for visibility)
+const ARCS=[
+  {f:'london',    t:'amsterdam',   c:'rgba(0,216,255,.18)'},{f:'london',    t:'singapore', c:'rgba(0,216,255,.18)'},
+  {f:'london',    t:'newyork',     c:'rgba(0,216,255,.2)'}, {f:'london',    t:'cayman',    c:'rgba(168,85,247,.18)'},
+  {f:'london',    t:'tokyo',       c:'rgba(0,216,255,.15)'},{f:'london',    t:'sydney',    c:'rgba(0,216,255,.15)'},
+  {f:'newyork',   t:'toronto',     c:'rgba(0,255,179,.15)'},{f:'newyork',   t:'cayman',    c:'rgba(168,85,247,.18)'},
+  {f:'newyork',   t:'chicago',     c:'rgba(168,85,247,.18)'},{f:'newyork',  t:'saopaulo',  c:'rgba(0,216,255,.13)'},
+  {f:'singapore', t:'shanghai',    c:'rgba(255,32,32,.2)'}, {f:'singapore', t:'tokyo',     c:'rgba(0,216,255,.15)'},
+  {f:'singapore', t:'sydney',      c:'rgba(0,216,255,.15)'},{f:'singapore', t:'mumbai',    c:'rgba(0,216,255,.13)'},
+  {f:'cayman',    t:'paris',       c:'rgba(168,85,247,.16)'},{f:'cayman',   t:'emtn_prog', c:'rgba(168,85,247,.16)'},
+  {f:'dubai',     t:'riyadh',      c:'rgba(255,170,0,.16)'},{f:'london',    t:'dubai',     c:'rgba(255,170,0,.18)'},
+  {f:'amsterdam', t:'frankfurt',   c:'rgba(0,255,179,.16)'},{f:'amsterdam', t:'warsaw',    c:'rgba(0,216,255,.14)'},
+  {f:'shanghai',  t:'ndf_shanghai',c:'rgba(255,32,32,.22)'},{f:'london',    t:'johannesburg',c:'rgba(0,216,255,.12)'},
+];
+
+// ════════════════════════════════════════════════════════
+// MAP ENGINE
+// ════════════════════════════════════════════════════════
+let proj, geoPath, W, H;
+const centerEl = document.getElementById('center');
+
+function rc(e){ return e.risk==='hi'?'br':e.risk==='md'?'warn':e.dot==='dgo'?'gold':'ok'; }
+
+function getWH(){ W=centerEl.clientWidth; H=centerEl.clientHeight; }
+
+function initProj(){
+  proj = d3.geoNaturalEarth1().scale(W/6.3).translate([W/2, H/2]);
+  geoPath = d3.geoPath().projection(proj);
+}
+
+function xy(lon,lat){
+  if(!proj) return {x:0,y:0};
+  const p=proj([lon,lat]);
+  return p?{x:p[0],y:p[1]}:{x:0,y:0};
+}
+
+function drawMap(world){
+  const canvas=document.getElementById('map-canvas');
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+
+  // Deep-sea ocean
+  const og=ctx.createLinearGradient(0,0,0,H);
+  og.addColorStop(0,'#020c1c'); og.addColorStop(.45,'#030e1f'); og.addColorStop(1,'#020b16');
+  ctx.fillStyle=og; ctx.fillRect(0,0,W,H);
+
+  const p2d=d3.geoPath().projection(proj).context(ctx);
+
+  // Grid
+  const grat=d3.geoGraticule().step([20,15]);
+  ctx.beginPath(); p2d(grat());
+  ctx.strokeStyle='rgba(0,100,165,.08)'; ctx.lineWidth=0.4; ctx.stroke();
+
+  // Sphere border
+  ctx.beginPath(); p2d({type:'Sphere'});
+  ctx.strokeStyle='rgba(0,130,180,.16)'; ctx.lineWidth=0.6; ctx.stroke();
+
+  // Equator & prime meridian
+  const eq={type:'LineString',coordinates:[[-180,0],[0,0],[180,0]]};
+  const pm={type:'LineString',coordinates:[[0,-85],[0,85]]};
+  ctx.beginPath(); p2d(eq); ctx.strokeStyle='rgba(0,150,200,.14)'; ctx.lineWidth=0.7; ctx.stroke();
+  ctx.beginPath(); p2d(pm); ctx.strokeStyle='rgba(0,150,200,.1)'; ctx.lineWidth=0.7; ctx.stroke();
+
+  // Tropics & Arctic/Antarctic circles
+  [[23.5,'rgba(255,200,0,.05)'],[-23.5,'rgba(255,200,0,.05)'],[66.5,'rgba(0,200,255,.04)'],[-66.5,'rgba(0,200,255,.04)']].forEach(([lat,col])=>{
+    const tropic={type:'LineString',coordinates:[[-180,lat],[180,lat]]};
+    ctx.beginPath(); p2d(tropic); ctx.strokeStyle=col; ctx.lineWidth=0.5; ctx.stroke();
+  });
+
+  // Country land fill
+  const countries=topojson.feature(world,world.objects.countries);
+  ctx.beginPath(); p2d(countries);
+  ctx.fillStyle='rgba(0,70,120,.24)'; ctx.fill();
+
+  // Sovereign borders
+  const borders=topojson.mesh(world,world.objects.countries,(a,b)=>a!==b);
+  ctx.beginPath(); p2d(borders);
+  ctx.strokeStyle='rgba(0,140,200,.22)'; ctx.lineWidth=0.35; ctx.stroke();
+
+  // Iridescent coastlines
+  countries.features.forEach((feat,i)=>{
+    const h=185+(i*9)%36;
+    const a=0.22+(i%4)*0.06;
+    ctx.beginPath(); p2d(feat);
+    ctx.strokeStyle=`hsla(${h},100%,62%,${a})`; ctx.lineWidth=0.55; ctx.stroke();
+  });
+
+  // Vignette
+  const vg=ctx.createRadialGradient(W/2,H/2,H*.2,W/2,H/2,W*.68);
+  vg.addColorStop(0,'transparent'); vg.addColorStop(1,'rgba(1,4,14,.6)');
+  ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+
+  // Grid coordinate labels
+  ctx.font='7px Share Tech Mono'; ctx.fillStyle='rgba(0,110,160,.18)';
+  for(let lo=-160;lo<=160;lo+=40){const p=proj([lo,-80]);if(p&&p[0]>0&&p[0]<W) ctx.fillText(lo+'°',p[0]-8,H-5);}
+  for(let la=-60;la<=60;la+=30){const p=proj([-178,la]);if(p&&p[1]>0&&p[1]<H) ctx.fillText(la+'°',3,p[1]+3);}
+}
+
+function drawArcs(){
+  const svg=d3.select('#arc-svg');
+  svg.selectAll('*').remove();
+  svg.attr('viewBox',`0 0 ${W} ${H}`);
+  ARCS.forEach(arc=>{
+    const from=ENT.find(e=>e.id===arc.f);
+    const to=ENT.find(e=>e.id===arc.t);
+    if(!from||!to) return;
+    const gc={type:'LineString',coordinates:[[from.lon,from.lat],[to.lon,to.lat]]};
+    svg.append('path').datum(gc).attr('d',geoPath)
+      .attr('fill','none').attr('stroke',arc.c).attr('stroke-width','0.75').attr('stroke-dasharray','3 4');
+  });
+}
+
+function buildNodes(){
+  const layer=document.getElementById('node-layer');
+  layer.innerHTML='';
+  ENT.forEach(e=>{
+    const {x,y}=xy(e.lon,e.lat);
+    const cls=rc(e);
+    const div=document.createElement('div');
+    div.className=`tac ${cls}${selId===e.id?' sel':''}`;
+    div.id='tn-'+e.id;
+    div.style.left=x+'px'; div.style.top=y+'px';
+    div.innerHTML=`<div class="tac-wico">⚠</div><div class="tac-ring"></div><div class="tac-core"></div><div class="tac-lbl">${e.city.split(',')[0]}</div>`;
+    div.onclick=ev=>{ev.stopPropagation();selectEnt(e.id);};
+    layer.appendChild(div);
+  });
+}
+
+// ════════════════════════════════════════════
+// HUD
+// ════════════════════════════════════════════
+let openHUD=null,tickTmr=null;
+
+function showHUD(e){
+  closeHUD();
+  const {x,y}=xy(e.lon,e.lat);
+  const cls=rc(e);
+  let hx=x+13,hy=y-8;
+  if(hx+205>W) hx=x-218;
+  if(hy+240>H) hy=y-220;
+  if(hy<5) hy=5;
+  if(hx<5) hx=5;
+
+  const layer=document.getElementById('hud-layer');
+  const sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  sv.setAttribute('class','hconn'); sv.id='hconn-svg';
+  const lc=cls==='br'?'rgba(255,32,32,.4)':cls==='warn'?'rgba(255,170,0,.3)':cls==='gold'?'rgba(255,208,96,.35)':'rgba(0,216,255,.28)';
+  sv.innerHTML=`<line x1="${x}" y1="${y}" x2="${hx}" y2="${hy+10}" stroke="${lc}" stroke-width="1" stroke-dasharray="3 3"/>`;
+  layer.appendChild(sv);
+
+  const div=document.createElement('div');
+  div.className=`hud ${cls}`; div.id='hud-main';
+  div.style.cssText=`left:${hx}px;top:${hy}px;pointer-events:all;`;
+
+  const bhtml=(cls==='br'&&e.alerts?.length)?`<div class="halt"><div class="halt-ico">⚠ BREACH DETECTED</div>${e.alerts.map(a=>`<div class="halt-msg">${a}</div>`).join('')}</div>`:'';
+  const kv3=e.kv.slice(0,3).map((r,i)=>`<div class="hkv"><span class="hk">${r[0]}</span><span class="hv ${e.kvc&&e.kvc[i]?e.kvc[i]:''}">${r[1]}</span></div>`).join('');
+  const acts=e.acts.slice(0,3).map(a=>`<button class="ha ${a[1]}" onclick="doAct('${a[0]}')">${a[0]}</button>`).join('');
+
+  div.innerHTML=`
+    <div class="hh ${cls}">
+      <div class="hh-dot"></div>
+      <div style="flex:1;min-width:0">
+        <div class="hh-type">${e.f.split(':')[1]||e.t} · ${e.region}</div>
+        <div class="hh-name">${e.n}</div>
+      </div>
+      <div class="hh-x" onclick="closeHUD()">✕</div>
+    </div>
+    <div class="hb">
+      <div class="hb-lbl">${e.sfx} · LIVE</div>
+      <div class="hb-val" id="hbv">${e.val}</div>
+      <div class="hb-sub">${e.lat.toFixed(2)}°${e.lat>=0?'N':'S'} ${Math.abs(e.lon).toFixed(2)}°${e.lon>=0?'E':'W'} · ${e.ccy}</div>
+    </div>
+    ${bhtml}${kv3}
+    <div class="hacts">${acts}</div>`;
+
+  layer.appendChild(div);
+  openHUD={div,sv};
+  startTick(e);
+}
+
+function startTick(e){
+  if(tickTmr) clearInterval(tickTmr);
+  const raw=e.val.replace(/[^0-9.\-]/g,'');
+  let base=parseFloat(raw)||0;
+  const pre=e.val.match(/^[^0-9\-]*/)?.[0]||'';
+  const suf=e.val.match(/[A-Z%]+$/)?.[0]||'';
+  const mag=Math.abs(base)*0.00016;
+  tickTmr=setInterval(()=>{
+    const el=document.getElementById('hbv');
+    if(!el){clearInterval(tickTmr);return;}
+    base+=(Math.random()-.5)*mag;
+    let d;
+    if(Math.abs(base)>=1000) d=pre+base.toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g,',')+suf;
+    else if(Math.abs(base)>=1) d=pre+base.toFixed(2)+suf;
+    else d=pre+base.toFixed(3)+suf;
+    el.textContent=d;
+    el.style.opacity='.55';
+    setTimeout(()=>{el.style.opacity='1';},80);
+  },600+Math.random()*350);
+}
+
+function closeHUD(){
+  if(openHUD){openHUD.div.remove();openHUD.sv.remove();openHUD=null;}
+  if(tickTmr){clearInterval(tickTmr);tickTmr=null;}
+}
+
+document.getElementById('center').addEventListener('click',ev=>{
+  if(!ev.target.closest('.tac')&&!ev.target.closest('.hud')&&!ev.target.closest('#hconn-svg')) closeHUD();
+});
+
+document.getElementById('center').addEventListener('mousemove',ev=>{
+  if(!proj) return;
+  const r=centerEl.getBoundingClientRect();
+  const c=proj.invert([ev.clientX-r.left,ev.clientY-r.top]);
+  if(c){
+    const lo=c[0].toFixed(1),la=c[1].toFixed(1);
+    document.getElementById('mapinfo').textContent=`LAT ${la}° · LON ${lo}° · 36 NODES ACTIVE`;
+    document.getElementById('sb-coord').textContent=`${la}°N ${lo}°E`;
+  }
+});
+
+// ════════════════════════════════════════════
+// SELECT
+// ════════════════════════════════════════════
+let selId='london',tMode='all';
+
+function selectEnt(id){
+  selId=id;
+  document.querySelectorAll('.tac').forEach(n=>n.classList.remove('sel'));
+  document.querySelectorAll('.titem').forEach(n=>n.classList.remove('sel'));
+  const tn=document.getElementById('tn-'+id); if(tn) tn.classList.add('sel');
+  const ti=document.getElementById('ti-'+id); if(ti){ti.classList.add('sel');ti.scrollIntoView({block:'nearest'});}
+  const e=ENT.find(x=>x.id===id); if(!e) return;
+  showHUD(e); renderDetail(e);
+}
+
+// ════════════════════════════════════════════
+// DETAIL
+// ════════════════════════════════════════════
+function renderDetail(e){
+  const ib=e.risk==='hi';
+  const gc=c=>c==='g'?'var(--a2)':c==='r'?'var(--danger)':c==='b'?'var(--acc)':c==='go'?'var(--gold)':'var(--warn)';
+  let h=`<div class="dsec">
+    <div class="dlbl">${t('selectedObj')} · ${e.region}</div>
+    <div class="dtitle${ib?' br':''}">${e.n}</div>
+    <div class="dfibo">${e.f}</div>
+    <div class="dcoord">${e.city} · ${e.lat.toFixed(2)}°${e.lat>=0?'N':'S'} ${Math.abs(e.lon).toFixed(2)}°${e.lon>=0?'E':'W'}</div>
+  </div>
+  <div class="dsec">${e.kv.map((r,i)=>`<div class="kv2"><span class="kk">${r[0]}</span><span class="kval ${e.kvc&&e.kvc[i]?e.kvc[i]:''}">${r[1]}</span></div>`).join('')}</div>`;
+
+  if(e.gauges?.length){
+    h+=`<div class="grow">`;
+    e.gauges.forEach(g=>{const col=gc(g.c);h+=`<div class="gg"><div class="ggl">${g.l}</div><div class="ggv" style="color:${col}">${g.v}</div><div class="ggbar"><div class="ggfill" style="width:${g.p}%;background:${col}"></div></div></div>`;});
+    h+=`</div>`;
+  }
+
+  h+=`<div class="swrap"><div class="dlbl" style="margin-bottom:2px">${t('trend7d')}</div><canvas id="spark" width="250" height="36" style="width:100%"></canvas></div>`;
+
+  if(ib&&e.alerts?.length) h+=`<div class="dsec" style="background:rgba(255,32,32,.04)"><div class="dlbl" style="color:var(--danger);margin-bottom:2px">${t('breachDetail')}</div>${e.alerts.map(a=>`<div style="font-size:8px;color:rgba(255,108,108,.9);padding:2px 0;border-bottom:1px solid rgba(255,32,32,.1);line-height:1.5">${a}</div>`).join('')}</div>`;
+
+  h+=`<div class="arow">${e.acts.map(a=>`<button class="abtn ${a[1]}" onclick="doAct('${a[0]}')">${a[0]}</button>`).join('')}</div>`;
+  h+=`<div class="ph"><div class="pt">${t('ontologyLinks')}</div></div>`;
+  h+=e.lks.map(l=>`<div class="lki"><span class="lkarr">${l[0]}</span><span class="lkd">${l[1]}</span><span class="lkt">${l[2]}</span></div>`).join('');
+
+  const aa=ENT.flatMap(x=>(x.alerts||[]).map(a=>({e:x,a})));
+  if(aa.length){
+    h+=`<div class="ph"><div class="pt">${t('systemAlerts')}</div><div class="pbdg" style="color:var(--danger);border-color:var(--danger)">${aa.length} ${t('open')}</div></div>`;
+    h+=aa.map(({e:x,a})=>`<div class="ali" onclick="selectEnt('${x.id}')"><div class="alico ${x.risk==='hi'?'r':'w'}">${x.risk==='hi'?t('riskHi'):'WARN'}</div><div><div class="altxt">${a}</div><div class="altm">${x.city} · LIVE</div></div></div>`).join('');
+  }
+
+  document.getElementById('rs').innerHTML=h;
+  drawSpark('spark',e.spark);
+}
+
+function drawSpark(id,data){
+  const c=document.getElementById(id);if(!c)return;
+  const ctx=c.getContext('2d'),w=c.width,h=c.height;
+  ctx.clearRect(0,0,w,h);
+  const mn=Math.min(...data),mx=Math.max(...data),rng=mx-mn||1;
+  const pts=data.map((v,i)=>({x:(i/(data.length-1))*(w-4)+2,y:h-4-((v-mn)/rng)*(h-10)}));
+  ctx.beginPath();ctx.moveTo(pts[0].x,h);pts.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(pts[pts.length-1].x,h);ctx.closePath();ctx.fillStyle='rgba(0,216,255,.07)';ctx.fill();
+  ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.strokeStyle='#00d8ff';ctx.lineWidth=1.5;ctx.stroke();
+  const l=pts[pts.length-1];ctx.beginPath();ctx.arc(l.x,l.y,2.5,0,Math.PI*2);ctx.fillStyle='#00ffb3';ctx.fill();
+}
+
+// ════════════════════════════════════════════
+// TREE
+// ════════════════════════════════════════════
+const GROUPS=[
+  {lk:'apacEast',  fn:e=>e.region==='APAC'&&['LegalEntity'].includes(e.t)&&['tokyo','seoul','shanghai','singapore','mumbai','sydney','almaty'].includes(e.id)},
+  {lk:'emeaEurope',fn:e=>e.region==='EMEA'&&['LegalEntity'].includes(e.t)&&['london','amsterdam','warsaw'].includes(e.id)},
+  {lk:'emeaMena',  fn:e=>e.region==='EMEA'&&['LegalEntity'].includes(e.t)&&['dubai','riyadh','telaviv','johannesburg','lagos','cairo'].includes(e.id)},
+  {lk:'amerNorth', fn:e=>e.region==='AMER'&&['LegalEntity'].includes(e.t)&&['newyork','toronto','chicago'].includes(e.id)},
+  {lk:'amerLatam', fn:e=>['cayman','mexicocity','saopaulo','buenosaires'].includes(e.id)},
+  {lk:'bankAccounts',fn:e=>e.t==='BankAccount'},
+  {lk:'debtProg',  fn:e=>['Bond','Program','CP','CreditFacility'].includes(e.t)},
+  {lk:'derivatives',fn:e=>['FXForward','NDF','IRS'].includes(e.t)},
+  {lk:'rates',     fn:e=>e.t==='BenchmarkRate'},
+  {lk:'counterparties',fn:e=>e.t==='Counterparty'},
+];
+
+function buildTree(){
+  const tree=document.getElementById('tree'); tree.innerHTML='';
+  GROUPS.forEach(g=>{
+    let ents=ENT.filter(g.fn);
+    if(tMode==='apac'&&!ents.some(e=>e.region==='APAC'))return;
+    if(tMode==='amer'&&!ents.some(e=>e.region==='AMER'))return;
+    if(tMode==='emea'&&!ents.some(e=>e.region==='EMEA'))return;
+    if(tMode==='risk'&&ents.every(e=>e.risk==='lo'))return;
+    if(tMode==='apac') ents=ents.filter(e=>e.region==='APAC');
+    if(tMode==='amer') ents=ents.filter(e=>e.region==='AMER');
+    if(tMode==='emea') ents=ents.filter(e=>e.region==='EMEA');
+    if(tMode==='risk') ents=ents.filter(e=>e.risk!=='lo');
+    if(!ents.length)return;
+    const gl=document.createElement('div');gl.className='tgrp';gl.textContent=tg(g.lk);tree.appendChild(gl);
+    ents.forEach(e=>{
+      const el=document.createElement('div');
+      el.className=`titem${selId===e.id?' sel':''}${e.risk==='hi'?' br':''}`;
+      el.id='ti-'+e.id;
+      const riskLabel = e.risk==='hi'?t('riskHi'):e.risk==='md'?t('riskMd'):t('riskLo');
+      el.innerHTML=`<div class="tdot ${e.dot}"></div><div class="tlbl">${e.city.split(',')[0]} · ${e.n}</div><div class="ttag">${e.tag}</div><div class="trsk r${e.risk}">${riskLabel}</div>`;
+      el.onclick=()=>selectEnt(e.id);
+      tree.appendChild(el);
+    });
+  });
+}
+function filterTree(v){v=v.toLowerCase();document.querySelectorAll('.titem').forEach(el=>{const l=el.querySelector('.tlbl')?.textContent.toLowerCase()||'';el.style.display=!v||l.includes(v)?'':'none';});}
+function sw(t,el){tMode=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));el.classList.add('on');buildTree();}
+function setLyr(n,el){
+  document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('on'));el.classList.add('on');
+  document.querySelectorAll('.tac').forEach(nd=>{
+    if(n==='breach') nd.style.opacity=nd.classList.contains('br')?'1':'0.08';
+    else if(n==='hub') nd.style.opacity=nd.classList.contains('gold')?'1':'0.25';
+    else nd.style.opacity='1';
+  });
+}
+function doAct(name){const n=document.getElementById('notif');n.textContent=t('notifExec',name);n.style.display='block';setTimeout(()=>{n.style.display='none';},1600);}
+
+// ════════════════════════════════════════════
+// TICKER
+// ════════════════════════════════════════════
+const TICKERS=[
+  {n:'EUR/USD',v:'1.0837',d:'-0.0003',u:false},{n:'USD/CNH',v:'7.2618',d:'+0.0021',u:true},
+  {n:'USD/JPY',v:'151.24',d:'-0.32',u:false}, {n:'GBP/USD',v:'1.2644',d:'+0.0008',u:true},
+  {n:'USD/KRW',v:'1,342',d:'+2.1',u:true},    {n:'AUD/USD',v:'0.6512',d:'+0.0015',u:true},
+  {n:'USD/INR',v:'83.42',d:'+0.12',u:true},   {n:'USD/SGD',v:'1.3420',d:'+0.0012',u:true},
+  {n:'USD/BRL',v:'4.98',d:'-0.02',u:false},   {n:'USD/MXN',v:'17.22',d:'+0.08',u:true},
+  {n:'USD/ZAR',v:'18.62',d:'+0.14',u:true},   {n:'USD/ARS',v:'875',d:'+12',u:true},
+  {n:'SOFR ON',v:'5.30%',d:'0.00',u:null},    {n:'EURIBOR 3M',v:'3.65%',d:'-0.02',u:false},
+  {n:'US 10Y',v:'4.42%',d:'-0.03',u:false},   {n:'BUND 10Y',v:'2.38%',d:'-0.02',u:false},
+  {n:'VIX',v:'16.2',d:'-0.4',u:false},        {n:'GOLD',v:'$2,198',d:'+$12',u:true},
+  {n:'WTI',v:'$78.42',d:'+$0.38',u:true},     {n:'SONIA',v:'5.19%',d:'-0.01',u:false},
+];
+function buildTicker(){
+  let h=TICKERS.map(t=>{const cls=t.u===true?'tku':t.u===false?'tkd':'';const a=t.u===true?'▲':t.u===false?'▼':'─';return`<span class="tk"><span class="tkn">${t.n}</span><span class="${cls}">${t.v} ${a} ${t.d}</span></span>`;}).join('');
+  document.getElementById('ticker').innerHTML=h+h;
+}
+
+function tickClock(){const now=new Date();const t=now.toUTCString().split(' ')[4];document.getElementById('clock').textContent=t;document.getElementById('sbtime').textContent=t.slice(0,5);}
+
+// ════════════════════════════════════════════
+// INTERNATIONALISATION (i18n)
+// ════════════════════════════════════════════
+const I18N = {
+  en:{
+    live:'LIVE', globalAum:'GLOBAL AUM', var95:'VaR 95%', lcr:'LCR', hubs:'HUBS', breaches:'BREACHES',
+    globalMatrix:'Global Matrix', searchEntities:'SEARCH ENTITIES...',
+    tabAll:'ALL', tabRisk:'RISK',
+    layerAll:'ALL LAYERS', layerCash:'CASH FLOW', layerInst:'INSTRUMENTS', layerHub:'HUB NODES', layerBreach:'BREACHES',
+    nodesActive:'36 STRATEGIC NODES ACTIVE',
+    warRoom:'War Room Inspector',
+    selectPrompt:'SELECT ANY NODE<br>24 FINANCIAL CENTERS<br>36 STRATEGIC ENTITIES<br>ACROSS 6 CONTINENTS',
+    sbOntology:'ONTOLOGY <span class="sbv g" style="margin-left:3px">● CONNECTED</span>',
+    sbTimezone:'TIMEZONES <span class="sbv" style="margin-left:3px">UTC-5 → UTC+10</span>',
+    sbCursor:'CURSOR',
+    breachBadge:'⚠ VANGUARD OMNIS — CRITICAL: CNH REPATRIATION · GBP BUFFER · MENA HEDGE · PBOC CAP',
+    selectedObj:'Selected Object', trend7d:'7-Day Trend', breachDetail:'⚠ BREACH DETAIL',
+    ontologyLinks:'Ontology Links', systemAlerts:'System Alerts', open:'OPEN',
+    utc:'UTC',
+    treeGroups:{
+      apacEast:'APAC — East Asia', emeaEurope:'EMEA — Europe', emeaMena:'EMEA — MENA & Africa',
+      amerNorth:'AMER — North America', amerLatam:'AMER — Latam & Carib',
+      bankAccounts:'Bank Accounts', debtProg:'Debt / Programs',
+      derivatives:'Derivatives', rates:'Rates', counterparties:'Counterparties',
+    },
+    riskLo:'LO', riskMd:'MD', riskHi:'HI',
+    notifExec:'▶ {0} — EXECUTING...',
+  },
+  de:{
+    live:'LIVE', globalAum:'GLOBALES AUM', var95:'VaR 95%', lcr:'LKR', hubs:'HUBS', breaches:'VERSTÖSSE',
+    globalMatrix:'Globale Matrix', searchEntities:'ENTITÄTEN SUCHEN...',
+    tabAll:'ALLE', tabRisk:'RISIKO',
+    layerAll:'ALLE EBENEN', layerCash:'CASHFLOW', layerInst:'INSTRUMENTE', layerHub:'HUB-KNOTEN', layerBreach:'VERSTÖSSE',
+    nodesActive:'36 STRATEGISCHE KNOTEN AKTIV',
+    warRoom:'Lageraum Inspektor',
+    selectPrompt:'KNOTEN AUSWÄHLEN<br>24 FINANZZENTREN<br>36 STRATEGISCHE EINHEITEN<br>AUF 6 KONTINENTEN',
+    sbOntology:'ONTOLOGIE <span class="sbv g" style="margin-left:3px">● VERBUNDEN</span>',
+    sbTimezone:'ZEITZONEN <span class="sbv" style="margin-left:3px">UTC-5 → UTC+10</span>',
+    sbCursor:'CURSOR',
+    breachBadge:'⚠ VANGUARD OMNIS — KRITISCH: CNH-REPATRIIERUNG · GBP-PUFFER · MENA-HEDGE · PBOC-LIMIT',
+    selectedObj:'Ausgewähltes Objekt', trend7d:'7-Tage-Trend', breachDetail:'⚠ VERSTOSSDETAILS',
+    ontologyLinks:'Ontologie-Links', systemAlerts:'Systemwarnungen', open:'OFFEN',
+    utc:'UTC',
+    treeGroups:{
+      apacEast:'APAC — Ostasien', emeaEurope:'EMEA — Europa', emeaMena:'EMEA — NAHOST & Afrika',
+      amerNorth:'AMER — Nordamerika', amerLatam:'AMER — Latam & Karibik',
+      bankAccounts:'Bankkonten', debtProg:'Schulden / Programme',
+      derivatives:'Derivate', rates:'Zinssätze', counterparties:'Gegenparteien',
+    },
+    riskLo:'NI', riskMd:'MI', riskHi:'HO',
+    notifExec:'▶ {0} — WIRD AUSGEFÜHRT...',
+  },
+  fr:{
+    live:'EN DIRECT', globalAum:'AUM MONDIAL', var95:'VaR 95%', lcr:'RLC', hubs:'HUBS', breaches:'VIOLATIONS',
+    globalMatrix:'Matrice Mondiale', searchEntities:'RECHERCHER ENTITÉS...',
+    tabAll:'TOUS', tabRisk:'RISQUE',
+    layerAll:'TOUTES COUCHES', layerCash:'FLUX DE TRÉSO.', layerInst:'INSTRUMENTS', layerHub:'NŒUDS HUB', layerBreach:'VIOLATIONS',
+    nodesActive:'36 NŒUDS STRATÉGIQUES ACTIFS',
+    warRoom:'Inspecteur Salle de Guerre',
+    selectPrompt:'SÉLECTIONNER UN NŒUD<br>24 CENTRES FINANCIERS<br>36 ENTITÉS STRATÉGIQUES<br>SUR 6 CONTINENTS',
+    sbOntology:'ONTOLOGIE <span class="sbv g" style="margin-left:3px">● CONNECTÉ</span>',
+    sbTimezone:'FUSEAUX <span class="sbv" style="margin-left:3px">UTC-5 → UTC+10</span>',
+    sbCursor:'CURSEUR',
+    breachBadge:'⚠ VANGUARD OMNIS — CRITIQUE: RAPATRIATION CNH · TAMPON GBP · COUVERTURE MENA · LIMITE PBOC',
+    selectedObj:'Objet Sélectionné', trend7d:'Tendance 7 Jours', breachDetail:'⚠ DÉTAIL VIOLATION',
+    ontologyLinks:'Liens Ontologie', systemAlerts:'Alertes Système', open:'OUVERT',
+    utc:'UTC',
+    treeGroups:{
+      apacEast:'APAC — Asie de l\'Est', emeaEurope:'EMEA — Europe', emeaMena:'EMEA — MOAN & Afrique',
+      amerNorth:'AMÉR — Amérique du Nord', amerLatam:'AMÉR — Latam & Caraïbes',
+      bankAccounts:'Comptes Bancaires', debtProg:'Dettes / Programmes',
+      derivatives:'Dérivés', rates:'Taux', counterparties:'Contreparties',
+    },
+    riskLo:'BAS', riskMd:'MOY', riskHi:'ÉLEVÉ',
+    notifExec:'▶ {0} — EN COURS...',
+  },
+  zh:{
+    live:'实时', globalAum:'全球资产管理规模', var95:'风险价值 95%', lcr:'流动性覆盖率', hubs:'枢纽', breaches:'违规',
+    globalMatrix:'全球矩阵', searchEntities:'搜索实体...',
+    tabAll:'全部', tabRisk:'风险',
+    layerAll:'所有图层', layerCash:'现金流', layerInst:'金融工具', layerHub:'枢纽节点', layerBreach:'违规警报',
+    nodesActive:'36个战略节点已激活',
+    warRoom:'作战室检查器',
+    selectPrompt:'选择任意节点<br>24个金融中心<br>36个战略实体<br>覆盖6大洲',
+    sbOntology:'本体 <span class="sbv g" style="margin-left:3px">● 已连接</span>',
+    sbTimezone:'时区 <span class="sbv" style="margin-left:3px">UTC-5 → UTC+10</span>',
+    sbCursor:'坐标',
+    breachBadge:'⚠ 先锋全球 — 严重警报: 人民币汇回受阻 · 英镑缓冲不足 · 中东对冲不足 · 人行上限',
+    selectedObj:'已选对象', trend7d:'7日趋势', breachDetail:'⚠ 违规详情',
+    ontologyLinks:'本体关联', systemAlerts:'系统警报', open:'条未处理',
+    utc:'世界标准时',
+    treeGroups:{
+      apacEast:'亚太 — 东亚', emeaEurope:'欧非中东 — 欧洲', emeaMena:'欧非中东 — 中东与非洲',
+      amerNorth:'美洲 — 北美', amerLatam:'美洲 — 拉美与加勒比',
+      bankAccounts:'银行账户', debtProg:'债务 / 融资计划',
+      derivatives:'衍生品', rates:'基准利率', counterparties:'交易对手',
+    },
+    riskLo:'低', riskMd:'中', riskHi:'高',
+    notifExec:'▶ {0} — 执行中...',
+  },
+  ja:{
+    live:'ライブ', globalAum:'グローバルAUM', var95:'VaR 95%', lcr:'流動性カバレッジ', hubs:'拠点', breaches:'違反',
+    globalMatrix:'グローバルマトリクス', searchEntities:'エンティティを検索...',
+    tabAll:'全て', tabRisk:'リスク',
+    layerAll:'全レイヤー', layerCash:'キャッシュフロー', layerInst:'金融商品', layerHub:'拠点ノード', layerBreach:'違反アラート',
+    nodesActive:'36の戦略的ノードが稼働中',
+    warRoom:'ウォールームインスペクター',
+    selectPrompt:'ノードを選択<br>24の金融センター<br>36の戦略的エンティティ<br>6大陸にわたる',
+    sbOntology:'オントロジー <span class="sbv g" style="margin-left:3px">● 接続済</span>',
+    sbTimezone:'タイムゾーン <span class="sbv" style="margin-left:3px">UTC-5 → UTC+10</span>',
+    sbCursor:'カーソル',
+    breachBadge:'⚠ バンガードオムニス — 重大: 人民元送金停止 · GBPバッファ不足 · MENAヘッジ不足 · PBOC上限',
+    selectedObj:'選択オブジェクト', trend7d:'7日間トレンド', breachDetail:'⚠ 違反詳細',
+    ontologyLinks:'オントロジーリンク', systemAlerts:'システムアラート', open:'件未処理',
+    utc:'協定世界時',
+    treeGroups:{
+      apacEast:'アジア太平洋 — 東アジア', emeaEurope:'EMEA — ヨーロッパ', emeaMena:'EMEA — 中東・アフリカ',
+      amerNorth:'米州 — 北米', amerLatam:'米州 — ラテンアメリカ・カリブ海',
+      bankAccounts:'銀行口座', debtProg:'債務 / プログラム',
+      derivatives:'デリバティブ', rates:'基準金利', counterparties:'カウンターパーティ',
+    },
+    riskLo:'低', riskMd:'中', riskHi:'高',
+    notifExec:'▶ {0} — 実行中...',
+  },
+};
+
+let currentLang = 'en';
+
+function setLang(lang, btn){
+  currentLang = lang;
+  // Update button states
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  // Update body class for CJK fonts
+  document.body.className = document.body.className.replace(/lang-\w+/g,'').trim();
+  if(lang==='zh') document.body.classList.add('lang-zh');
+  if(lang==='ja') document.body.classList.add('lang-ja');
+  // Apply html lang attr
+  document.documentElement.lang = lang==='zh'?'zh-CN':lang==='ja'?'ja':lang;
+
+  applyLang(lang);
+  // Rebuild tree + detail with new language
+  buildTree();
+  if(selId) renderDetail(ENT.find(e=>e.id===selId)||ENT[0]);
+}
+
+function applyLang(lang){
+  const T = I18N[lang] || I18N.en;
+  // data-key elements
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    const k = el.getAttribute('data-key');
+    if(T[k] !== undefined) el.innerHTML = T[k];
+  });
+  // placeholder
+  document.querySelectorAll('[data-key-placeholder]').forEach(el=>{
+    const k = el.getAttribute('data-key-placeholder');
+    if(T[k] !== undefined) el.placeholder = T[k];
+  });
+  // Breach badge
+  const bb = document.getElementById('breach-badge');
+  if(bb) bb.textContent = T.breachBadge;
+  // Search input placeholder
+  const srch = document.getElementById('srch');
+  if(srch) srch.placeholder = T.searchEntities;
+}
+
+function t(key, ...args){
+  const T = I18N[currentLang] || I18N.en;
+  let s = T[key] || I18N.en[key] || key;
+  args.forEach((a,i)=>{ s = s.replace('{'+i+'}', a); });
+  return s;
+}
+
+function tg(groupKey){
+  const T = I18N[currentLang] || I18N.en;
+  return (T.treeGroups && T.treeGroups[groupKey]) || (I18N.en.treeGroups[groupKey]) || groupKey;
+}
+
+// ════════════════════════════════════════════
+// RESIZE
+// ════════════════════════════════════════════
+let worldCache=null;
+function rebuild(){
+  if(!worldCache)return;
+  getWH();initProj();
+  drawMap(worldCache);drawArcs();buildNodes();
+  closeHUD();selectEnt(selId);
+}
+window.addEventListener('resize',()=>{clearTimeout(window._rt);window._rt=setTimeout(rebuild,100);});
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+window.addEventListener('load',()=>{
+  buildTree(); buildTicker(); setInterval(tickClock,1000);
+  applyLang('en');
+  getWH(); initProj();
+
+  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+    .then(r=>{if(!r.ok)throw new Error('CDN');return r.json();})
+    .then(world=>{
+      worldCache=world;
+      drawMap(world); drawArcs(); buildNodes();
+      selectEnt('london');
+    })
+    .catch(()=>{
+      const canvas=document.getElementById('map-canvas');
+      canvas.width=W; canvas.height=H;
+      const ctx=canvas.getContext('2d');
+      ctx.fillStyle='#030e1f'; ctx.fillRect(0,0,W,H);
+      ctx.strokeStyle='rgba(0,100,165,.08)'; ctx.lineWidth=0.4;
+      for(let lo=-180;lo<=180;lo+=20){const px=((lo+180)/360)*W;ctx.beginPath();ctx.moveTo(px,0);ctx.lineTo(px,H);ctx.stroke();}
+      for(let la=-90;la<=90;la+=15){const py=((90-la)/180)*H;ctx.beginPath();ctx.moveTo(0,py);ctx.lineTo(W,py);ctx.stroke();}
+      proj=d3.geoEquirectangular().scale(W/6.5).translate([W/2,H/2]);
+      geoPath=d3.geoPath().projection(proj);
+      buildNodes(); drawArcs(); selectEnt('london');
+    });
+});
+</script>
+</body>
+</html>

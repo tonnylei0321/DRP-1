@@ -27,6 +27,11 @@ class TenantService:
         self._repo = repository or TenantRepository()
         self._graphdb = graphdb or GraphDBClient()
 
+    async def list_tenants(self) -> list[TenantResponse]:
+        """列出所有激活租户。"""
+        tenants = await self._repo.list_active(self._session)
+        return [TenantResponse.model_validate(t) for t in tenants]
+
     async def create_tenant(self, data: TenantCreate) -> TenantResponse:
         """创建租户：① 写 PG 元数据  ② 创建 GraphDB Named Graph。
 
