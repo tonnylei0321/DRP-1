@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>央企穿透式资金监管平台 — DRP 数字风控中枢</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#020810;--bg2:#050e1c;--panel:#071525;--b1:#0c2038;--b2:#14304e;--acc:#2ae0ff;--a2:#33ffbe;--warn:#ffbb33;--danger:#ff4444;--purple:#b87aff;--gold:#ffe080;--muted:#3a6888;--text:#8cc8e0;--hi:#e0f0ff;--mono:'Share Tech Mono',monospace;--orb:'Orbitron',sans-serif;--chs:'Noto Sans SC',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--chs);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,200,255,.013) 2px,rgba(0,200,255,.013) 3px);}
+#app{display:grid;grid-template-rows:48px 1fr 24px;height:100vh;}
+#main{display:grid;grid-template-columns:220px 1fr 300px;overflow:hidden;}
+@keyframes bk{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes scan{from{top:-60px}to{top:100%}}
+@keyframes tks{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* TOPBAR */
+#topbar{background:rgba(3,9,20,.98);border-bottom:1px solid var(--b2);display:flex;align-items:center;padding:0 16px;gap:14px;z-index:300;}
+.logo-wrap{display:flex;align-items:center;gap:10px;white-space:nowrap;flex-shrink:0;}
+.logo-emblem{width:38px;height:38px;flex-shrink:0;filter:drop-shadow(0 0 10px rgba(0,216,255,.7));}
+.logo-text{display:flex;flex-direction:column;justify-content:center;line-height:1.15;}
+.logo-top{font-family:var(--orb);font-weight:400;font-size:9px;color:var(--hi);letter-spacing:3px;opacity:.9;}
+.logo-mid{font-weight:700;font-size:15px;color:var(--acc);letter-spacing:2px;text-shadow:0 0 20px rgba(0,216,255,.6);}
+.logo-bot{font-weight:600;font-size:11px;color:#ff6a2a;letter-spacing:1px;text-shadow:0 0 18px rgba(255,100,40,.55);}
+.sep{width:1px;height:18px;background:var(--b2);}
+.tg{display:flex;align-items:center;gap:5px;}
+.tl{font-size:10px;color:var(--muted);letter-spacing:1px;}
+.tv{font-family:var(--mono);font-size:12px;color:var(--a2);font-weight:600;}
+.tv.w{color:var(--warn);}.tv.r{color:var(--danger);animation:bk .9s infinite;}.tv.g{color:var(--gold);}
+.ldot{width:7px;height:7px;border-radius:50%;background:var(--a2);box-shadow:0 0 10px var(--a2);animation:bk 2s ease-in-out infinite;}
+#tbr{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.bbadge{font-size:10px;padding:3px 10px;border:1px solid var(--danger);color:var(--danger);background:rgba(255,32,32,.08);letter-spacing:.8px;animation:bk 1.2s infinite;}
+
+/* LEFT */
+#left{background:rgba(4,11,22,.97);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden;}
+.ph{background:rgba(3,8,18,.95);border-bottom:1px solid var(--b1);padding:6px 11px;display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.pt{font-weight:600;font-size:11px;color:var(--text);letter-spacing:1px;}
+.pbdg{margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--acc);border:1px solid rgba(0,216,255,.3);padding:2px 6px;}
+.psrch{padding:5px 9px;border-bottom:1px solid var(--b1);flex-shrink:0;}
+.psrch input{width:100%;background:rgba(2,7,17,.8);border:1px solid var(--b1);color:var(--hi);padding:5px 9px;font-size:11px;outline:none;font-family:var(--chs);}
+.psrch input:focus{border-color:var(--acc);}
+.tree{overflow-y:auto;flex:1;}.tree::-webkit-scrollbar{width:3px;}.tree::-webkit-scrollbar-thumb{background:var(--b2);}
+.tgrp{padding:6px 11px 3px;font-size:9px;color:var(--text);letter-spacing:1px;font-weight:600;}
+.titem{padding:4px 11px 4px 13px;display:flex;align-items:center;gap:5px;cursor:pointer;transition:background .1s;position:relative;}
+.titem:hover{background:rgba(0,216,255,.04);}
+.titem.sel{background:rgba(0,216,255,.1);}.titem.sel::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc);box-shadow:0 0 8px var(--acc);}
+.titem.br{background:rgba(255,32,32,.05);}.titem.br.sel{background:rgba(255,32,32,.12);}.titem.br::before{background:var(--danger)!important;box-shadow:0 0 8px var(--danger)!important;}
+.tdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.dc{background:var(--acc);box-shadow:0 0 5px var(--acc);}.dg{background:var(--a2);box-shadow:0 0 5px var(--a2);}.da{background:var(--warn);box-shadow:0 0 5px var(--warn);}.dr{background:var(--danger);box-shadow:0 0 5px var(--danger);animation:bk .8s infinite;}.dp{background:var(--purple);box-shadow:0 0 5px var(--purple);}.dgo{background:var(--gold);box-shadow:0 0 5px var(--gold);}
+.tlbl{font-size:12px;color:var(--hi);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ttag{font-family:var(--mono);font-size:9px;color:var(--text);flex-shrink:0;}
+.trsk{font-family:var(--mono);font-size:9px;flex-shrink:0;font-weight:600;}
+.rlo{color:var(--a2);}.rmd{color:var(--warn);}.rhi{color:var(--danger);animation:bk .8s infinite;}
+
+/* CENTER */
+#center{position:relative;overflow:hidden;background:var(--bg);display:flex;flex-direction:column;}
+#kpi-bar{display:flex;gap:0;border-bottom:1px solid var(--b1);background:rgba(3,9,20,.6);flex-shrink:0;}
+.kpi{flex:1;padding:10px 14px;border-right:1px solid var(--b1);display:flex;flex-direction:column;gap:2px;cursor:default;}
+.kpi:last-child{border-right:none;}
+.kpi-label{font-size:10px;color:var(--text);letter-spacing:.5px;}
+.kpi-val{font-family:var(--orb);font-weight:700;font-size:20px;letter-spacing:.5px;}
+.kpi-val.g{color:var(--a2);text-shadow:0 0 12px rgba(0,255,179,.3);}
+.kpi-val.w{color:var(--warn);text-shadow:0 0 10px rgba(255,170,0,.3);}
+.kpi-val.r{color:var(--danger);text-shadow:0 0 12px rgba(255,32,32,.4);}
+.kpi-val.b{color:var(--acc);text-shadow:0 0 10px rgba(0,216,255,.3);}
+.kpi-val.go{color:var(--gold);text-shadow:0 0 10px rgba(255,208,96,.3);}
+.kpi-val.a{color:var(--warn);text-shadow:0 0 10px rgba(255,170,0,.3);}
+.kpi-delta{font-family:var(--mono);font-size:9px;color:var(--text);}
+
+/* BREADCRUMB */
+#breadcrumb-bar{padding:5px 12px;border-bottom:1px solid var(--b1);background:rgba(3,9,20,.4);flex-shrink:0;display:flex;align-items:center;gap:0;overflow-x:auto;}
+.bc-item{font-size:11px;color:var(--text);cursor:pointer;padding:2px 6px;transition:all .12s;white-space:nowrap;}
+.bc-item:hover{color:var(--acc);}
+.bc-active{color:var(--hi);font-weight:600;cursor:default;}
+.bc-sep{font-size:9px;color:var(--muted);padding:0 2px;}
+
+/* GRAPH AREA */
+#graph-area{flex:1;position:relative;overflow:hidden;cursor:default;}
+#graph-canvas{position:absolute;inset:0;}
+#graph-tip{position:absolute;display:none;background:rgba(2,8,20,.95);border:1px solid rgba(0,216,255,.4);padding:8px 12px;font-size:11px;color:var(--hi);line-height:1.7;pointer-events:none;z-index:100;max-width:260px;backdrop-filter:blur(8px);border-radius:2px;}
+#graph-tip b{color:#fff;font-weight:600;font-size:12px;}
+
+#scan{position:absolute;left:0;right:0;height:60px;pointer-events:none;z-index:5;background:linear-gradient(0deg,transparent,rgba(0,180,255,.02) 50%,transparent);animation:scan 6s linear infinite;}
+#ticker-wrap{position:absolute;bottom:0;left:0;right:0;height:24px;background:rgba(2,7,18,.94);border-top:1px solid var(--b1);overflow:hidden;z-index:50;}
+#ticker{white-space:nowrap;display:inline-block;animation:tks 90s linear infinite;}
+.tk{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--text);padding:4px 16px 4px 0;}
+.tku{color:var(--a2);}.tkd{color:var(--danger);}.tkn{color:var(--text);margin-right:4px;}
+
+/* RIGHT */
+#right{background:rgba(4,11,22,.97);border-left:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden;}
+.rs{overflow-y:auto;flex:1;}.rs::-webkit-scrollbar{width:3px;}.rs::-webkit-scrollbar-thumb{background:var(--b2);}
+.dsec{border-bottom:1px solid var(--b1);padding:7px 11px;}
+.dlbl{font-size:9px;color:var(--text);letter-spacing:1px;margin-bottom:3px;font-weight:600;}
+.dtitle{font-weight:700;font-size:15px;color:var(--hi);letter-spacing:.5px;line-height:1.3;}
+.dtitle.br{color:var(--danger);text-shadow:0 0 10px rgba(255,32,32,.4);}
+.kv2{padding:3px 0;display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid rgba(12,32,56,.55);}
+.kk{font-size:10px;color:var(--text);}.kval{font-family:var(--mono);font-size:11px;color:var(--hi);text-align:right;font-weight:600;}
+.kval.g{color:var(--a2);}.kval.a{color:var(--warn);}.kval.r{color:var(--danger);}.kval.b{color:var(--acc);}.kval.p{color:var(--purple);}.kval.go{color:var(--gold);}
+.grow{display:flex;gap:5px;padding:6px 11px;border-bottom:1px solid var(--b1);}
+.gg{flex:1;text-align:center;}.ggl{font-size:9px;color:var(--text);margin-bottom:2px;}.ggv{font-family:var(--orb);font-weight:600;font-size:13px;}
+.ggbar{height:4px;background:var(--b2);margin-top:3px;border-radius:2px;}.ggfill{height:4px;border-radius:2px;transition:width .5s;}
+.arow{display:flex;flex-wrap:wrap;gap:4px;padding:6px 11px;border-bottom:1px solid var(--b1);}
+.abtn{font-size:11px;font-weight:600;padding:4px 10px;border:1px solid var(--b2);background:transparent;color:var(--hi);cursor:pointer;transition:all .13s;font-family:var(--chs);}
+.abtn:hover{border-color:var(--acc);color:var(--acc);}.abtn.g{border-color:rgba(0,255,179,.26);color:var(--a2);}.abtn.w{border-color:rgba(255,170,0,.26);color:var(--warn);}.abtn.r{border-color:rgba(255,32,32,.26);color:var(--danger);}
+.ali{padding:4px 11px;display:flex;gap:6px;border-bottom:1px solid var(--b1);cursor:pointer;transition:background .11s;}.ali:hover{background:rgba(0,0,0,.16);}
+.alico{font-family:var(--mono);font-size:9px;padding:2px 5px;flex-shrink:0;margin-top:1px;font-weight:600;}.alico.r{color:var(--danger);border:1px solid var(--danger);}.alico.w{color:var(--warn);border:1px solid var(--warn);}
+.altxt{font-size:11px;color:var(--hi);line-height:1.5;flex:1;}.altm{font-family:var(--mono);font-size:9px;color:var(--text);margin-top:1px;}
+.swrap{padding:5px 11px 6px;border-bottom:1px solid var(--b1);}
+
+/* STATUS BAR */
+#sb{background:rgba(3,8,18,.98);border-top:1px solid var(--b1);display:flex;align-items:center;padding:0 12px;gap:14px;z-index:300;}
+.sbi{display:flex;align-items:center;gap:3px;font-size:9px;color:var(--text);}.sbv{color:var(--hi);}.sbv.g{color:var(--a2);}
+#notif{position:fixed;top:52px;left:50%;transform:translateX(-50%);background:rgba(4,11,22,.96);border:1px solid var(--a2);color:var(--a2);font-size:11px;padding:6px 18px;z-index:9999;display:none;letter-spacing:1px;}
+</style>
+</head>
+<body>
+<div id="app">
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="logo-wrap">
+    <svg class="logo-emblem" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="wg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d8ff"/><stop offset="100%" stop-color="#0090cc"/></linearGradient><linearGradient id="cg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00ffb3"/><stop offset="100%" stop-color="#00d8ff"/></linearGradient><filter id="gl"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <path d="M40,14 L8,22 L14,34 L22,28 L18,42 L28,36 L24,50 L40,40 Z" fill="url(#wg)" opacity=".92" filter="url(#gl)"/>
+      <path d="M40,14 L72,22 L66,34 L58,28 L62,42 L52,36 L56,50 L40,40 Z" fill="url(#wg)" opacity=".92" filter="url(#gl)"/>
+      <path d="M40,26 L52,32 L52,46 L40,54 L28,46 L28,32 Z" fill="none" stroke="url(#cg)" stroke-width="1.2" opacity=".9" filter="url(#gl)"/>
+      <circle cx="40" cy="38" r="2.5" fill="url(#cg)" filter="url(#gl)"/>
+      <line x1="40" y1="31" x2="40" y2="45" stroke="#00ffb3" stroke-width=".6" opacity=".7"/>
+      <line x1="33" y1="38" x2="47" y2="38" stroke="#00ffb3" stroke-width=".6" opacity=".7"/>
+      <rect x="28" y="54" width="24" height="2" rx="1" fill="url(#cg)" opacity=".7"/>
+    </svg>
+    <div class="logo-text">
+      <div class="logo-top">DRP PLATFORM</div>
+      <div class="logo-mid">穿透式资金监管</div>
+      <div class="logo-bot">数字风控中枢</div>
+    </div>
+  </div>
+  <div class="sep"></div>
+  <div class="ldot"></div><div class="tl" style="margin-left:2px">实时监控</div>
+  <div class="sep"></div>
+  <div class="tg"><div class="tl">集团总资产</div><div class="tv">&#165;1,862.4亿</div></div>
+  <div class="sep"></div>
+  <div class="tg"><div class="tl">资金池余额</div><div class="tv">&#165;486.8亿</div></div>
+  <div class="sep"></div>
+  <div class="tg"><div class="tl">风险敞口</div><div class="tv w">&#165;84.2亿</div></div>
+  <div class="sep"></div>
+  <div class="tg"><div class="tl">违规预警</div><div class="tv r">6</div></div>
+  <div id="tbr">
+    <div class="bbadge">&#9888; 严重: 华东超额担保 &#183; 西南穿透异常 &#183; 境外汇回受阻</div>
+    <div class="sep"></div>
+    <div class="tg"><div class="tl">北京时间</div><div class="tv" id="clock">--:--:--</div></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="left">
+    <div class="ph"><div class="pt">组织架构</div><div class="pbdg" id="tree-count">48 实体</div></div>
+    <div class="psrch"><input id="srch" placeholder="搜索子公司..." oninput="filterTree(this.value)"></div>
+    <div class="tree" id="tree"></div>
+  </div>
+
+  <div id="center">
+    <div id="kpi-bar"></div>
+    <div id="breadcrumb-bar"><div id="breadcrumb"></div></div>
+    <div id="graph-area">
+      <canvas id="graph-canvas"></canvas>
+      <div id="graph-tip"></div>
+      <div id="scan"></div>
+    </div>
+    <div id="ticker-wrap"><div id="ticker"></div></div>
+  </div>
+
+  <div id="right">
+    <div class="ph"><div class="pt">监管作战室</div><div class="pbdg" style="color:var(--danger);border-color:var(--danger)">6 预警</div></div>
+    <div class="rs" id="rs"></div>
+  </div>
+</div>
+
+<div id="sb">
+  <div class="sbi">本体引擎 <span class="sbv g" style="margin-left:3px">&#9679; 已连接</span></div>
+  <div class="sbi">数据源 <span class="sbv" style="margin-left:3px">SAP &#183; 用友 &#183; 银企直连</span></div>
+  <div class="sbi">穿透层级 <span class="sbv" style="margin-left:3px">L1&#8594;L6</span></div>
+  <div class="sbi" style="margin-left:auto">DRP &#183; FIBO OWL/RDF &#183; SASAC &#183; <span class="sbv" id="sbtime">--:--</span></div>
+</div>
+</div>
+<div id="notif"></div>
+<script src="prototype_app.js"></script>
+</body>
+</html>
