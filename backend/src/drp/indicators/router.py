@@ -15,15 +15,30 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/indicators", tags=["监管指标"])
 
 # 后端业务域 → 前端领域 ID 映射
+# 后端 registry.py 中的7个域：银行账户(001-031)、资金集中(032-041)、
+# 结算(042-068)、票据(069-078)、债务融资(079-085)、决策风险(086-097)、国资委考核(098-106)
+# 前端7大领域：fund、debt、guarantee、invest、derivative、finbiz、overseas
+#
+# 映射策略：
+# - 银行账户(31个) → fund(资金管理)：账户管理是资金管理的核心
+# - 资金集中(10个) → fund(资金管理)：资金归集属于资金管理
+# - 结算(27个) → 拆分：前14个→finbiz(金融业务)，后13个→invest(投资管理)
+# - 票据(10个) → derivative(金融衍生品)：票据属于金融工具
+# - 债务融资(7个) → debt(债务管理)：直接对应
+# - 决策风险(12个) → guarantee(担保管理)：风险决策与担保风控关联
+# - 国资委考核(9个) → overseas(境外资金)：国资委考核含境外监管
 _DOMAIN_MAP: dict[str, str] = {
     "银行账户": "fund",
     "资金集中": "fund",
-    "结算": "finbiz",
-    "票据": "finbiz",
+    "结算": "finbiz",       # 默认映射到 finbiz
+    "票据": "derivative",
     "债务融资": "debt",
-    "决策风险": "finbiz",
+    "决策风险": "guarantee",
     "国资委考核": "overseas",
 }
+
+# 结算域指标中，编号 >= 056 的映射到 invest（投资管理）
+_SETTLEMENT_INVEST_THRESHOLD = "056"
 
 
 def _safe_float(val: str | None) -> float | None:
@@ -93,6 +108,9 @@ LIMIT 1000
         # 后端域名 → 前端领域 ID 映射
         backend_domain = row.get("domain", "")
         frontend_domain = _DOMAIN_MAP.get(backend_domain, backend_domain)
+        # 结算域拆分：编号 >= 056 的指标映射到 invest
+        if backend_domain == "结算" and indicator_id >= _SETTLEMENT_INVEST_THRESHOLD:
+            frontend_domain = "invest"
 
         threshold_low = _safe_float(row.get("thresholdLow"))
         threshold_high = _safe_float(row.get("thresholdHigh"))

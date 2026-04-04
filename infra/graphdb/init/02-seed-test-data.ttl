@@ -1,0 +1,189 @@
+@prefix ctio:   <https://drp.example.com/ontology/ctio/> .
+@prefix fibo:   <https://spec.edmcouncil.org/fibo/ontology/BE/LegalEntities/LegalPersons/> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+
+# ══════════════════════════════════════════════
+# 测试数据 — 央企穿透式资金监管平台
+# 用于验收测试的最小数据集
+# Named Graph: urn:tenant:tenant-test
+# ══════════════════════════════════════════════
+
+# ── 集团根节点 ──
+<urn:entity:group> a fibo:LegalEntity ;
+    ctio:entityName "中央企业集团" ;
+    ctio:orgLevel 0 ;
+    ctio:entityType "集团" ;
+    ctio:city "北京" ;
+    ctio:cashBalance 4868000 ;
+    ctio:totalDebt 3421000 ;
+    ctio:totalAsset 18624000 ;
+    ctio:guaranteeBalance 1286000 ;
+    ctio:complianceScore 92.4 ;
+    ctio:riskLevel "lo" .
+
+# ── 二级子集团：华东 ──
+<urn:entity:east_group> a fibo:LegalEntity ;
+    ctio:entityName "华东子集团" ;
+    ctio:orgLevel 1 ;
+    ctio:entityType "二级子集团" ;
+    ctio:city "上海" ;
+    ctio:isSubsidiaryOf <urn:entity:group> ;
+    ctio:cashBalance 824000 ;
+    ctio:totalDebt 682000 ;
+    ctio:totalAsset 2840000 ;
+    ctio:guaranteeBalance 456000 ;
+    ctio:complianceScore 68.2 ;
+    ctio:riskLevel "hi" .
+
+# ── 二级子集团：华南 ──
+<urn:entity:south_group> a fibo:LegalEntity ;
+    ctio:entityName "华南子集团" ;
+    ctio:orgLevel 1 ;
+    ctio:entityType "二级子集团" ;
+    ctio:city "深圳" ;
+    ctio:isSubsidiaryOf <urn:entity:group> ;
+    ctio:cashBalance 682000 ;
+    ctio:totalDebt 486000 ;
+    ctio:totalAsset 2420000 ;
+    ctio:guaranteeBalance 182000 ;
+    ctio:complianceScore 91.8 ;
+    ctio:riskLevel "lo" .
+
+# ── 二级子集团：金融板块 ──
+<urn:entity:fin_group> a fibo:LegalEntity ;
+    ctio:entityName "金融板块" ;
+    ctio:orgLevel 1 ;
+    ctio:entityType "二级子集团" ;
+    ctio:city "北京" ;
+    ctio:isSubsidiaryOf <urn:entity:group> ;
+    ctio:cashBalance 1246000 ;
+    ctio:totalDebt 628000 ;
+    ctio:totalAsset 3240000 ;
+    ctio:guaranteeBalance 86000 ;
+    ctio:complianceScore 94.2 ;
+    ctio:riskLevel "lo" .
+
+# ── 三级子公司：上海实业 ──
+<urn:entity:sh_industry> a fibo:LegalEntity ;
+    ctio:entityName "上海实业" ;
+    ctio:orgLevel 2 ;
+    ctio:entityType "三级子公司" ;
+    ctio:city "上海" ;
+    ctio:isSubsidiaryOf <urn:entity:east_group> ;
+    ctio:cashBalance 182000 ;
+    ctio:totalDebt 148000 ;
+    ctio:totalAsset 620000 ;
+    ctio:guaranteeBalance 186000 ;
+    ctio:complianceScore 72.4 ;
+    ctio:riskLevel "hi" .
+
+# ── 三级子公司：广州贸易 ──
+<urn:entity:gz_trade> a fibo:LegalEntity ;
+    ctio:entityName "广州贸易" ;
+    ctio:orgLevel 2 ;
+    ctio:entityType "三级子公司" ;
+    ctio:city "广州" ;
+    ctio:isSubsidiaryOf <urn:entity:south_group> ;
+    ctio:cashBalance 186000 ;
+    ctio:totalDebt 124000 ;
+    ctio:totalAsset 620000 ;
+    ctio:guaranteeBalance 48000 ;
+    ctio:complianceScore 92.4 ;
+    ctio:riskLevel "lo" .
+
+# ── 三级子公司：财务公司 ──
+<urn:entity:fin_co> a fibo:LegalEntity ;
+    ctio:entityName "集团财务公司" ;
+    ctio:orgLevel 2 ;
+    ctio:entityType "财务公司" ;
+    ctio:city "北京" ;
+    ctio:isSubsidiaryOf <urn:entity:fin_group> ;
+    ctio:cashBalance 864000 ;
+    ctio:totalDebt 248000 ;
+    ctio:totalAsset 1860000 ;
+    ctio:guaranteeBalance 24000 ;
+    ctio:complianceScore 96.8 ;
+    ctio:riskLevel "lo" .
+
+# ══════════════════════════════════════════════
+# 实体间关系
+# ══════════════════════════════════════════════
+
+# 控股关系（hasSubsidiary 由 isSubsidiaryOf 的反向推导，此处显式声明）
+<urn:entity:group> ctio:hasSubsidiary <urn:entity:east_group> .
+<urn:entity:group> ctio:hasSubsidiary <urn:entity:south_group> .
+<urn:entity:group> ctio:hasSubsidiary <urn:entity:fin_group> .
+<urn:entity:east_group> ctio:hasSubsidiary <urn:entity:sh_industry> .
+<urn:entity:south_group> ctio:hasSubsidiary <urn:entity:gz_trade> .
+<urn:entity:fin_group> ctio:hasSubsidiary <urn:entity:fin_co> .
+
+# 资金归集关系
+<urn:entity:east_group> ctio:fundFlowTo <urn:entity:group> .
+<urn:entity:south_group> ctio:fundFlowTo <urn:entity:group> .
+<urn:entity:fin_group> ctio:fundFlowTo <urn:entity:group> .
+<urn:entity:sh_industry> ctio:fundFlowTo <urn:entity:east_group> .
+<urn:entity:gz_trade> ctio:fundFlowTo <urn:entity:south_group> .
+<urn:entity:fin_co> ctio:fundFlowTo <urn:entity:fin_group> .
+
+# 担保关系
+<urn:entity:group> ctio:guarantees <urn:entity:east_group> .
+<urn:entity:east_group> ctio:guarantees <urn:entity:sh_industry> .
+
+# ══════════════════════════════════════════════
+# 监管指标数据（关联到实体）
+# ══════════════════════════════════════════════
+
+# 华东子集团的指标
+<urn:indicator:east_f01> a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "f01" ;
+    ctio:indicatorName "资金归集率" ;
+    ctio:domain "资金集中" ;
+    ctio:unit "%" ;
+    ctio:currentValue 72.5 ;
+    ctio:thresholdLow 85 ;
+    ctio:thresholdHigh 95 ;
+    ctio:direction "up" ;
+    ctio:affectsEntity <urn:entity:east_group> .
+
+<urn:indicator:east_d01> a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "d01" ;
+    ctio:indicatorName "资产负债率" ;
+    ctio:domain "债务融资" ;
+    ctio:unit "%" ;
+    ctio:currentValue 68.5 ;
+    ctio:thresholdHigh 65 ;
+    ctio:direction "down" ;
+    ctio:affectsEntity <urn:entity:east_group> .
+
+<urn:indicator:east_g01> a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "g01" ;
+    ctio:indicatorName "风险事件数" ;
+    ctio:domain "决策风险" ;
+    ctio:unit "个" ;
+    ctio:currentValue 8 ;
+    ctio:thresholdHigh 5 ;
+    ctio:direction "down" ;
+    ctio:affectsEntity <urn:entity:east_group> .
+
+# 华南子集团的指标（正常）
+<urn:indicator:south_f01> a ctio:RegulatoryIndicator ;
+    ctio:indicatorId "f01" ;
+    ctio:indicatorName "资金归集率" ;
+    ctio:domain "资金集中" ;
+    ctio:unit "%" ;
+    ctio:currentValue 92.4 ;
+    ctio:thresholdLow 85 ;
+    ctio:thresholdHigh 95 ;
+    ctio:direction "up" ;
+    ctio:affectsEntity <urn:entity:south_group> .
+
+# 穿透路径数据（指标 → 实体 → 账户）
+<urn:indicator:east_f01> ctio:affectedBy <urn:entity:east_group> .
+<urn:entity:east_group> ctio:ownsAccount <urn:account:east_acct_001> .
+
+<urn:account:east_acct_001> a ctio:DirectLinkedAccount ;
+    ctio:accountNumber "ACC-EAST-001" ;
+    ctio:balance 824000 ;
+    ctio:status "active" ;
+    ctio:isDirectLinked true .
