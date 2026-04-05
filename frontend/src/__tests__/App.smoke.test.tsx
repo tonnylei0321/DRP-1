@@ -20,7 +20,9 @@ class MockWebSocket {
   onerror: ((ev: Event) => void) | null = null;
   onmessage: ((ev: MessageEvent) => void) | null = null;
   readyState = 0;
-  close = vi.fn();
+  close() {
+    this.readyState = 3;
+  }
 
   constructor(url: string) {
     this.url = url;

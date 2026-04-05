@@ -120,6 +120,7 @@ describe('TenantsPage 新建租户', () => {
 describe('TenantsPage 删除租户', () => {
   it('点击"删除" → 显示自定义确认 Modal → 点击确认 → 调用 tenantsApi.delete → 刷新列表', async () => {
     let listCallCount = 0;
+    let deletedUrl = '';
 
     server.use(
       http.get(`${BASE_URL}/tenants`, () => {
@@ -128,6 +129,10 @@ describe('TenantsPage 删除租户', () => {
           return HttpResponse.json([]);
         }
         return HttpResponse.json(MOCK_TENANTS);
+      }),
+      http.delete(`${BASE_URL}/tenants/:id`, ({ request }) => {
+        deletedUrl = request.url;
+        return new HttpResponse(null, { status: 204 });
       }),
     );
 
@@ -156,6 +161,9 @@ describe('TenantsPage 删除租户', () => {
 
     // 显示空状态
     expect(screen.getByText('暂无租户')).toBeInTheDocument();
+
+    // 验证 DELETE 请求 URL 包含正确的租户 ID
+    expect(deletedUrl).toContain('/tenants/t-1');
   });
 
   it('确认 Modal 中点击"取消" → 关闭 Modal → 列表不变', async () => {

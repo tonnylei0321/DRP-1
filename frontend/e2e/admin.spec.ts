@@ -30,7 +30,7 @@ const MOCK_QUALITY_T_NEW = {
 // ─── 辅助：登录 ──────────────────────────────────────────────────────────────
 
 async function login(page: Page) {
-  await page.route('**/auth/login', route => {
+  await page.route('**/localhost:8000/auth/login', route => {
     route.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ access_token: 'test-token', token_type: 'bearer', expires_in: 3600 }),
@@ -50,12 +50,12 @@ test.describe('管理页面', () => {
     let tenantCreated = false;
 
     // mock ETL 任务列表
-    await page.route('**/etl/jobs', route => {
+    await page.route('**/localhost:8000/etl/jobs', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_ETL_JOBS) });
     });
 
     // mock 租户列表 — 创建后返回包含新租户的列表
-    await page.route('**/tenants', route => {
+    await page.route('**/localhost:8000/tenants', route => {
       if (route.request().method() === 'POST') {
         tenantCreated = true;
         route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(MOCK_NEW_TENANT) });
@@ -66,7 +66,7 @@ test.describe('管理页面', () => {
     });
 
     // mock 数据质量 — 根据 tenantId 返回不同数据
-    await page.route('**/etl/quality/*', route => {
+    await page.route('**/localhost:8000/etl/quality/*', route => {
       const url = route.request().url();
       if (url.includes('t-new')) {
         route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_QUALITY_T_NEW) });
@@ -76,16 +76,16 @@ test.describe('管理页面', () => {
     });
 
     // mock 其他必要 API
-    await page.route('**/auth/users', route => {
+    await page.route('**/localhost:8000/auth/users', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
     });
-    await page.route('**/auth/roles', route => {
+    await page.route('**/localhost:8000/auth/roles', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
     });
-    await page.route('**/auth/audit-logs*', route => {
+    await page.route('**/localhost:8000/auth/audit-logs*', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
     });
-    await page.route('**/mappings', route => {
+    await page.route('**/localhost:8000/mappings', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
     });
 
@@ -133,7 +133,7 @@ test.describe('管理页面', () => {
     // 先创建新租户使列表有多个选项
     // 通过直接设置 tenantCreated 状态来模拟
     // 重新 mock 租户列表返回两个租户
-    await page.route('**/tenants', route => {
+    await page.route('**/localhost:8000/tenants', route => {
       if (route.request().method() === 'GET') {
         route.fulfill({
           status: 200, contentType: 'application/json',

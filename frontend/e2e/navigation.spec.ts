@@ -38,7 +38,7 @@ const MOCK_QUALITY = {
 // ─── 辅助：登录 ──────────────────────────────────────────────────────────────
 
 async function login(page: Page) {
-  await page.route('**/auth/login', route => {
+  await page.route('**/localhost:8000/auth/login', route => {
     route.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ access_token: 'test-token', token_type: 'bearer', expires_in: 3600 }),
@@ -56,28 +56,28 @@ async function login(page: Page) {
 test.describe('全局导航', () => {
   test.beforeEach(async ({ page }) => {
     // 设置所有 API mock
-    await page.route('**/auth/users', route => {
+    await page.route('**/localhost:8000/auth/users', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_USERS) });
     });
-    await page.route('**/auth/roles', route => {
+    await page.route('**/localhost:8000/auth/roles', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_ROLES) });
     });
-    await page.route('**/auth/audit-logs*', route => {
+    await page.route('**/localhost:8000/auth/audit-logs*', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_AUDIT_LOGS) });
     });
-    await page.route('**/tenants', route => {
+    await page.route('**/localhost:8000/tenants', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_TENANTS) });
     });
-    await page.route('**/mappings/generate', route => {
+    await page.route('**/localhost:8000/mappings/generate', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mappings: MOCK_MAPPINGS, mapping_yaml: 'yaml' }) });
     });
-    await page.route('**/mappings', route => {
+    await page.route('**/localhost:8000/mappings', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_MAPPINGS) });
     });
-    await page.route('**/etl/jobs', route => {
+    await page.route('**/localhost:8000/etl/jobs', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_ETL_JOBS) });
     });
-    await page.route('**/etl/quality/*', route => {
+    await page.route('**/localhost:8000/etl/quality/*', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_QUALITY) });
     });
 

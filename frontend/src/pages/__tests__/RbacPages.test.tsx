@@ -82,6 +82,7 @@ describe('RolesPage 权限配置', () => {
 describe('RolesPage 删除角色', () => {
   it('点击"删除" → 显示确认 Modal → 点击确认 → 调用 rolesApi.delete → 刷新列表', async () => {
     let listCallCount = 0;
+    let deletedUrl = '';
 
     server.use(
       http.get(`${BASE_URL}/auth/roles`, () => {
@@ -91,6 +92,10 @@ describe('RolesPage 删除角色', () => {
           return HttpResponse.json([]);
         }
         return HttpResponse.json(MOCK_ROLES);
+      }),
+      http.delete(`${BASE_URL}/auth/roles/:id`, ({ request }) => {
+        deletedUrl = request.url;
+        return new HttpResponse(null, { status: 204 });
       }),
     );
 
@@ -116,6 +121,9 @@ describe('RolesPage 删除角色', () => {
     await waitFor(() => {
       expect(screen.queryByText('admin')).not.toBeInTheDocument();
     });
+
+    // 验证 DELETE 请求 URL 包含正确的角色 ID
+    expect(deletedUrl).toContain('/auth/roles/role-1');
   });
 
   it('点击"删除" → 显示确认 Modal → 点击取消 → 关闭 Modal → 列表不变', async () => {

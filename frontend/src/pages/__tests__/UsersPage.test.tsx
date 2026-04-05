@@ -115,6 +115,7 @@ describe('UsersPage 新建用户', () => {
 describe('UsersPage 删除用户', () => {
   it('点击"删除" → 显示自定义确认 Modal → 点击确认 → 调用 usersApi.delete → 刷新列表', async () => {
     let listCallCount = 0;
+    let deletedUrl = '';
 
     server.use(
       http.get(`${BASE_URL}/auth/users`, () => {
@@ -123,6 +124,10 @@ describe('UsersPage 删除用户', () => {
           return HttpResponse.json([MOCK_USERS[1]]);
         }
         return HttpResponse.json(MOCK_USERS);
+      }),
+      http.delete(`${BASE_URL}/auth/users/:id`, ({ request }) => {
+        deletedUrl = request.url;
+        return new HttpResponse(null, { status: 204 });
       }),
     );
 
@@ -152,6 +157,9 @@ describe('UsersPage 删除用户', () => {
 
     // 第二个用户仍在
     expect(screen.getByText('user@example.com')).toBeInTheDocument();
+
+    // 验证 DELETE 请求 URL 包含正确的用户 ID
+    expect(deletedUrl).toContain('/auth/users/user-1');
   });
 });
 

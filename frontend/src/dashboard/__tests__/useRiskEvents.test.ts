@@ -309,3 +309,79 @@ describe('useRiskEvents', () => {
     expect(Math.min(INITIAL * Math.pow(2, 6), MAX)).toBe(30000);
   });
 });
+
+
+// ─── 属性测试 ────────────────────────────────────────────────────
+
+import * as fc from 'fast-check';
+
+describe('属性测试 — Property 8: WebSocket 事件添加与时间戳', () => {
+  it('Feature: admin-portal-testing, Property 8: 接收消息后 events[0] 包含所有字段且有 timestamp', () => {
+    /**
+     * Validates: Requirements 5.7
+     */
+    fc.assert(
+      fc.property(
+        fc.record({
+          indicator_id: fc.string({ minLength: 1, maxLength: 20 }),
+          indicator_name: fc.string({ minLength: 1, maxLength: 30 }),
+          domain: fc.constantFrom('credit', 'market', 'operational', 'liquidity'),
+          value: fc.option(fc.float({ min: 0, max: 100, noNaN: true }), { nil: null }),
+          target_value: fc.option(fc.float({ min: 0, max: 100, noNaN: true }), { nil: null }),
+          threshold: fc.option(fc.float({ min: 0, max: 100, noNaN: true }), { nil: null }),
+        }),
+        (eventData) => {
+          const { result } = renderHook(() => useRiskEvents('t-1'));
+
+          act(() => { latestWs().simulateOpen(); });
+
+          const fullEvent = { type: 'risk_event', tenant_id: 't-1', ...eventData };
+          act(() => { latestWs().simulateMessage(fullEvent); });
+
+          const received = result.current.events[0];
+          // 验证所有字段存在
+          expect(received.indicator_id).toBe(eventData.indicator_id);
+          expect(received.domain).toBe(eventData.domain);
+          // 验证 timestamp 存在且为 ISO 8601 格式
+          expect(received.timestamp).toBeDefined();
+          expect(new Date(received.timestamp!).toISOString()).toBe(received.timestamp);
+        }
+      ),
+      { numRuns: 50 }
+    );
+  });
+});
+
+describe('属性测试 — Property 9: WebSocket 事件数组长度不变量', () => {
+  it('Feature: admin-portal-testing, Property 9: events.length <= 200 且保留最新', () => {
+    /**
+     * Validates: Requirements 5.8
+     */
+    fc.assert(
+      fc.property(
+        fc.integer({ min: 1, max: 300 }),
+        (messageCount) => {
+          const { result } = renderHook(() => useRiskEvents('t-1'));
+
+          act(() => { latestWs().simulateOpen(); });
+
+          act(() => {
+            for (let i = 0; i < messageCount; i++) {
+              latestWs().simulateMessage(makeRiskEvent({ indicator_id: `ind-${i}` }));
+            }
+          });
+
+          // 长度不变量
+          expect(result.current.events.length).toBeLessThanOrEqual(200);
+
+          // 保留最新
+          if (messageCount > 0) {
+            const expectedLatest = `ind-${messageCount - 1}`;
+            expect(result.current.events[0].indicator_id).toBe(expectedLatest);
+          }
+        }
+      ),
+      { numRuns: 30 }
+    );
+  });
+});

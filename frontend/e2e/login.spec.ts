@@ -32,25 +32,25 @@ const MOCK_AUDIT_LOGS = [
 // ─── 辅助：设置通用 API mock ─────────────────────────────────────────────────
 
 async function setupApiMocks(page: Page) {
-  await page.route('**/auth/users', route => {
+  await page.route('**/localhost:8000/auth/users', route => {
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_USERS) });
   });
-  await page.route('**/auth/roles', route => {
+  await page.route('**/localhost:8000/auth/roles', route => {
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_ROLES) });
   });
-  await page.route('**/auth/audit-logs*', route => {
+  await page.route('**/localhost:8000/auth/audit-logs*', route => {
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_AUDIT_LOGS) });
   });
-  await page.route('**/tenants', route => {
+  await page.route('**/localhost:8000/tenants', route => {
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_TENANTS) });
   });
-  await page.route('**/etl/jobs', route => {
+  await page.route('**/localhost:8000/etl/jobs', route => {
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
   });
-  await page.route('**/mappings', route => {
+  await page.route('**/localhost:8000/mappings', route => {
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
   });
-  await page.route('**/etl/quality/*', route => {
+  await page.route('**/localhost:8000/etl/quality/*', route => {
     route.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ tenant_id: 't-1', null_rate: 0.05, latency_seconds: 120, format_compliance: 0.95, overall: 90.5, is_healthy: true }),
@@ -63,7 +63,7 @@ async function setupApiMocks(page: Page) {
 test.describe('登录流程', () => {
   test('输入有效凭据 → 登录成功 → 主布局可见且侧边栏可见', async ({ page }) => {
     // mock 登录接口返回成功
-    await page.route('**/auth/login', route => {
+    await page.route('**/localhost:8000/auth/login', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_LOGIN_SUCCESS) });
     });
     await setupApiMocks(page);
@@ -85,7 +85,7 @@ test.describe('登录流程', () => {
 
   test('输入错误密码 → 显示错误提示信息', async ({ page }) => {
     // mock 登录接口返回 401
-    await page.route('**/auth/login', route => {
+    await page.route('**/localhost:8000/auth/login', route => {
       route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ detail: '账号或密码错误' }) });
     });
 

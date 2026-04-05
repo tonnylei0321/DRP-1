@@ -19,7 +19,7 @@ const MOCK_LOGIN_LOGS = [
 // ─── 辅助：登录 ──────────────────────────────────────────────────────────────
 
 async function login(page: Page) {
-  await page.route('**/auth/login', route => {
+  await page.route('**/localhost:8000/auth/login', route => {
     route.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ access_token: 'test-token', token_type: 'bearer', expires_in: 3600 }),
@@ -37,7 +37,7 @@ async function login(page: Page) {
 test.describe('审计日志', () => {
   test.beforeEach(async ({ page }) => {
     // mock 审计日志 — 根据 event_type 参数返回不同数据
-    await page.route('**/auth/audit-logs*', route => {
+    await page.route('**/localhost:8000/auth/audit-logs*', route => {
       const url = route.request().url();
       if (url.includes('event_type=login')) {
         route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(MOCK_LOGIN_LOGS) });
@@ -47,22 +47,22 @@ test.describe('审计日志', () => {
     });
 
     // mock 其他必要 API
-    await page.route('**/auth/users', route => {
+    await page.route('**/localhost:8000/auth/users', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
     });
-    await page.route('**/auth/roles', route => {
+    await page.route('**/localhost:8000/auth/roles', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
     });
-    await page.route('**/tenants', route => {
+    await page.route('**/localhost:8000/tenants', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
     });
-    await page.route('**/etl/jobs', route => {
+    await page.route('**/localhost:8000/etl/jobs', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
     });
-    await page.route('**/mappings', route => {
+    await page.route('**/localhost:8000/mappings', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
     });
-    await page.route('**/etl/quality/*', route => {
+    await page.route('**/localhost:8000/etl/quality/*', route => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ tenant_id: 't-1', null_rate: 0.05, latency_seconds: 120, format_compliance: 0.95, overall: 90.5, is_healthy: true }) });
     });
 

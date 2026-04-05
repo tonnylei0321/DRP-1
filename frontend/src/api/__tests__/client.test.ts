@@ -16,6 +16,8 @@ import {
   auditApi,
   mappingApi,
   usersApi,
+  rolesApi,
+  etlApi,
   REQUEST_TIMEOUT_MS,
 } from '../client';
 
@@ -509,6 +511,205 @@ describe('属性测试 — Property 1: Token 管理 round-trip', () => {
         expect(localStorage.getItem('drp_token')).toBeNull();
       }),
       { numRuns: 100 }
+    );
+  });
+});
+
+
+// ─── 属性测试 — Property 2: HTTP 错误状态码映射 ──────────────────────────────
+
+describe('属性测试 — Property 2: HTTP 错误状态码映射', () => {
+  beforeEach(() => { localStorage.clear(); clearToken(); });
+
+  it('Feature: admin-portal-testing, Property 2: 400-599 状态码映射', async () => {
+    /**
+     * Validates: Requirements 2.3
+     */
+    await fc.assert(
+      fc.asyncProperty(
+        fc.integer({ min: 400, max: 599 }),
+        fc.string({ minLength: 1, maxLength: 50 }),
+        async (status, text) => {
+          server.use(
+            http.get(`${BASE_URL}/tenants`, () => {
+              return new HttpResponse(text, { status });
+            }),
+          );
+          try {
+            await tenantsApi.list();
+            // 不应到达这里
+            return false;
+          } catch (e: any) {
+            // Error message 应包含状态码
+            return e.message.includes(String(status));
+          }
+        }
+      ),
+      { numRuns: 20 }
+    );
+  });
+});
+
+
+// ─── 属性测试 — Property 3: API 请求体构造正确性 ─────────────────────────────
+
+describe('属性测试 — Property 3: API 请求体构造正确性', () => {
+  beforeEach(() => { localStorage.clear(); clearToken(); });
+
+  it('Feature: admin-portal-testing, Property 3: POST/PUT 请求包含正确字段和 Content-Type', async () => {
+    /**
+     * Validates: Requirements 2.5, 2.6, 2.8, 2.9
+     */
+    await fc.assert(
+      fc.asyncProperty(
+        fc.emailAddress(),
+        fc.string({ minLength: 1, maxLength: 50 }),
+        async (email, password) => {
+          let capturedBody: any = null;
+          let capturedContentType: string | null = null;
+          server.use(
+            http.post(`${BASE_URL}/auth/login`, async ({ request }) => {
+              capturedBody = await request.json();
+              capturedContentType = request.headers.get('Content-Type');
+              return HttpResponse.json({ access_token: 'tok', token_type: 'bearer', expires_in: 3600 });
+            }),
+          );
+          await authApi.login(email, password);
+          return capturedBody?.email === email
+            && capturedBody?.password === password
+            && capturedContentType === 'application/json';
+        }
+      ),
+      { numRuns: 20 }
+    );
+  });
+});
+
+
+// ─── 属性测试 — Property 4: 审计日志查询字符串构造 ────────────────────────────
+
+describe('属性测试 — Property 4: 审计日志查询字符串构造', () => {
+  beforeEach(() => { localStorage.clear(); clearToken(); });
+
+  it('Feature: admin-portal-testing, Property 4: 查询参数正确拼接', async () => {
+    /**
+     * Validates: Requirements 2.7
+     */
+    await fc.assert(
+      fc.asyncProperty(
+        fc.record({
+          page: fc.option(fc.integer({ min: 0, max: 100 }), { nil: undefined }),
+          per_page: fc.option(fc.integer({ min: 0, max: 100 }), { nil: undefined }),
+          event_type: fc.option(fc.constantFrom('login', 'logout', 'update', ''), { nil: undefined }),
+        }),
+        async (params) => {
+          let capturedUrl = '';
+          server.use(
+            http.get(`${BASE_URL}/auth/audit-logs`, ({ request }) => {
+              capturedUrl = request.url;
+              return HttpResponse.json([]);
+            }),
+          );
+          await auditApi.list(params);
+          const url = new URL(capturedUrl);
+
+          // 验证非 null/undefined 参数被正确拼接
+          if (params.page != null) {
+            if (url.searchParams.get('page') !== String(params.page)) return false;
+          }
+          if (params.per_page != null) {
+            if (url.searchParams.get('per_page') !== String(params.per_page)) return false;
+          }
+          if (params.event_type) {
+            if (url.searchParams.get('event_type') !== params.event_type) return false;
+          }
+          // URL 不应包含 'undefined'
+          if (capturedUrl.includes('undefined')) return false;
+          return true;
+        }
+      ),
+      { numRuns: 50 }
+    );
+  });
+});
+
+
+// ─── 属性测试 — Property 10: JWT 安全验证 ────────────────────────────────────
+
+describe('属性测试 — Property 10: JWT 安全验证', () => {
+  beforeEach(() => { localStorage.clear(); clearToken(); });
+
+  it('Feature: admin-portal-testing, Property 10: 伪造 JWT 触发 401 时清除 Token', async () => {
+    /**
+     * Validates: Requirements 2.3, 安全测试层
+     */
+    await fc.assert(
+      fc.asyncProperty(
+        fc.oneof(
+          fc.string({ minLength: 1, maxLength: 100 }), // 随机字符串
+          fc.constant('eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.tampered'), // 篡改签名
+          fc.constant('eyJhbGciOiJIUzI1NiJ9..sig'), // 空 payload
+        ),
+        async (fakeToken) => {
+          setToken(fakeToken);
+          server.use(
+            http.get(`${BASE_URL}/tenants`, () => {
+              return new HttpResponse('Unauthorized', { status: 401 });
+            }),
+          );
+          try {
+            await tenantsApi.list();
+            return false;
+          } catch (e: any) {
+            return getToken() === null && e.message.includes('401');
+          }
+        }
+      ),
+      { numRuns: 20 }
+    );
+  });
+});
+
+
+// ─── 属性测试 — Property 11: 401 响应自动清除 Token ──────────────────────────
+
+describe('属性测试 — Property 11: 401 响应自动清除 Token', () => {
+  beforeEach(() => { localStorage.clear(); clearToken(); });
+
+  it('Feature: admin-portal-testing, Property 11: 所有端点 401 均清除 Token', async () => {
+    /**
+     * Validates: Requirements 2.11
+     */
+    const endpoints = [
+      { name: 'GET /tenants', fn: () => tenantsApi.list(), method: 'get' as const, path: '/tenants' },
+      { name: 'GET /auth/users', fn: () => usersApi.list(), method: 'get' as const, path: '/auth/users' },
+      { name: 'GET /auth/roles', fn: () => rolesApi.list(), method: 'get' as const, path: '/auth/roles' },
+      { name: 'GET /etl/jobs', fn: () => etlApi.list(), method: 'get' as const, path: '/etl/jobs' },
+    ];
+
+    await fc.assert(
+      fc.asyncProperty(
+        fc.constantFrom(...endpoints),
+        async (endpoint) => {
+          localStorage.clear();
+          clearToken();
+          setToken('test-token-for-401');
+
+          const handler = http.get(`${BASE_URL}${endpoint.path}`, () =>
+            new HttpResponse('Unauthorized', { status: 401 }),
+          );
+
+          server.use(handler);
+
+          try {
+            await endpoint.fn();
+            return false;
+          } catch {
+            return getToken() === null && localStorage.getItem('drp_token') === null;
+          }
+        }
+      ),
+      { numRuns: 20 }
     );
   });
 });
