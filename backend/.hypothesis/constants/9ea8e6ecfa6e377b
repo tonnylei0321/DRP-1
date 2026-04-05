@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/observability/tracing.py
+# hypothesis_version: 6.151.10
+
+[b'x-trace-id', 'drp', 'headers', 'http', 'http.response.start', 'name', 'parent_span_id', 'span_id', 'trace_id', 'type', 'websocket']

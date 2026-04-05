@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/observability/health.py
+# hypothesis_version: 6.151.10
+
+[3.0, 200, '/health', '0.1.0', 'SELECT 1', 'components', 'degraded', 'env', 'graphdb', 'ok', 'postgres', 'redis', 'sqlalchemy', 'status', 'timestamp', 'version', '基础设施', '数据新鲜度告警：从未完成增量同步']

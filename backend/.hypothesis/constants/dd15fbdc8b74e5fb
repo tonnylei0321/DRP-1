@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/tenants/models.py
+# hypothesis_version: 6.151.10
+
+[100, 200, 300, 'active', 'tenant']

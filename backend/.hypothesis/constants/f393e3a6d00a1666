@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/indicators/router.py
+# hypothesis_version: 6.151.10
+
+[500, '/indicators', '/{entity_id}', '056', '^[a-zA-Z0-9_-]+$', 'debt', 'derivative', 'direction', 'domain', 'finbiz', 'fund', 'guarantee', 'indicatorId', 'invest', 'name', 'overseas', 'thresholdHigh', 'thresholdLow', 'unit', 'up', 'value', '债务融资', '决策风险', '国资委考核', '数据查询失败，请稍后重试', '监管指标', '票据', '结算', '获取实体监管指标', '资金集中', '银行账户']

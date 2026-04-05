@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/drill/router.py
+# hypothesis_version: 6.151.10
+
+[404, 500, '#', '/', '/drill', '/path/{indicator_id}', ':', 'Content-Disposition', 'Heading2', 'Normal', 'Title', 'account_iri', 'account_number', 'acct', 'acctNo', 'application/json', 'application/pdf', 'balance', 'contribution_value', 'entities', 'entity', 'entityName', 'entity_iri', 'entity_name', 'generated_at', 'indicator_id', 'isDirectLinked', 'is_direct_linked', 'node', 'nodeLabel', 'nodeType', 'node_iri', 'node_label', 'node_type', 'object', 'path', 'predicate', 'status', 'step', 'tenant_id', 'true', 'utf-8', 'value', '影响法人列表', '法人 IRI', '法人名称', '溯源路径', '穿透溯源', '贡献值']

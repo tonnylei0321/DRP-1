@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/config.py
+# hypothesis_version: 6.151.10
+
+[5432, 8000, '../.env', '0.0.0.0', 'HS256', 'admin', 'development', 'drp', 'drp_dev', 'ignore', 'localhost', 'root', 'utf-8']

@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/org/router.py
+# hypothesis_version: 6.151.10
+
+[500, '#', '/', '/org', '/tree', ':', '^[a-zA-Z0-9_-]+$', 'asset', 'borrowing', 'cash', 'city', 'compliance', 'debt', 'entity', 'fundFlow', 'fxExposure', 'guarantee', 'hasChildren', 'hasSubsidiary', 'has_children', 'id', 'level', 'lo', 'name', 'parent', 'parent_id', 'relType', 'risk', 'root', 'source', 'target', 'true', 'type', 'unknown', '从根节点向下展开的最大层数', '指定子树根节点 ID（用于穿透钻取）', '数据查询失败，请稍后重试', '未知', '组织架构', '获取实体关系列表', '获取组织架构树']

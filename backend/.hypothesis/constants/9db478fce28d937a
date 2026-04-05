@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/tenants/schemas.py
+# hypothesis_version: 6.151.10
+
+[100, 200, '^[a-z0-9\\-]+$', 'from_attributes', '唯一标识符（小写字母、数字、连字符）', '租户名称']

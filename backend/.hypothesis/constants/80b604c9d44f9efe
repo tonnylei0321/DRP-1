@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/mapping/schemas.py
+# hypothesis_version: 6.151.10
+
+['from_attributes', '仅处理指定表（留空则处理所有表）', '数据库 DDL SQL 内容']

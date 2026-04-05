@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/mapping/router.py
+# hypothesis_version: 6.151.10
+
+[400, 404, 422, '/generate', '/mappings', '/{mapping_id}/reject', 'DDL 解析失败，未找到有效表定义', 'approved', 'auto_approved', 'confidence', 'mapping:approve', 'mapping:read', 'rejected', 'source_field', 'source_table', 'target_property', 'transform_rule', '映射不存在', '语义映射', '需要租户上下文']

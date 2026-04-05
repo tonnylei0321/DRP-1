@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/mapping/ddl_parser.py
+# hypothesis_version: 6.151.10
+
+[200, '"', '(', ')', ',', 'CHECK', 'CONSTRAINT', 'FOREIGN', 'INDEX', 'KEY', 'PRIMARY', 'UNIQUE', '\\bDEFAULT\\s+(\\S+)', '\\bNOT\\s+NULL\\b']

@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/etl/router.py
+# hypothesis_version: 6.151.10
+
+[0.0, 0.05, 0.95, 1.0, 80.0, 100.0, 100, 86400, 999999, '/etl', '/jobs', '/quality/{tenant_id}', '/sync', 'Celery 不可用，无法异步执行', 'ETL 任务', 'etl:read', 'etl:trigger', 'from_attributes', 'full_sync', 'incremental_sync', 'inf']

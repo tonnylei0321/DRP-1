@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/tenants/router.py
+# hypothesis_version: 6.151.10
+
+[404, 502, '/tenants', '/{tenant_id}', '租户管理']

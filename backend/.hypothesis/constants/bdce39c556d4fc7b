@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/auth/models.py
+# hypothesis_version: 6.151.10
+
+[100, 200, 255, 500, 'CASCADE', 'Group', 'Permission', 'Role', 'active', 'audit_log', 'email', 'group', 'group.id', 'groups', 'name', 'permission', 'permission.id', 'permissions', 'role', 'role.id', 'role_permission', 'roles', 'selectin', 'tenant.id', 'tenant_id', 'user', 'user.id', 'user_group', 'user_role', 'users']

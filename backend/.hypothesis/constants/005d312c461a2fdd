@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/org/schemas.py
+# hypothesis_version: 6.151.10
+
+['lo', '合规评分（0-100）', '子节点列表', '实体名称', '实体唯一标识', '实体类型', '所在城市', '担保余额（万元）', '是否有子节点', '未知', '源节点 ID', '现金余额（万元）', '目标节点 ID', '负债总额（万元）', '资产总额（万元）', '风险等级（hi/md/lo）']

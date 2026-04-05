@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/mapping/llm_service.py
+# hypothesis_version: 6.151.10
+
+[0.0, 60.0, 200, 2048, '\n可用目��属性：', '\n字段列表：', '\n请输出 JSON 数组。', '2023-06-01', 'LLM 响应 JSON 解析失败: %s', 'NOT NULL', '[', ']', 'anthropic-version', 'anthropic_api_key', 'application/json', 'claude-sonnet-4-6', 'claude_api_key', 'content', 'content-type', 'ctio:accountNumber', 'ctio:balance', 'ctio:bankCode', 'ctio:cashPoolId', 'ctio:currency', 'ctio:entityId', 'ctio:hasUKeyStatus', 'ctio:isDirectLinked', 'ctio:isRestricted', 'ctio:repaymentDate', 'ctio:riskLevel', 'ctio:status6311', 'max_tokens', 'messages', 'model', 'reasoning', 'role', 'source_field', 'system', 'target_property', 'text', 'transform_rule', 'user', 'x-api-key', '允许NULL']

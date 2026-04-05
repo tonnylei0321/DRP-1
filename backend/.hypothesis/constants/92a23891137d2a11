@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/etl/quality.py
+# hypothesis_version: 6.151.10
+
+[0.0, 0.3, 0.4, 1.0, 80.0, 7200.0, 100, 'NONE', 'NULL', 'inf']

@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/indicators/schemas.py
+# hypothesis_version: 6.151.10
+
+['up', '单位', '指标 ID', '指标值', '指标名称', '方向（up/down/mid）', '阈值 [下限, 上限]']

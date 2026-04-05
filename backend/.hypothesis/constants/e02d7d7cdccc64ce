@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/auth/service.py
+# hypothesis_version: 6.151.10
+
+['account_locked', 'bad_password', 'deleted', 'email', 'failed_count', 'local', 'locked', 'method', 'reason', 'user.login', 'user.login_blocked', 'user.login_failed', 'user_not_found', '账户因连续失败登录被锁定: %s', '账户已被锁定，请稍后再试', '邮箱或密码不正确']
