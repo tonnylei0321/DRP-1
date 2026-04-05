@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/etl/engine.py
+# hypothesis_version: 6.151.10
+
+['ID', '[全量同步] 租户=%s 表=%s 开始', '[哈希同步] 租户=%s 表=%s', 'id', 'source_field', 'source_table', 'target_property', 'unknown', '表 %s 无有效映射，跳过写入']

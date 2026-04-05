@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/mapping/yaml_generator.py
+# hypothesis_version: 6.151.10
+
+['auto_approved', 'confidence', 'data_type', 'mappings', 'source_field', 'source_table', 'target_property', 'transform_rule']

@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/mapping/rml_compiler.py
+# hypothesis_version: 6.151.10
+
+['(', '-', '.', '.\n', 'BIGINT', 'BOOL', 'BOOLEAN', 'CHAR', 'DATE', 'DATETIME', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'INTEGER', 'NUMERIC', 'NVARCHAR', 'SMALLINT', 'TEXT', 'TIMESTAMP', 'VARCHAR', '_', 'data_type', 'source_field', 'source_table', 'target_property', 'transform_rule', 'urn:source:db', 'xsd:boolean', 'xsd:date', 'xsd:dateTime', 'xsd:decimal', 'xsd:double', 'xsd:float', 'xsd:integer', 'xsd:long', 'xsd:short', 'xsd:string']

@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/etl/cleaner.py
+# hypothesis_version: 6.151.10
+
+['$', "'", ',', '0', '1', 'N/A', 'NA', 'NONE', 'NULL', 'active', 'close', 'disable', 'disabled', 'enable', 'enabled', 'false', 'frozen', 'inactive', 'n', 'no', 'open', 'restricted', 'true', 'unrestricted', 'y', 'yes', '¥', 'Ã©', 'â€™', 'é', '冻结', '正常', '正常户', '注销', '限制']
