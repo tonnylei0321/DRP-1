@@ -2,7 +2,8 @@
  * 9.5 审计日志页 — 时间/用户/操作类型过滤、导出
  */
 import { useEffect, useState } from 'react';
-import { auditApi, AuditLog } from '../api/client';
+import { auditApi } from '../api/client';
+import type { AuditLog } from '../api/client';
 import { Btn, Badge, PageHeader, EmptyState, Spinner, ErrorBox } from '../components/ui';
 
 const EVENT_TYPES = ['', 'login', 'login_failed', 'logout', 'permission_denied', 'user_created', 'user_deleted', 'role_changed'];

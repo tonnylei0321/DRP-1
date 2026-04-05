@@ -19,14 +19,32 @@ PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 FRONTEND_DIR="$PROJECT_ROOT/frontend"
 BACKEND_DIR="$PROJECT_ROOT/backend"
 FRONTEND_PID_FILE="$PROJECT_ROOT/.frontend.pid"
+DASHBOARD_DIR="$PROJECT_ROOT/dashboard"
 FRONTEND_LOG="$PROJECT_ROOT/.frontend_logs"
 BACKEND_PID_FILE="$PROJECT_ROOT/.backend.pid"
 BACKEND_LOG="$PROJECT_ROOT/log/backend.log"
-UV_PYTHON="${UV_PYTHON:-$HOME/.local/share/uv/python/cpython-3.12.10-macos-aarch64-none/bin/python3.12}"
-SITE_PKGS="$BACKEND_DIR/.venv/lib/python3.12/site-packages"
+UV_PYTHON="${UV_PYTHON:-$BACKEND_DIR/.venv/bin/python}"
+SITE_PKGS="$(find "$BACKEND_DIR/.venv/lib" -maxdepth 1 -name 'python3.*' -type d 2>/dev/null | head -1)/site-packages"
 
 cd "$PROJECT_ROOT"
 mkdir -p log
+
+# ── 端口清理辅助函数 ──
+kill_port() {
+    local port=$1
+    local pids
+    pids=$(lsof -iTCP:"$port" -sTCP:LISTEN -t 2>/dev/null || true)
+    if [[ -n "$pids" ]]; then
+        echo "[$(date '+%H:%M:%S')] 清理端口 :$port 上的残留进程 (PID: $pids)..."
+        echo "$pids" | xargs kill 2>/dev/null || true
+        sleep 1
+        # 如果还没死，强制杀
+        pids=$(lsof -iTCP:"$port" -sTCP:LISTEN -t 2>/dev/null || true)
+        if [[ -n "$pids" ]]; then
+            echo "$pids" | xargs kill -9 2>/dev/null || true
+        fi
+    fi
+}
 
 # ── 前端启停函数 ──
 stop_frontend() {
@@ -47,18 +65,22 @@ stop_frontend() {
         fi
         rm -f "$FRONTEND_PID_FILE.dashboard"
     fi
-    pkill -f "vite.*frontend" 2>/dev/null || true
+    pkill -f "vite.*frontend\|vite.*dashboard" 2>/dev/null || true
+    # 确保端口释放
+    kill_port 5173
+    kill_port 5174
 }
 
 start_frontend() {
     echo "[$(date '+%H:%M:%S')] 启动前端（Vite）..."
-    cd "$FRONTEND_DIR"
     mkdir -p "$PROJECT_ROOT/.frontend_logs"
     # 管理后台 5173
+    cd "$FRONTEND_DIR"
     nohup npm run dev > "$FRONTEND_LOG/admin.log" 2>&1 &
     echo $! > "$FRONTEND_PID_FILE"
     # 监管大屏 5174
-    nohup npm run dev:dashboard > "$FRONTEND_LOG/dashboard.log" 2>&1 &
+    cd "$DASHBOARD_DIR"
+    nohup npm run dev > "$FRONTEND_LOG/dashboard.log" 2>&1 &
     echo $! > "$FRONTEND_PID_FILE.dashboard"
     cd "$PROJECT_ROOT"
     sleep 2
@@ -69,20 +91,19 @@ start_frontend() {
 
 # ── 后端启停函数 ──
 stop_backend() {
-    if [ ! -f "$BACKEND_PID_FILE" ]; then
-        pkill -f "uvicorn drp.main" 2>/dev/null || true
-        return
-    fi
-    local _bp=$({ cat "$BACKEND_PID_FILE"; } 2>/dev/null)
-    _bp=${_bp//[[:space:]]/}
-    if [[ -z "${_bp-}" ]]; then
+    if [ -f "$BACKEND_PID_FILE" ]; then
+        local _bp=$({ cat "$BACKEND_PID_FILE"; } 2>/dev/null)
+        _bp=${_bp//[[:space:]]/}
+        if [[ -n "${_bp-}" ]]; then
+            echo "[$(date '+%H:%M:%S')] 停止后端，PID=$_bp..."
+            kill "$_bp" 2>/dev/null || true
+            sleep 1
+        fi
         rm -f "$BACKEND_PID_FILE"
-        return
     fi
-    echo "[$(date '+%H:%M:%S')] 停止后端，PID=$_bp..."
-    kill "$_bp" 2>/dev/null || true
-    sleep 1
-    rm -f "$BACKEND_PID_FILE"
+    pkill -f "uvicorn drp.main" 2>/dev/null || true
+    # 确保端口释放
+    kill_port 8000
 }
 
 start_backend() {

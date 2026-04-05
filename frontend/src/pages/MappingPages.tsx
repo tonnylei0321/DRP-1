@@ -3,7 +3,8 @@
  * 9.7 映射审核队列页 — 置信度展示、确认/修改/忽略操作
  */
 import React, { useEffect, useState } from 'react';
-import { mappingApi, MappingSpec } from '../api/client';
+import { mappingApi } from '../api/client';
+import type { MappingSpec } from '../api/client';
 import { Btn, Badge, PageHeader, EmptyState, Spinner, ErrorBox, Card, Modal, Input } from '../components/ui';
 
 // ─── DDL 上传页 ──────────────────────────────────────────────────────────────

@@ -4,7 +4,8 @@
  * 9.10 数据质量面板 — 三维评分可视化
  */
 import { useEffect, useState } from 'react';
-import { etlApi, EtlJob, tenantsApi, Tenant, qualityApi, DataQuality } from '../api/client';
+import { etlApi, tenantsApi, qualityApi } from '../api/client';
+import type { EtlJob, Tenant, DataQuality } from '../api/client';
 import { Btn, Badge, PageHeader, EmptyState, Spinner, ErrorBox, Card, Modal, Input } from '../components/ui';
 
 // ─── ETL 任务监控 ────────────────────────────────────────────────────────────

@@ -3,6 +3,7 @@
  * 左：风险事件流 | 中：D3力导向图 | 右：WarRoom审查器
  */
 import { useState, useEffect, useRef } from 'react';
+import * as d3 from 'd3';
 import { getToken, clearToken } from './api/client';
 import { RiskEventWebSocket, type RiskEventResponse } from './api/riskEventApi';
 import LoginPanel from './pages/LoginPanel';

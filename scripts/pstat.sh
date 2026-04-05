@@ -9,7 +9,7 @@ set -euo pipefail
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.dev.yml}"
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 FRONTEND_PID_FILE="$PROJECT_ROOT/.frontend.pid"
-FRONTEND_LOG="$PROJECT_ROOT/.frontend.log"
+FRONTEND_LOG_DIR="$PROJECT_ROOT/.frontend_logs"
 BACKEND_PID_FILE="$PROJECT_ROOT/.backend.pid"
 BACKEND_LOG="$PROJECT_ROOT/log/backend.log"
 
@@ -43,23 +43,34 @@ fi
 
 echo ""
 echo "=== 前端状态 ==="
+# 管理后台
 if [ -f "$FRONTEND_PID_FILE" ]; then
     pid=$(cat "$FRONTEND_PID_FILE")
     if kill -0 "$pid" 2>/dev/null; then
-        url=$(grep -o 'http://localhost:[0-9]*' "$FRONTEND_LOG" 2>/dev/null | head -1)
-        echo "  运行中 (PID $pid)"
-        echo "  管理后台: ${url:-http://localhost:5173}/"
-        echo "  监管看板: ${url:-http://localhost:5173}/dashboard"
+        echo "  管理后台 运行中 (PID $pid)"
+        echo "  地址: http://localhost:5173/"
     else
-        echo "  已停止（PID 文件残留，执行 restart.sh frontend 重启）"
+        echo "  管理后台 已停止（PID 文件残留）"
     fi
 else
-    echo "  未运行"
+    echo "  管理后台 未运行"
+fi
+# 监管大屏
+if [ -f "$FRONTEND_PID_FILE.dashboard" ]; then
+    pid=$(cat "$FRONTEND_PID_FILE.dashboard")
+    if kill -0 "$pid" 2>/dev/null; then
+        echo "  监管大屏 运行中 (PID $pid)"
+        echo "  地址: http://localhost:5174/"
+    else
+        echo "  监管大屏 已停止（PID 文件残留）"
+    fi
+else
+    echo "  监管大屏 未运行"
 fi
 
 echo ""
 echo "=== 端口监听 ==="
-for port in 7200 5432 6379 8000 5173 5174; do
+for port in 7201 5433 6380 8000 5173 5174; do
     info=$(lsof -iTCP:$port -sTCP:LISTEN -n -P 2>/dev/null | tail -1)
     if [ -n "$info" ]; then
         echo "  :$port  $info"

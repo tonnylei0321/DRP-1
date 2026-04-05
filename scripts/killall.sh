@@ -33,13 +33,20 @@ echo "[$(date '+%H:%M:%S')] 后端已停止"
 if [ -f "$FRONTEND_PID_FILE" ]; then
     pid=$(cat "$FRONTEND_PID_FILE")
     if kill -0 "$pid" 2>/dev/null; then
-        echo "[$(date '+%H:%M:%S')] 停止前端进程 (PID $pid)..."
+        echo "[$(date '+%H:%M:%S')] 停止前端管理后台 (PID $pid)..."
         kill "$pid" 2>/dev/null || true
     fi
     rm -f "$FRONTEND_PID_FILE"
-else
-    pkill -f "vite.*frontend\|frontend.*vite" 2>/dev/null || true
 fi
+if [ -f "$FRONTEND_PID_FILE.dashboard" ]; then
+    pid=$(cat "$FRONTEND_PID_FILE.dashboard")
+    if kill -0 "$pid" 2>/dev/null; then
+        echo "[$(date '+%H:%M:%S')] 停止前端监管大屏 (PID $pid)..."
+        kill "$pid" 2>/dev/null || true
+    fi
+    rm -f "$FRONTEND_PID_FILE.dashboard"
+fi
+pkill -f "vite.*frontend\|vite.*dashboard" 2>/dev/null || true
 echo "[$(date '+%H:%M:%S')] 前端已停止"
 
 # ── 停止 Docker 服务 ──

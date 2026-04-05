@@ -3,7 +3,8 @@
  * 9.4 角色管理页 — 权限树配置
  */
 import { useEffect, useState } from 'react';
-import { rolesApi, Role } from '../api/client';
+import { rolesApi } from '../api/client';
+import type { Role } from '../api/client';
 import { Btn, Badge, PageHeader, EmptyState, Spinner, ErrorBox, Card, Modal } from '../components/ui';
 
 // ─── 用户组管理（占位） ─────────────────────────────────────────────────────

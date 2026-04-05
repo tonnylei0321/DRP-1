@@ -2,7 +2,8 @@
  * 9.2 用户管理页 — 增删改查、角色分配
  */
 import React, { useEffect, useState } from 'react';
-import { usersApi, UserItem } from '../api/client';
+import { usersApi } from '../api/client';
+import type { UserItem } from '../api/client';
 import { Btn, Badge, PageHeader, EmptyState, Spinner, ErrorBox, Modal, Input } from '../components/ui';
 
 export default function UsersPage() {
