@@ -1,0 +1,18 @@
+{
+  "title": "需求文档：前后端集成 — 穿透式资金监管平台",
+  "description": "",
+  "author": "雷涛",
+  "version": "1.0",
+  "doc_number": "DRP-REQ-001",
+  "created_date": "2026-04-04",
+  "files": {
+    "markdown": "requirements.md",
+    "docx": "requirements.docx",
+    "xml": null
+  },
+  "sections": [
+    "简介",
+    "术语表",
+    "需求"
+  ]
+}

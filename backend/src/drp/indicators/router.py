@@ -73,7 +73,7 @@ async def get_entity_indicators(
     - 不返回 status 字段，由前端根据 threshold + direction 计算
     """
     sparql = f"""
-PREFIX ctio: <urn:ctio:>
+PREFIX ctio: <https://drp.example.com/ontology/ctio/>
 SELECT ?indicatorId ?name ?domain ?unit ?value ?thresholdLow ?thresholdHigh ?direction
 WHERE {{
   ?ind a ctio:RegulatoryIndicator ;

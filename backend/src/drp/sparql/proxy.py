@@ -103,7 +103,7 @@ async def sparql_query(
         )
         resp.raise_for_status()
         data = resp.json()
-        vars_ = data["results"]["vars"]
+        vars_ = data["head"]["vars"]
         return [
             {v: binding.get(v, {}).get("value") for v in vars_}
             for binding in data["results"]["bindings"]

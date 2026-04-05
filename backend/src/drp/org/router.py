@@ -38,7 +38,7 @@ async def get_org_tree(
         root_filter = f'FILTER(?entity = <urn:entity:{root_id}> || EXISTS {{ ?entity ctio:isSubsidiaryOf+ <urn:entity:{root_id}> }})'
 
     sparql = f"""
-PREFIX ctio: <urn:ctio:>
+PREFIX ctio: <https://drp.example.com/ontology/ctio/>
 PREFIX fibo: <https://spec.edmcouncil.org/fibo/ontology/BE/LegalEntities/LegalPersons/>
 
 SELECT ?entity ?name ?level ?type ?city ?parent
@@ -230,7 +230,7 @@ async def get_entity_relations(
     - 性能约束：SPARQL 查询超时 30 秒，结果集上限 1000 条
     """
     sparql = f"""
-PREFIX ctio: <urn:ctio:>
+PREFIX ctio: <https://drp.example.com/ontology/ctio/>
 SELECT ?source ?target ?relType
 WHERE {{
   {{

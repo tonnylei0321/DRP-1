@@ -39,7 +39,7 @@ async def get_entities_by_indicator(
     tenant_id 从 JWT 上下文中自动注入到 SPARQL。
     """
     sparql = f"""
-PREFIX ctio: <urn:ctio:>
+PREFIX ctio: <https://drp.example.com/ontology/ctio/>
 PREFIX fibo-be-le-lp: <https://spec.edmcouncil.org/fibo/ontology/BE/LegalEntities/LegalPersons/>
 SELECT ?entity ?entityName ?value WHERE {{
   ?ind a ctio:RegulatoryIndicator ;
@@ -80,7 +80,7 @@ async def get_accounts_by_entity(
     """
     entity_iri = f"urn:entity:{entity_id}"
     sparql = f"""
-PREFIX ctio: <urn:ctio:>
+PREFIX ctio: <https://drp.example.com/ontology/ctio/>
 PREFIX fibo-fbc-pas-caa: <https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/ClientsAndAccounts/>
 SELECT ?acct ?acctNo ?balance ?status ?isDirectLinked WHERE {{
   <{entity_iri}> ctio:ownsAccount ?acct .
@@ -119,7 +119,7 @@ async def get_account_properties(
     """第三级穿透：返回账户完整 FIBO+CTIO 属性。"""
     account_iri = f"urn:entity:{account_id}"
     sparql = f"""
-PREFIX ctio: <urn:ctio:>
+PREFIX ctio: <https://drp.example.com/ontology/ctio/>
 SELECT ?predicate ?object WHERE {{
   <{account_iri}> ?predicate ?object .
 }}
@@ -167,7 +167,7 @@ async def get_drill_path(
     使用 SPARQL 属性路径（/+）进行深度遍历。
     """
     sparql = f"""
-PREFIX ctio: <urn:ctio:>
+PREFIX ctio: <https://drp.example.com/ontology/ctio/>
 SELECT ?step ?node ?nodeType ?nodeLabel WHERE {{
   VALUES ?indicatorId {{ "{indicator_id}" }}
   ?ind a ctio:RegulatoryIndicator ;
