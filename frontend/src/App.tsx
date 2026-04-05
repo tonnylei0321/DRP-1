@@ -1,7 +1,7 @@
 /**
  * 管理后台主应用 — 侧边栏导航 + 页面路由
  */
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { clearToken, getToken } from './api/client';
 import LoginPage from './pages/LoginPage';
 import UsersPage from './pages/UsersPage';
@@ -47,9 +47,28 @@ function PageContent({ page }: { page: Page }) {
 export default function App() {
   const [authed, setAuthed] = useState(() => !!getToken());
   const [page, setPage] = useState<Page>('users');
+  const savedPageRef = useRef<Page | null>(null);
+
+  // 监听 401 auth-expired 事件，保存当前 page 并跳转登录页
+  useEffect(() => {
+    function handleAuthExpired() {
+      savedPageRef.current = page;
+      setAuthed(false);
+    }
+    window.addEventListener('drp-auth-expired', handleAuthExpired);
+    return () => window.removeEventListener('drp-auth-expired', handleAuthExpired);
+  }, [page]);
+
+  function handleLogin() {
+    setAuthed(true);
+    if (savedPageRef.current) {
+      setPage(savedPageRef.current);
+      savedPageRef.current = null;
+    }
+  }
 
   if (!authed) {
-    return <LoginPage onLogin={() => setAuthed(true)} />;
+    return <LoginPage onLogin={handleLogin} />;
   }
 
   return (

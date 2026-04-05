@@ -21,6 +21,9 @@ export function getToken(): string | null {
   return _token;
 }
 
+/** 默认请求超时时间（毫秒） */
+export const REQUEST_TIMEOUT_MS = 30_000;
+
 async function request<T>(
   method: string,
   path: string,
@@ -33,19 +36,36 @@ async function request<T>(
   };
   if (_token) headers['Authorization'] = `Bearer ${_token}`;
 
-  const resp = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  if (!resp.ok) {
-    const text = await resp.text().catch(() => '');
-    throw new Error(`${resp.status} ${resp.statusText}: ${text}`);
+  try {
+    const resp = await fetch(`${BASE_URL}${path}`, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
+    });
+
+    if (!resp.ok) {
+      if (resp.status === 401) {
+        clearToken();
+        window.dispatchEvent(new CustomEvent('drp-auth-expired'));
+      }
+      const text = await resp.text().catch(() => '');
+      throw new Error(`${resp.status} ${resp.statusText}: ${text}`);
+    }
+    // 204 No Content
+    if (resp.status === 204) return undefined as T;
+    return resp.json() as Promise<T>;
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw new Error(`请求超时: ${method} ${path}`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
   }
-  // 204 No Content
-  if (resp.status === 204) return undefined as T;
-  return resp.json() as Promise<T>;
 }
 
 // ─── 认证 ────────────────────────────────────────────────────────────────────
@@ -125,8 +145,8 @@ export interface AuditLog {
 export const auditApi = {
   list: (params?: { page?: number; per_page?: number; event_type?: string }) => {
     const qs = new URLSearchParams();
-    if (params?.page) qs.set('page', String(params.page));
-    if (params?.per_page) qs.set('per_page', String(params.per_page));
+    if (params?.page != null) qs.set('page', String(params.page));
+    if (params?.per_page != null) qs.set('per_page', String(params.per_page));
     if (params?.event_type) qs.set('event_type', params.event_type);
     return request<AuditLog[]>('GET', `/auth/audit-logs?${qs}`);
   },

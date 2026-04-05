@@ -58,5 +58,5 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
 };
 
 export function t(lang: Lang, key: string): string {
-  return STRINGS[lang][key] ?? key;
+  return Object.prototype.hasOwnProperty.call(STRINGS[lang], key) ? STRINGS[lang][key] : key;
 }

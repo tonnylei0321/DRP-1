@@ -80,6 +80,7 @@ export function TenantsPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
+  const [deleteTenantTarget, setDeleteTenantTarget] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -103,10 +104,15 @@ export function TenantsPage() {
     } finally { setSaving(false); }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('确认删除租户？此操作将删除所有相关数据！')) return;
-    try { await tenantsApi.delete(id); load(); }
-    catch (e: unknown) { setError(e instanceof Error ? e.message : '删除失败'); }
+  async function handleDeleteConfirm() {
+    if (!deleteTenantTarget) return;
+    try {
+      await tenantsApi.delete(deleteTenantTarget);
+      setDeleteTenantTarget(null);
+      load();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : '删除失败');
+    }
   }
 
   function statusBadge(s: string): 'success' | 'warn' | 'danger' {
@@ -137,7 +143,7 @@ export function TenantsPage() {
                   {new Date(t.created_at).toLocaleString('zh-CN')}
                 </td>
                 <td>
-                  <Btn variant="danger" size="sm" onClick={() => handleDelete(t.id)}>删除</Btn>
+                  <Btn variant="danger" size="sm" onClick={() => setDeleteTenantTarget(t.id)}>删除</Btn>
                 </td>
               </tr>
             ))}
@@ -152,6 +158,15 @@ export function TenantsPage() {
               <Btn variant="ghost" onClick={() => setShowCreate(false)}>取消</Btn>
               <Btn onClick={handleCreate} disabled={saving}>{saving ? '创建中...' : '创建'}</Btn>
             </div>
+          </div>
+        </Modal>
+      )}
+      {deleteTenantTarget && (
+        <Modal title="确认删除" onClose={() => setDeleteTenantTarget(null)}>
+          <p style={{ color: 'var(--text)', marginBottom: '16px' }}>确认删除该租户？此操作将删除所有相关数据！</p>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+            <Btn variant="ghost" onClick={() => setDeleteTenantTarget(null)}>取消</Btn>
+            <Btn variant="danger" onClick={handleDeleteConfirm}>确认删除</Btn>
           </div>
         </Modal>
       )}

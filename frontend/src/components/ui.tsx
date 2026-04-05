@@ -22,14 +22,14 @@ export function Btn({ variant = 'primary', size = 'md', style, children, ...rest
     ...(variant === 'ghost' && { background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)' }),
     ...style,
   };
-  return <button style={base} {...rest}>{children}</button>;
+  return <button className={`btn btn-${variant}`} style={base} {...rest}>{children}</button>;
 }
 
 // ─── Card ────────────────────────────────────────────────────────────────────
 
 export function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{
+    <div className="card" style={{
       background: 'var(--bg-card)', border: '1px solid var(--border)',
       borderRadius: '10px', padding: '20px', ...style,
     }}>
@@ -116,13 +116,31 @@ export function Spinner() {
 
 // ─── ErrorBox ────────────────────────────────────────────────────────────────
 
+// 脱敏函数：过滤内部路径、SQL 关键字、堆栈跟踪
+export function sanitizeErrorMessage(message: string): string {
+  const sensitivePatterns = [
+    /\/app\/src\/[^\s]+/g,           // 内部路径
+    /File "[^"]+", line \d+/g,       // Python 文件路径
+    /Traceback \(most recent/gi,     // Python 堆栈跟踪
+    /relation "[^"]+" does not exist/gi, // PostgreSQL 错误
+    /at [A-Z]\w+\.[a-z]\w+\s*\(/g,  // JS 堆栈跟踪
+  ];
+
+  for (const pattern of sensitivePatterns) {
+    if (pattern.test(message)) {
+      return '操作失败，请稍后重试或联系管理员';
+    }
+  }
+  return message;
+}
+
 export function ErrorBox({ message }: { message: string }) {
   return (
     <div style={{
       background: 'rgba(239,68,68,0.1)', border: '1px solid var(--danger)',
       borderRadius: '8px', padding: '12px 16px', color: 'var(--danger)', marginBottom: '16px',
     }}>
-      {message}
+      {sanitizeErrorMessage(message)}
     </div>
   );
 }

@@ -4,7 +4,7 @@
  */
 import { useEffect, useState } from 'react';
 import { rolesApi, Role } from '../api/client';
-import { Btn, Badge, PageHeader, EmptyState, Spinner, ErrorBox, Card } from '../components/ui';
+import { Btn, Badge, PageHeader, EmptyState, Spinner, ErrorBox, Card, Modal } from '../components/ui';
 
 // ─── 用户组管理（占位） ─────────────────────────────────────────────────────
 
@@ -35,6 +35,7 @@ export function RolesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selected, setSelected] = useState<Role | null>(null);
+  const [deleteRoleTarget, setDeleteRoleTarget] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -49,10 +50,11 @@ export function RolesPage() {
 
   useEffect(() => { load(); }, []);
 
-  async function handleDeleteRole(id: string) {
-    if (!confirm('确认删除该角色？')) return;
+  async function handleDeleteConfirm() {
+    if (!deleteRoleTarget) return;
     try {
-      await rolesApi.delete(id);
+      await rolesApi.delete(deleteRoleTarget);
+      setDeleteRoleTarget(null);
       load();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : '删除失败');
@@ -86,7 +88,7 @@ export function RolesPage() {
                   </div>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <Badge label={`${role.permissions.length} 权限`} variant="info" />
-                    <Btn variant="danger" size="sm" onClick={e => { e.stopPropagation(); handleDeleteRole(role.id); }}>
+                    <Btn variant="danger" size="sm" onClick={e => { e.stopPropagation(); setDeleteRoleTarget(role.id); }}>
                       删除
                     </Btn>
                   </div>
@@ -131,6 +133,16 @@ export function RolesPage() {
           )}
         </Card>
       </div>
+
+      {deleteRoleTarget && (
+        <Modal title="确认删除" onClose={() => setDeleteRoleTarget(null)}>
+          <p style={{ color: 'var(--text)', marginBottom: '16px' }}>确认删除该角色？此操作不可撤销。</p>
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+            <Btn variant="ghost" type="button" onClick={() => setDeleteRoleTarget(null)}>取消</Btn>
+            <Btn variant="danger" onClick={handleDeleteConfirm}>确认删除</Btn>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

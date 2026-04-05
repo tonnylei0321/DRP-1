@@ -34,11 +34,20 @@ export default function AuditPage() {
     return 'info';
   }
 
+  function sanitizeCsvField(value: string): string {
+    if (/^[=+\-@\t\r]/.test(value)) {
+      return `'${value}`;
+    }
+    return value;
+  }
+
   function handleExport() {
     const csv = [
       'ID,UserID,EventType,Resource,IP,CreatedAt',
       ...logs.map(l =>
-        `${l.id},${l.user_id},${l.event_type},${l.resource || ''},${l.ip_address || ''},${l.created_at}`
+        [l.id, l.user_id, l.event_type, l.resource || '', l.ip_address || '', l.created_at]
+          .map(sanitizeCsvField)
+          .join(',')
       ),
     ].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

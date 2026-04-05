@@ -12,6 +12,7 @@ export default function UsersPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({ email: '', username: '', password: '', full_name: '' });
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -41,10 +42,11 @@ export default function UsersPage() {
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('确认删除该用户？')) return;
+  async function handleDeleteConfirm() {
+    if (!deleteTarget) return;
     try {
-      await usersApi.delete(id);
+      await usersApi.delete(deleteTarget);
+      setDeleteTarget(null);
       load();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : '删除失败');
@@ -82,7 +84,7 @@ export default function UsersPage() {
                   {new Date(u.created_at).toLocaleString('zh-CN')}
                 </td>
                 <td>
-                  <Btn variant="danger" size="sm" onClick={() => handleDelete(u.id)}>删除</Btn>
+                  <Btn variant="danger" size="sm" onClick={() => setDeleteTarget(u.id)}>删除</Btn>
                 </td>
               </tr>
             ))}
@@ -106,6 +108,16 @@ export default function UsersPage() {
               <Btn type="submit" disabled={saving}>{saving ? '保存中...' : '创建'}</Btn>
             </div>
           </form>
+        </Modal>
+      )}
+
+      {deleteTarget && (
+        <Modal title="确认删除" onClose={() => setDeleteTarget(null)}>
+          <p style={{ color: 'var(--text)', marginBottom: '16px' }}>确认删除该用户？此操作不可撤销。</p>
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+            <Btn variant="ghost" type="button" onClick={() => setDeleteTarget(null)}>取消</Btn>
+            <Btn variant="danger" onClick={handleDeleteConfirm}>确认删除</Btn>
+          </div>
         </Modal>
       )}
     </div>

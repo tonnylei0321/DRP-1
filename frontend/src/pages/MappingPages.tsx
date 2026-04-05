@@ -4,7 +4,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { mappingApi, MappingSpec } from '../api/client';
-import { Btn, Badge, PageHeader, EmptyState, Spinner, ErrorBox, Card } from '../components/ui';
+import { Btn, Badge, PageHeader, EmptyState, Spinner, ErrorBox, Card, Modal, Input } from '../components/ui';
 
 // ─── DDL 上传页 ──────────────────────────────────────────────────────────────
 
@@ -102,6 +102,8 @@ export function MappingsPage() {
   const [mappings, setMappings] = useState<MappingSpec[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [rejectTarget, setRejectTarget] = useState<string | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
 
   async function load() {
     setLoading(true);
@@ -121,11 +123,22 @@ export function MappingsPage() {
     load();
   }
 
-  async function handleReject(id: string) {
-    const reason = prompt('拒绝原因（可选）');
-    if (reason === null) return; // 用户取消
-    await mappingApi.reject(id, reason);
+  function handleReject(id: string) {
+    setRejectTarget(id);
+    setRejectReason('');
+  }
+
+  async function handleRejectConfirm() {
+    if (!rejectTarget) return;
+    await mappingApi.reject(rejectTarget, rejectReason);
+    setRejectTarget(null);
+    setRejectReason('');
     load();
+  }
+
+  function handleRejectCancel() {
+    setRejectTarget(null);
+    setRejectReason('');
   }
 
   function statusBadge(s: string): 'success' | 'danger' | 'warn' | 'info' {
@@ -217,6 +230,23 @@ export function MappingsPage() {
 
           {mappings.length === 0 && <EmptyState message="暂无映射记录" />}
         </>
+      )}
+
+      {rejectTarget && (
+        <Modal title="拒绝映射" onClose={handleRejectCancel}>
+          <div style={{ marginBottom: '16px' }}>
+            <Input
+              label="拒绝原因（可选）"
+              value={rejectReason}
+              onChange={e => setRejectReason(e.target.value)}
+              placeholder="请输入拒绝原因..."
+            />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+            <Btn variant="ghost" onClick={handleRejectCancel}>取消</Btn>
+            <Btn variant="danger" onClick={handleRejectConfirm}>确认拒绝</Btn>
+          </div>
+        </Modal>
       )}
     </div>
   );
