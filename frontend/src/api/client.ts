@@ -104,6 +104,7 @@ export interface UserItem {
   status: string;
   tenant_id: string | null;
   created_at: string;
+  role_ids?: string[];
 }
 
 export const usersApi = {

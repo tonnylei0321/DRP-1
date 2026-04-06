@@ -2,10 +2,10 @@
  * 9.3 用户组管理页 — 占位（API 待实现时展示友好提示）
  * 9.4 角色管理页 — 权限树配置
  */
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { rolesApi } from '../api/client';
 import type { Role } from '../api/client';
-import { Btn, Badge, PageHeader, EmptyState, Spinner, ErrorBox, Card, Modal } from '../components/ui';
+import { Btn, Badge, PageHeader, EmptyState, Spinner, ErrorBox, Card, Modal, Input } from '../components/ui';
 
 // ─── 用户组管理（占位） ─────────────────────────────────────────────────────
 
@@ -38,6 +38,19 @@ export function RolesPage() {
   const [selected, setSelected] = useState<Role | null>(null);
   const [deleteRoleTarget, setDeleteRoleTarget] = useState<string | null>(null);
 
+  // 搜索
+  const [search, setSearch] = useState('');
+
+  // 新建角色
+  const [showCreate, setShowCreate] = useState(false);
+  const [createForm, setCreateForm] = useState({ name: '', description: '' });
+  const [createSaving, setCreateSaving] = useState(false);
+
+  // 编辑角色
+  const [editTarget, setEditTarget] = useState<Role | null>(null);
+  const [editForm, setEditForm] = useState({ name: '', description: '' });
+  const [editSaving, setEditSaving] = useState(false);
+
   async function load() {
     setLoading(true);
     try {
@@ -56,22 +69,78 @@ export function RolesPage() {
     try {
       await rolesApi.delete(deleteRoleTarget);
       setDeleteRoleTarget(null);
+      if (selected?.id === deleteRoleTarget) setSelected(null);
       load();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : '删除失败');
     }
   }
 
+  async function handleCreateSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setCreateSaving(true);
+    try {
+      await rolesApi.create({ name: createForm.name, description: createForm.description, permissions: [] });
+      setShowCreate(false);
+      setCreateForm({ name: '', description: '' });
+      load();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : '创建失败');
+    } finally {
+      setCreateSaving(false);
+    }
+  }
+
+  function openEdit(role: Role) {
+    setEditTarget(role);
+    setEditForm({ name: role.name, description: role.description || '' });
+  }
+
+  async function handleEditSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editTarget) return;
+    setEditSaving(true);
+    try {
+      await rolesApi.update(editTarget.id, { name: editForm.name, description: editForm.description });
+      setEditTarget(null);
+      load();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : '编辑失败');
+    } finally {
+      setEditSaving(false);
+    }
+  }
+
+  // 前端过滤
+  const filteredRoles = roles.filter(r => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return r.name.toLowerCase().includes(q) || (r.description || '').toLowerCase().includes(q);
+  });
+
   return (
     <div>
-      <PageHeader title="角色管理" />
+      <PageHeader
+        title="角色管理"
+        action={<Btn onClick={() => setShowCreate(true)}>+ 新建角色</Btn>}
+      />
       {error && <ErrorBox message={error} />}
+
+      {/* 搜索框 */}
+      <div style={{ marginBottom: '16px' }}>
+        <Input
+          placeholder="搜索角色名称或描述..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
         {/* 角色列表 */}
         <Card>
-          {loading ? <Spinner /> : roles.length === 0 ? <EmptyState message="暂无角色" /> : (
+          {loading ? <Spinner /> : filteredRoles.length === 0 ? <EmptyState message="暂无角色" /> : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {roles.map(role => (
+              {filteredRoles.map(role => (
                 <div key={role.id}
                   onClick={() => setSelected(role)}
                   style={{
@@ -89,6 +158,9 @@ export function RolesPage() {
                   </div>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <Badge label={`${role.permissions.length} 权限`} variant="info" />
+                    <Btn variant="ghost" size="sm" onClick={e => { e.stopPropagation(); openEdit(role); }}>
+                      编辑
+                    </Btn>
                     <Btn variant="danger" size="sm" onClick={e => { e.stopPropagation(); setDeleteRoleTarget(role.id); }}>
                       删除
                     </Btn>
@@ -135,6 +207,39 @@ export function RolesPage() {
         </Card>
       </div>
 
+      {/* 新建角色 Modal */}
+      {showCreate && (
+        <Modal title="新建角色" onClose={() => setShowCreate(false)}>
+          <form onSubmit={handleCreateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <Input label="角色名称*" required value={createForm.name}
+              onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))} />
+            <Input label="描述" value={createForm.description}
+              onChange={e => setCreateForm(f => ({ ...f, description: e.target.value }))} />
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <Btn variant="ghost" type="button" onClick={() => setShowCreate(false)}>取消</Btn>
+              <Btn type="submit" disabled={createSaving}>{createSaving ? '保存中...' : '创建'}</Btn>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* 编辑角色 Modal */}
+      {editTarget && (
+        <Modal title="编辑角色" onClose={() => setEditTarget(null)}>
+          <form onSubmit={handleEditSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <Input label="角色名称*" required value={editForm.name}
+              onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} />
+            <Input label="描述" value={editForm.description}
+              onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} />
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <Btn variant="ghost" type="button" onClick={() => setEditTarget(null)}>取消</Btn>
+              <Btn type="submit" disabled={editSaving}>{editSaving ? '保存中...' : '保存'}</Btn>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* 删除确认 Modal */}
       {deleteRoleTarget && (
         <Modal title="确认删除" onClose={() => setDeleteRoleTarget(null)}>
           <p style={{ color: 'var(--text)', marginBottom: '16px' }}>确认删除该角色？此操作不可撤销。</p>
