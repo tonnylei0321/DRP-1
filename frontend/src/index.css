@@ -1,17 +1,26 @@
-/* 管理后台全局样式 — 深色主题 */
+/* 管理后台全局样式 — 玻璃态深色主题 */
 :root {
-  --bg: #0a0e1a;
-  --bg-card: #111827;
-  --bg-input: #1f2937;
-  --border: #374151;
+  --bg: #060a14;
+  --bg-gradient: linear-gradient(135deg, #060a14 0%, #0c1629 50%, #0a1020 100%);
+  --bg-card: rgba(17, 24, 39, 0.6);
+  --bg-card-solid: #111827;
+  --bg-input: rgba(31, 41, 55, 0.8);
+  --bg-glass: rgba(255, 255, 255, 0.03);
+  --border: rgba(55, 65, 81, 0.5);
+  --border-glass: rgba(255, 255, 255, 0.08);
   --accent: #3b82f6;
   --accent-hover: #2563eb;
+  --accent-glow: rgba(59, 130, 246, 0.25);
   --warn: #f59e0b;
   --danger: #ef4444;
   --success: #10b981;
   --text: #e5e7eb;
   --text-muted: #6b7280;
   --gold: #fbbf24;
+  --glass-blur: 12px;
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3), 0 0 1px rgba(255, 255, 255, 0.05);
+  --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(59, 130, 246, 0.15);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
@@ -22,10 +31,14 @@
 
 body {
   background: var(--bg);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
   color: var(--text);
-  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', monospace;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
@@ -37,28 +50,136 @@ body {
   border: none;
 }
 
-a { color: var(--accent); text-decoration: none; }
+a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+a:hover { color: var(--accent-hover); }
 button { cursor: pointer; }
 
+/* ─── 输入框 — 玻璃态 ─── */
 input, select, textarea {
   background: var(--bg-input);
-  border: 1px solid var(--border);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-glass);
   color: var(--text);
-  border-radius: 6px;
-  padding: 8px 12px;
+  border-radius: 8px;
+  padding: 10px 14px;
   font-size: 14px;
   outline: none;
   width: 100%;
   font-family: inherit;
+  transition: var(--transition-smooth);
 }
-input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
 
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
-th { color: var(--text-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+/* ─── 表格 — 现代化 ─── */
+table { width: 100%; border-collapse: separate; border-spacing: 0; }
+th, td { padding: 12px 16px; text-align: left; }
+th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+td {
+  border-bottom: 1px solid rgba(55, 65, 81, 0.3);
+}
+tbody tr {
+  transition: var(--transition-smooth);
+}
+tbody tr:hover {
+  background: rgba(59, 130, 246, 0.04);
+}
 
-.badge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
-.badge-success { background: rgba(16,185,129,0.15); color: var(--success); }
-.badge-warn { background: rgba(245,158,11,0.15); color: var(--warn); }
-.badge-danger { background: rgba(239,68,68,0.15); color: var(--danger); }
-.badge-info { background: rgba(59,130,246,0.15); color: var(--accent); }
+/* ─── 徽章 ─── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(4px);
+}
+.badge-success { background: rgba(16,185,129,0.12); color: var(--success); border: 1px solid rgba(16,185,129,0.2); }
+.badge-warn { background: rgba(245,158,11,0.12); color: var(--warn); border: 1px solid rgba(245,158,11,0.2); }
+.badge-danger { background: rgba(239,68,68,0.12); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
+.badge-info { background: rgba(59,130,246,0.12); color: var(--accent); border: 1px solid rgba(59,130,246,0.2); }
+
+/* ─── 玻璃态卡片 ─── */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-smooth);
+}
+.glass-card:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+/* ─── 悬停缩放动画 ─── */
+.hover-scale {
+  transition: var(--transition-smooth);
+}
+.hover-scale:hover {
+  transform: translateY(-2px) scale(1.01);
+}
+
+/* ─── 滚动条 ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ─── 代码高亮 ─── */
+code, pre, .code-highlight {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-glass);
+  border-radius: 6px;
+  color: #a5f3fc;
+}
+code { padding: 2px 6px; }
+pre {
+  padding: 16px;
+  overflow-x: auto;
+  line-height: 1.7;
+}
+
+/* ─── 响应式网格 ─── */
+.grid-responsive {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+@media (max-width: 768px) {
+  .grid-responsive { grid-template-columns: 1fr; }
+}
+
+/* ─── 动画关键帧 ─── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+  50% { box-shadow: 0 0 0 8px transparent; }
+}

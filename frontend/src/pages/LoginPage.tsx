@@ -35,15 +35,33 @@ export default function LoginPage({ onLogin }: Props) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      minHeight: '100vh', background: 'var(--bg)',
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #060a14 0%, #0c1629 40%, #1a0a2e 100%)',
     }}>
       <div style={{
-        background: 'var(--bg-card)', border: '1px solid var(--border)',
-        borderRadius: '12px', padding: '40px', width: '380px',
+        background: 'rgba(17, 24, 39, 0.7)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: '16px', padding: '40px', width: '400px',
+        boxShadow: '0 24px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+        animation: 'fadeIn 0.4s ease-out',
       }}>
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{ color: 'var(--accent)', fontSize: '28px', fontWeight: 700 }}>DRP</div>
-          <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>穿透式资金监管平台</div>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div style={{
+            width: '48px', height: '48px', margin: '0 auto 12px',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+            borderRadius: '14px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontWeight: 700, fontSize: '18px',
+            boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+          }}>DR</div>
+          <div style={{
+            fontSize: '20px', fontWeight: 700,
+            background: 'linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%)',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+          }}>DRP</div>
+          <div style={{ color: 'var(--text-muted)', marginTop: '4px', fontSize: '13px' }}>穿透式资金监管平台</div>
         </div>
 
         {error && <ErrorBox message={error} />}
