@@ -20,7 +20,7 @@ const NAV_ITEMS: { id: Page; label: string; icon: string; requiredPermission: st
   { id: 'dashboard', label: '监管看板',        icon: '🖥️', requiredPermission: 'drill:read' },
   { id: 'users',    label: '用户管理',       icon: '👥', requiredPermission: 'user:read' },
   { id: 'groups',   label: '用户组',          icon: '🗂️', requiredPermission: 'user:read' },
-  { id: 'roles',    label: '角色权限',        icon: '🔑', requiredPermission: 'user:read' },
+  { id: 'roles',    label: '角色权限',        icon: '🔑', requiredPermission: 'role:read' },
   { id: 'audit',    label: '审计日志',        icon: '📋', requiredPermission: 'audit:read' },
   { id: 'ddl',      label: 'DDL 上传',        icon: '⬆️', requiredPermission: 'mapping:read' },
   { id: 'mappings', label: '映射审核',        icon: '🔀', requiredPermission: 'mapping:read' },

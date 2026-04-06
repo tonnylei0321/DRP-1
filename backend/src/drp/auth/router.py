@@ -17,6 +17,20 @@ from drp.db.session import get_session
 router = APIRouter(prefix="/auth", tags=["认证"])
 
 
+def _user_response(user: User) -> UserResponse:
+    """从 User ORM 对象构造 UserResponse，手动填充 role_ids。"""
+    return UserResponse(
+        id=user.id,
+        email=user.email,
+        username=user.username,
+        full_name=user.full_name,
+        status=user.status,
+        tenant_id=user.tenant_id,
+        role_ids=[r.id for r in user.roles],
+        created_at=user.created_at,
+    )
+
+
 def _get_auth_service(session: AsyncSession = Depends(get_session)) -> AuthService:
     return AuthService(session=session)
 
@@ -71,6 +85,7 @@ class UserUpdate(BaseModel):
     username: str | None = None
     full_name: str | None = None
     status: str | None = None
+    role_ids: list[uuid.UUID] | None = None
 
 
 @router.get("/users", response_model=list[UserResponse],
@@ -80,7 +95,7 @@ async def list_users(session: AsyncSession = Depends(get_session)) -> list[UserR
     result = await session.execute(
         select(User).where(User.status != "deleted").order_by(User.created_at)
     )
-    return [UserResponse.model_validate(u) for u in result.scalars()]
+    return [_user_response(u) for u in result.scalars()]
 
 
 @router.get("/users/{user_id}", response_model=UserResponse,
@@ -91,9 +106,7 @@ async def get_user(user_id: uuid.UUID, session: AsyncSession = Depends(get_sessi
     user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="用户不存在")
-    return UserResponse.model_validate(user)
-
-
+    return _user_response(user)
 @router.post("/users", response_model=UserResponse, status_code=HTTPStatus.CREATED,
              dependencies=[Depends(require_permission("user:write"))])
 async def create_user(data: UserCreate, session: AsyncSession = Depends(get_session)) -> UserResponse:
@@ -115,7 +128,7 @@ async def create_user(data: UserCreate, session: AsyncSession = Depends(get_sess
     session.add(user)
     await session.commit()
     await session.refresh(user)
-    return UserResponse.model_validate(user)
+    return _user_response(user)
 
 
 @router.put("/users/{user_id}", response_model=UserResponse,
@@ -133,9 +146,20 @@ async def update_user(user_id: uuid.UUID, data: UserUpdate,
         user.full_name = data.full_name
     if data.status is not None:
         user.status = data.status
+    if data.role_ids is not None:
+        # 删除旧的 user_role 关联
+        old_urs = await session.execute(
+            select(UserRole).where(UserRole.user_id == user_id)
+        )
+        for ur in old_urs.scalars():
+            await session.delete(ur)
+        await session.flush()
+        # 添加新的 user_role 关联
+        for rid in data.role_ids:
+            session.add(UserRole(user_id=user.id, role_id=rid))
     await session.commit()
     await session.refresh(user)
-    return UserResponse.model_validate(user)
+    return _user_response(user)
 
 
 @router.delete("/users/{user_id}", status_code=HTTPStatus.NO_CONTENT,
@@ -169,7 +193,9 @@ class RoleCreate(BaseModel):
 
 
 class RoleUpdate(BaseModel):
-    permissions: list[str]
+    name: str | None = None
+    description: str | None = None
+    permissions: list[str] | None = None
 
 
 @router.get("/roles", response_model=list[RoleResponse],
@@ -222,20 +248,25 @@ async def update_role(role_id: uuid.UUID, data: RoleUpdate,
     role = result.scalar_one_or_none()
     if not role:
         raise HTTPException(status_code=404, detail="角色不存在")
-    # 删除旧权限关联
-    old_rps = await session.execute(
-        select(RolePermission).where(RolePermission.role_id == role_id)
-    )
-    for rp in old_rps.scalars():
-        await session.delete(rp)
-    await session.flush()
-    # 添加新权限关联
-    if data.permissions:
-        perms_result = await session.execute(
-            select(Permission).where(Permission.resource.in_(data.permissions))
+    if data.name is not None:
+        role.name = data.name
+    if data.description is not None:
+        role.description = data.description
+    if data.permissions is not None:
+        # 删除旧权限关联
+        old_rps = await session.execute(
+            select(RolePermission).where(RolePermission.role_id == role_id)
         )
-        for perm in perms_result.scalars():
-            session.add(RolePermission(role_id=role.id, permission_id=perm.id))
+        for rp in old_rps.scalars():
+            await session.delete(rp)
+        await session.flush()
+        # 添加新权限关联
+        if data.permissions:
+            perms_result = await session.execute(
+                select(Permission).where(Permission.resource.in_(data.permissions))
+            )
+            for perm in perms_result.scalars():
+                session.add(RolePermission(role_id=role.id, permission_id=perm.id))
     await session.commit()
     await session.refresh(role)
     return RoleResponse(

@@ -25,6 +25,7 @@ export function GroupsPage() {
 const ALL_PERMISSIONS = [
   'tenant:read', 'tenant:write', 'tenant:delete',
   'user:read', 'user:write', 'user:delete',
+  'role:read', 'role:write',
   'mapping:read', 'mapping:write', 'mapping:approve',
   'etl:read', 'etl:write',
   'drill:read',
@@ -53,8 +54,8 @@ const PERMISSION_GROUPS = [
     menu: '角色权限',
     icon: '🔑',
     permissions: [
-      { key: 'user:read', label: '查看角色' },
-      { key: 'user:write', label: '编辑角色' },
+      { key: 'role:read', label: '查看角色' },
+      { key: 'role:write', label: '编辑角色' },
     ],
   },
   {

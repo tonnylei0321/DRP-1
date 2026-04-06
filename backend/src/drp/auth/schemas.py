@@ -35,6 +35,7 @@ class UserResponse(BaseModel):
     full_name: str | None
     status: str
     tenant_id: uuid.UUID | None
+    role_ids: list[uuid.UUID] = []
     created_at: datetime
 
     model_config = {"from_attributes": True}
