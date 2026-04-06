@@ -21,6 +21,18 @@ export function getToken(): string | null {
   return _token;
 }
 
+/** 从 JWT token payload 中解析 permissions 数组 */
+export function getPermissions(): string[] {
+  const token = getToken();
+  if (!token) return [];
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.permissions || [];
+  } catch {
+    return [];
+  }
+}
+
 /** 默认请求超时时间（毫秒） */
 export const REQUEST_TIMEOUT_MS = 30_000;
 

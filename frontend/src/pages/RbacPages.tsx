@@ -31,6 +31,81 @@ const ALL_PERMISSIONS = [
   'audit:read',
 ];
 
+/** 权限按菜单分组定义 */
+const PERMISSION_GROUPS = [
+  {
+    menu: '监管看板',
+    icon: '🖥️',
+    permissions: [
+      { key: 'drill:read', label: '查看看板' },
+    ],
+  },
+  {
+    menu: '用户管理',
+    icon: '👥',
+    permissions: [
+      { key: 'user:read', label: '查看用户' },
+      { key: 'user:write', label: '编辑用户' },
+      { key: 'user:delete', label: '删除用户' },
+    ],
+  },
+  {
+    menu: '角色权限',
+    icon: '🔑',
+    permissions: [
+      { key: 'user:read', label: '查看角色' },
+      { key: 'user:write', label: '编辑角色' },
+    ],
+  },
+  {
+    menu: '审计日志',
+    icon: '📋',
+    permissions: [
+      { key: 'audit:read', label: '查看日志' },
+    ],
+  },
+  {
+    menu: 'DDL 上传',
+    icon: '⬆️',
+    permissions: [
+      { key: 'mapping:read', label: '查看映射' },
+      { key: 'mapping:write', label: '上传 DDL' },
+    ],
+  },
+  {
+    menu: '映射审核',
+    icon: '🔀',
+    permissions: [
+      { key: 'mapping:read', label: '查看映射' },
+      { key: 'mapping:approve', label: '审核映射' },
+    ],
+  },
+  {
+    menu: 'ETL 监控',
+    icon: '⚙️',
+    permissions: [
+      { key: 'etl:read', label: '查看任务' },
+      { key: 'etl:write', label: '触发同步' },
+    ],
+  },
+  {
+    menu: '租户管理',
+    icon: '🏢',
+    permissions: [
+      { key: 'tenant:read', label: '查看租户' },
+      { key: 'tenant:write', label: '编辑租户' },
+      { key: 'tenant:delete', label: '删除租户' },
+    ],
+  },
+  {
+    menu: '数据质量',
+    icon: '📊',
+    permissions: [
+      { key: 'etl:read', label: '查看质量' },
+    ],
+  },
+];
+
 export function RolesPage() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
@@ -171,28 +246,96 @@ export function RolesPage() {
           )}
         </Card>
 
-        {/* 权限树 */}
+        {/* 权限树 — 按菜单分组 */}
         <Card>
           {selected ? (
             <div>
               <div style={{ fontWeight: 600, marginBottom: '16px' }}>{selected.name} — 权限配置</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {ALL_PERMISSIONS.map(perm => (
-                  <label key={perm} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      style={{ width: 'auto' }}
-                      checked={selected.permissions.includes(perm)}
-                      onChange={() => {
-                        const perms = selected.permissions.includes(perm)
-                          ? selected.permissions.filter(p => p !== perm)
-                          : [...selected.permissions, perm];
-                        setSelected({ ...selected, permissions: perms });
-                      }}
-                    />
-                    <span style={{ fontFamily: 'monospace', fontSize: '13px' }}>{perm}</span>
-                  </label>
-                ))}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                {PERMISSION_GROUPS.map((group, gi) => {
+                  // 该组所有唯一权限 key
+                  const groupKeys = [...new Set(group.permissions.map(p => p.key))];
+                  const allChecked = groupKeys.every(k => selected.permissions.includes(k));
+                  const someChecked = !allChecked && groupKeys.some(k => selected.permissions.includes(k));
+
+                  return (
+                    <div key={group.menu + gi}>
+                      {/* 分组标题 — 可点击全选/全不选 */}
+                      <div
+                        onClick={() => {
+                          if (allChecked) {
+                            // 全不选：移除该组所有权限
+                            const perms = selected.permissions.filter(p => !groupKeys.includes(p));
+                            setSelected({ ...selected, permissions: perms });
+                          } else {
+                            // 全选：添加该组缺失的权限
+                            const perms = [...new Set([...selected.permissions, ...groupKeys])];
+                            setSelected({ ...selected, permissions: perms });
+                          }
+                        }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '8px',
+                          padding: '8px 10px', borderRadius: '8px', cursor: 'pointer',
+                          background: 'rgba(255,255,255,0.03)',
+                          transition: 'background 0.2s',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          style={{ width: 'auto', accentColor: 'var(--accent)' }}
+                          checked={allChecked}
+                          ref={el => { if (el) el.indeterminate = someChecked; }}
+                          readOnly
+                        />
+                        <span style={{ fontSize: '15px' }}>{group.icon}</span>
+                        <span style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text)' }}>
+                          {group.menu}
+                        </span>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '11px', marginLeft: 'auto' }}>
+                          {groupKeys.filter(k => selected.permissions.includes(k)).length}/{groupKeys.length}
+                        </span>
+                      </div>
+
+                      {/* 该组的功能权限列表 */}
+                      <div style={{ paddingLeft: '36px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        {group.permissions.map((perm, pi) => (
+                          <label
+                            key={`${group.menu}-${perm.key}-${pi}`}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: '8px',
+                              padding: '5px 10px', borderRadius: '6px', cursor: 'pointer',
+                              transition: 'background 0.15s',
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              style={{ width: 'auto', accentColor: 'var(--accent)' }}
+                              checked={selected.permissions.includes(perm.key)}
+                              onChange={() => {
+                                const perms = selected.permissions.includes(perm.key)
+                                  ? selected.permissions.filter(p => p !== perm.key)
+                                  : [...selected.permissions, perm.key];
+                                setSelected({ ...selected, permissions: perms });
+                              }}
+                            />
+                            <span style={{ fontSize: '13px', color: 'var(--text)' }}>{perm.label}</span>
+                            <span style={{ fontFamily: 'monospace', fontSize: '11px', color: 'var(--text-muted)' }}>
+                              {perm.key}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+
+                      {/* 分隔线（最后一组不加） */}
+                      {gi < PERMISSION_GROUPS.length - 1 && (
+                        <div style={{
+                          height: '1px', background: 'rgba(255,255,255,0.06)',
+                          margin: '6px 0',
+                        }} />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
                 <Btn onClick={async () => {

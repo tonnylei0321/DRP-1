@@ -2,7 +2,7 @@
  * 管理后台主应用 — 侧边栏导航 + 页面路由
  */
 import { useState, useEffect, useRef } from 'react';
-import { clearToken, getToken } from './api/client';
+import { clearToken, getToken, getPermissions } from './api/client';
 import LoginPage from './pages/LoginPage';
 import UsersPage from './pages/UsersPage';
 import { GroupsPage, RolesPage } from './pages/RbacPages';
@@ -16,17 +16,17 @@ type Page =
   | 'ddl' | 'mappings' | 'etl' | 'tenants' | 'quality'
   | 'dashboard';
 
-const NAV_ITEMS: { id: Page; label: string; icon: string }[] = [
-  { id: 'dashboard', label: '监管看板',        icon: '🖥️' },
-  { id: 'users',    label: '用户管理',       icon: '👥' },
-  { id: 'groups',   label: '用户组',          icon: '🗂️' },
-  { id: 'roles',    label: '角色权限',        icon: '🔑' },
-  { id: 'audit',    label: '审计日志',        icon: '📋' },
-  { id: 'ddl',      label: 'DDL 上传',        icon: '⬆️' },
-  { id: 'mappings', label: '映射审核',        icon: '🔀' },
-  { id: 'etl',      label: 'ETL 监控',        icon: '⚙️' },
-  { id: 'tenants',  label: '租户管理',        icon: '🏢' },
-  { id: 'quality',  label: '数据质量',        icon: '📊' },
+const NAV_ITEMS: { id: Page; label: string; icon: string; requiredPermission: string }[] = [
+  { id: 'dashboard', label: '监管看板',        icon: '🖥️', requiredPermission: 'drill:read' },
+  { id: 'users',    label: '用户管理',       icon: '👥', requiredPermission: 'user:read' },
+  { id: 'groups',   label: '用户组',          icon: '🗂️', requiredPermission: 'user:read' },
+  { id: 'roles',    label: '角色权限',        icon: '🔑', requiredPermission: 'user:read' },
+  { id: 'audit',    label: '审计日志',        icon: '📋', requiredPermission: 'audit:read' },
+  { id: 'ddl',      label: 'DDL 上传',        icon: '⬆️', requiredPermission: 'mapping:read' },
+  { id: 'mappings', label: '映射审核',        icon: '🔀', requiredPermission: 'mapping:read' },
+  { id: 'etl',      label: 'ETL 监控',        icon: '⚙️', requiredPermission: 'etl:read' },
+  { id: 'tenants',  label: '租户管理',        icon: '🏢', requiredPermission: 'tenant:read' },
+  { id: 'quality',  label: '数据质量',        icon: '📊', requiredPermission: 'etl:read' },
 ];
 
 function PageContent({ page }: { page: Page }) {
@@ -49,6 +49,12 @@ export default function App() {
   const [page, setPage] = useState<Page>('users');
   const savedPageRef = useRef<Page | null>(null);
 
+  // 根据权限过滤可见菜单（permissions 为空时显示全部，向后兼容）
+  const userPermissions = getPermissions();
+  const visibleNavItems = NAV_ITEMS.filter(item =>
+    userPermissions.length === 0 || userPermissions.includes(item.requiredPermission)
+  );
+
   // 监听 401 auth-expired 事件，保存当前 page 并跳转登录页
   useEffect(() => {
     function handleAuthExpired() {
@@ -64,6 +70,15 @@ export default function App() {
     if (savedPageRef.current) {
       setPage(savedPageRef.current);
       savedPageRef.current = null;
+    } else {
+      // 登录后跳转到第一个有权限的菜单页面
+      const perms = getPermissions();
+      const visible = NAV_ITEMS.filter(item =>
+        perms.length === 0 || perms.includes(item.requiredPermission)
+      );
+      if (visible.length > 0) {
+        setPage(visible[0].id);
+      }
     }
   }
 
@@ -103,7 +118,7 @@ export default function App() {
 
         {/* 导航 */}
         <nav style={{ flex: 1, padding: '12px 8px', overflowY: 'auto' }}>
-          {NAV_ITEMS.map(item => {
+          {visibleNavItems.map(item => {
             const isActive = page === item.id;
             return (
               <button

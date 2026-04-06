@@ -43,7 +43,7 @@ describe('RolesPage 渲染', () => {
 // ─── RolesPage 权限配置 ─────────────────────────────────────────────────────
 
 describe('RolesPage 权限配置', () => {
-  it('选择角色 → 右侧面板显示权限树复选框列表', async () => {
+  it('选择角色 → 右侧面板显示按菜单分组的权限树', async () => {
     const user = userEvent.setup();
     render(<RolesPage />);
 
@@ -58,18 +58,26 @@ describe('RolesPage 权限配置', () => {
     // 右侧面板显示权限配置标题
     expect(screen.getByText('admin — 权限配置')).toBeInTheDocument();
 
-    // 验证权限复选框列表（ALL_PERMISSIONS 中的权限项）
+    // 验证权限复选框列表：9 个分组标题 checkbox + 17 个权限 checkbox = 26
     const checkboxes = screen.getAllByRole('checkbox');
-    // ALL_PERMISSIONS 有 13 项
-    expect(checkboxes.length).toBe(13);
+    expect(checkboxes.length).toBe(26);
 
-    // 验证部分权限标签可见
+    // 验证分组标题可见
+    expect(screen.getByText('监管看板')).toBeInTheDocument();
+    expect(screen.getByText('用户管理')).toBeInTheDocument();
+    expect(screen.getByText('租户管理')).toBeInTheDocument();
+
+    // 验证权限 key 标签可见（monospace 显示）
     expect(screen.getByText('tenant:read')).toBeInTheDocument();
-    expect(screen.getByText('user:read')).toBeInTheDocument();
+    expect(screen.getAllByText('user:read').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('audit:read')).toBeInTheDocument();
 
-    // MOCK_ROLES 的权限是 test:perm_a/b/c，不在 ALL_PERMISSIONS 中，
-    // 所以所有复选框都应该是未勾选状态
+    // 验证功能标签可见
+    expect(screen.getByText('查看租户')).toBeInTheDocument();
+    expect(screen.getByText('查看日志')).toBeInTheDocument();
+
+    // MOCK_ROLES 的权限是 test:perm_a/b/c，不在 PERMISSION_GROUPS 中，
+    // 所以所有权限复选框都应该是未勾选状态
     checkboxes.forEach(cb => {
       expect(cb).not.toBeChecked();
     });
