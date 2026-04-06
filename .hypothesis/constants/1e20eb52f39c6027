@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/indicators/calculator.py
+# hypothesis_version: 6.151.10
+
+[3600, '0.0', 'domain', 'false', 'id', 'indicator_id', 'indicator_name', 'is_compliant', 'kpi', 'name', 'risk_event', 'risk_events', 'sparql', 'target_value', 'tenant_id', 'threshold', 'true', 'type', 'value', '债务融资', '决策风险', '国资委考核', '指标 %s 不存在于注册表', '票据', '结算', '资金集中', '银行账户']

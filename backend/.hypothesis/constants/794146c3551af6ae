@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/.venv/bin/pytest
+# hypothesis_version: 6.151.10
+
+['-script.pyw', '.exe', '__main__']

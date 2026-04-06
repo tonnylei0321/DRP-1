@@ -136,8 +136,8 @@
   - 确保 `cd dashboard && npm run build` 编译通过
   - 确保所有测试通过，如有问题请询问用户
 
-- [ ] 9. 后端属性测试与单元测试
-  - [ ] 9.1 添加 hypothesis 到后端 dev 依赖
+- [x] 9. 后端属性测试与单元测试
+  - [x] 9.1 添加 hypothesis 到后端 dev 依赖
     - 在 `backend/pyproject.toml` 的 `[dependency-groups] dev` 中添加 `"hypothesis>=6.100.0"`
     - 运行 `cd backend && uv sync --group dev` 安装
     - _需求: 测试基础设施_
@@ -204,14 +204,14 @@
     - 标签：`// Feature: e2e-test-data-pipeline, Property 9: 域诊断提示显示逻辑`
     - **验证: 需求 6.10**
 
-- [ ] 11. 检查点 — 全部测试验证
+- [x] 11. 检查点 — 全部测试验证
   - 运行 `cd backend && uv run pytest tests/ -x` 确保后端测试全部通过
   - 运行 `cd frontend && npm test` 确保前端测试全部通过
   - 运行 `cd dashboard && npm test` 确保大屏测试全部通过
   - 确保所有测试通过，如有问题请询问用户
 
-- [ ] 12. 冒烟测试
-  - [ ] 12.1 编写后端冒烟测试
+- [x] 12. 冒烟测试
+  - [x] 12.1 编写后端冒烟测试
     - 创建 `backend/tests/test_e2e_smoke.py`，标记 `@pytest.mark.integration`
     - 用例 1：运行 `scripts/generate_test_data.py` → 验证 `backend/tests/fixtures/ddl/` 下生成 7 个域文件 + `all_tables.sql`
     - 用例 2：读取 `all_tables.sql` → 调用 DDL_Parser → 验证解析出的表数量 ≥ 14（7 域 × 2 表）
@@ -224,7 +224,7 @@
     - 创建 `frontend/src/pages/__tests__/MappingBatch.test.tsx`：测试"全部确认"和"按阈值确认"按钮渲染和点击
     - _需求: 3.1, 4.8, 4.9_
 
-- [ ] 13. 最终检查点 — 端到端验证
+- [x] 13. 最终检查点 — 端到端验证
   - 确保所有测试通过
   - 验证全链路步骤可执行：① 生成 DDL → ② 上传 → ③ 映射 → ④ ETL → ⑤ 大屏
   - 确保所有测试通过，如有问题请询问用户

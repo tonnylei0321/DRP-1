@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/sparql/proxy.py
+# hypothesis_version: 6.151.10
+
+[30.0, 'Accept', 'Content-Type', '\\bWHERE\\s*\\{', 'bindings', 'head', 'results', 'tenant_id', 'value', 'vars', '{', '}']
