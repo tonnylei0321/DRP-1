@@ -1,7 +1,7 @@
 /**
  * 管理后台主应用 — 侧边栏导航 + 页面路由
  */
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { clearToken, getToken, getPermissions } from './api/client';
 import LoginPage from './pages/LoginPage';
 import UsersPage from './pages/UsersPage';
@@ -49,11 +49,15 @@ export default function App() {
   const [page, setPage] = useState<Page>('users');
   const savedPageRef = useRef<Page | null>(null);
 
-  // 根据权限过滤可见菜单（null 表示 token 无 permissions 字段，显示全部向后兼容）
-  const userPermissions = getPermissions();
-  const visibleNavItems = NAV_ITEMS.filter(item =>
-    userPermissions === null || userPermissions.includes(item.requiredPermission)
-  );
+  // 根据权限过滤可见菜单（依赖 authed 状态确保登录后重新计算）
+  // null 表示 token 无 permissions 字段，显示全部向后兼容
+  const visibleNavItems = useMemo(() => {
+    if (!authed) return NAV_ITEMS;
+    const perms = getPermissions();
+    return NAV_ITEMS.filter(item =>
+      perms === null || perms.includes(item.requiredPermission)
+    );
+  }, [authed]);
 
   // 监听 401 auth-expired 事件，保存当前 page 并跳转登录页
   useEffect(() => {
@@ -118,7 +122,11 @@ export default function App() {
 
         {/* 导航 */}
         <nav style={{ flex: 1, padding: '12px 8px', overflowY: 'auto' }}>
-          {visibleNavItems.map(item => {
+          {visibleNavItems.length === 0 ? (
+            <div style={{ padding: '16px 12px', color: 'var(--text-muted)', fontSize: '12px', textAlign: 'center' }}>
+              暂无可访问的功能模块，请联系管理员分配权限
+            </div>
+          ) : visibleNavItems.map(item => {
             const isActive = page === item.id;
             return (
               <button
@@ -169,7 +177,17 @@ export default function App() {
         overflowY: 'auto',
         background: 'transparent',
       }}>
-        <PageContent page={page} />
+        {visibleNavItems.length === 0 ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.3 }}>🔒</div>
+              <div style={{ fontSize: '16px', marginBottom: '8px' }}>暂无访问权限</div>
+              <div style={{ fontSize: '13px' }}>请联系管理员为您分配功能权限</div>
+            </div>
+          </div>
+        ) : (
+          <PageContent page={page} />
+        )}
       </main>
     </div>
   );
