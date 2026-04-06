@@ -198,7 +198,17 @@ export default function App() {
             <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
               <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.3 }}>🔒</div>
               <div style={{ fontSize: '16px', marginBottom: '8px' }}>暂无访问权限</div>
-              <div style={{ fontSize: '13px' }}>请联系管理员为您分配功能权限</div>
+              <div style={{ fontSize: '13px', marginBottom: '20px' }}>请联系管理员为您分配功能权限</div>
+              <button
+                onClick={() => { clearToken(); setAuthed(false); }}
+                style={{
+                  padding: '10px 24px', borderRadius: '10px', border: 'none',
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                  color: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: 500,
+                }}
+              >
+                重新登录
+              </button>
             </div>
           </div>
         ) : (
