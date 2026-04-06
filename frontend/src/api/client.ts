@@ -21,15 +21,19 @@ export function getToken(): string | null {
   return _token;
 }
 
-/** 从 JWT token payload 中解析 permissions 数组 */
-export function getPermissions(): string[] {
+/** 从 JWT token payload 中解析 permissions 数组。
+ *  返回 null 表示 token 中无 permissions 字段（向后兼容，显示全部菜单）。
+ *  返回空数组 [] 表示用户没有任何权限。
+ */
+export function getPermissions(): string[] | null {
   const token = getToken();
-  if (!token) return [];
+  if (!token) return null;
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.permissions || [];
+    if (!('permissions' in payload)) return null; // token 中无此字段，向后兼容
+    return Array.isArray(payload.permissions) ? payload.permissions : [];
   } catch {
-    return [];
+    return null;
   }
 }
 

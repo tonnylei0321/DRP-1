@@ -49,10 +49,10 @@ export default function App() {
   const [page, setPage] = useState<Page>('users');
   const savedPageRef = useRef<Page | null>(null);
 
-  // 根据权限过滤可见菜单（permissions 为空时显示全部，向后兼容）
+  // 根据权限过滤可见菜单（null 表示 token 无 permissions 字段，显示全部向后兼容）
   const userPermissions = getPermissions();
   const visibleNavItems = NAV_ITEMS.filter(item =>
-    userPermissions.length === 0 || userPermissions.includes(item.requiredPermission)
+    userPermissions === null || userPermissions.includes(item.requiredPermission)
   );
 
   // 监听 401 auth-expired 事件，保存当前 page 并跳转登录页
@@ -74,7 +74,7 @@ export default function App() {
       // 登录后跳转到第一个有权限的菜单页面
       const perms = getPermissions();
       const visible = NAV_ITEMS.filter(item =>
-        perms.length === 0 || perms.includes(item.requiredPermission)
+        perms === null || perms.includes(item.requiredPermission)
       );
       if (visible.length > 0) {
         setPage(visible[0].id);
