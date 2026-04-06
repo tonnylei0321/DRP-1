@@ -1,4 +1,7 @@
 """映射 API 路由。"""
+import logging
+import re
+import time
 import uuid
 from datetime import datetime, timezone
 from http import HTTPStatus
@@ -13,13 +16,20 @@ from drp.mapping.ddl_parser import parse_ddl
 from drp.mapping.llm_service import generate_mapping_suggestions
 from drp.mapping.models import MappingRepository, compute_ddl_hash
 from drp.mapping.schemas import (
+    BatchApproveRequest,
+    BatchApproveResponse,
     GenerateMappingRequest,
     GenerateMappingResponse,
     MappingItemResponse,
+    RejectMappingRequest,
 )
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/mappings", tags=["语义映射"])
 _repo = MappingRepository()
+
+# DDL 注入防护：表名/列名白名单
+_SAFE_NAME_RE = re.compile(r'^[a-zA-Z0-9_]+$')
 
 
 @router.get(
@@ -56,6 +66,10 @@ async def generate_mapping(
     if not current_user.tenant_id:
         raise HTTPException(status_code=400, detail="需要租户上下文")
 
+    # DDL 大小限制：最大 5MB
+    if len(data.ddl.encode("utf-8")) > 5_242_880:
+        raise HTTPException(status_code=422, detail="DDL 内容超过 5MB 限制")
+
     tenant_id = uuid.UUID(current_user.tenant_id)
     ddl_hash = compute_ddl_hash(data.ddl)
 
@@ -69,14 +83,36 @@ async def generate_mapping(
         if not tables:
             raise HTTPException(status_code=404, detail=f"未找到表: {data.table_name}")
 
+    # 表名/列名白名单校验
+    for table in tables:
+        if not _SAFE_NAME_RE.match(table.name):
+            raise HTTPException(status_code=422, detail=f"表名包含非法字符: {table.name}")
+        for col in table.columns:
+            if not _SAFE_NAME_RE.match(col.name):
+                raise HTTPException(status_code=422, detail=f"列名包含非法字符: {table.name}.{col.name}")
+
     # 获取历史映射（置信度计算参考）
     history = await _repo.get_approved_for_history(session, tenant_id)
+
+    # LLM 审计日志
+    start_time = time.time()
+    logger.info(
+        "[LLM映射] 开始: 操作人=%s 租户=%s 表数=%d",
+        current_user.sub, current_user.tenant_id, len(tables),
+    )
 
     # 调用 LLM 生成建议
     all_suggestions = []
     for table in tables:
         suggestions = await generate_mapping_suggestions(table, history=history)
         all_suggestions.extend(suggestions)
+
+    elapsed = time.time() - start_time
+    logger.info(
+        "[LLM映射] 完成: 操作人=%s 租户=%s 表数=%d 字段数=%d 映射数=%d 耗时=%.1fs",
+        current_user.sub, current_user.tenant_id, len(tables),
+        sum(len(t.columns) for t in tables), len(all_suggestions), elapsed,
+    )
 
     # 持久化
     suggestion_dicts = [
@@ -99,6 +135,71 @@ async def generate_mapping(
         total=len(items),
         auto_approved=sum(1 for i in items if i.auto_approved),
         mappings=items,
+    )
+
+
+@router.get(
+    "/export-yaml",
+    dependencies=[Depends(require_permission("mapping:read"))],
+)
+async def export_mapping_yaml(
+    session: AsyncSession = Depends(get_session),
+    current_user: TokenPayload = Depends(get_current_user),
+):
+    """导出已审核通过的映射为 YAML。"""
+    from drp.mapping.yaml_generator import generate_mapping_yaml_from_specs
+
+    specs = await _repo.list_by_tenant(
+        session, uuid.UUID(current_user.tenant_id), status="approved"
+    )
+    if not specs:
+        raise HTTPException(status_code=404, detail="无已审核通过的映射记录")
+    yaml_str = generate_mapping_yaml_from_specs(specs)
+    return {"mapping_yaml": yaml_str}
+
+
+@router.post(
+    "/batch-approve",
+    response_model=BatchApproveResponse,
+    dependencies=[Depends(require_permission("mapping:approve"))],
+)
+async def batch_approve_mappings(
+    data: BatchApproveRequest,
+    session: AsyncSession = Depends(get_session),
+    current_user: TokenPayload = Depends(get_current_user),
+) -> BatchApproveResponse:
+    """批量审核映射。"""
+    pending = await _repo.list_by_tenant(
+        session, uuid.UUID(current_user.tenant_id), status="pending"
+    )
+    total_pending = len(pending)
+
+    approved_count = 0
+    for m in pending:
+        if approved_count >= data.max_count:
+            break
+        if data.mode == "all" or (
+            data.mode == "threshold"
+            and m.confidence is not None
+            and m.confidence >= data.threshold
+        ):
+            m.status = "approved"
+            m.approved_by = uuid.UUID(current_user.sub)
+            m.approved_at = datetime.now(timezone.utc)
+            approved_count += 1
+
+    await session.commit()
+
+    logger.info(
+        "[批量审核] 操作人=%s 租户=%s 模式=%s 阈值=%s 审核数=%d 总待审=%d",
+        current_user.sub, current_user.tenant_id, data.mode,
+        data.threshold, approved_count, total_pending,
+    )
+
+    return BatchApproveResponse(
+        approved_count=approved_count,
+        skipped_count=total_pending - approved_count,
+        total_pending=total_pending,
     )
 
 
@@ -132,6 +233,7 @@ async def approve_mapping(
 )
 async def reject_mapping(
     mapping_id: uuid.UUID,
+    data: RejectMappingRequest,
     session: AsyncSession = Depends(get_session),
     current_user: TokenPayload = Depends(get_current_user),
 ) -> MappingItemResponse:
@@ -143,6 +245,11 @@ async def reject_mapping(
     mapping.status = "rejected"
     mapping.approved_by = uuid.UUID(current_user.sub)
     mapping.approved_at = datetime.now(timezone.utc)
+
+    # 持久化拒绝原因，过滤 HTML 标签防止存储型 XSS
+    if data.reason:
+        mapping.reject_reason = re.sub(r'<[^>]+>', '', data.reason)
+
     await session.commit()
     await session.refresh(mapping)
     return MappingItemResponse.model_validate(mapping)

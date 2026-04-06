@@ -32,3 +32,8 @@ export async function fetchIndicatorsByDomain(domain: CtioDomainCode): Promise<C
 export async function fetchIndicator(code: string): Promise<CtioIndicatorResponse> {
   return request<CtioIndicatorResponse>('GET', `/indicators/${code}`);
 }
+
+/** 按实体获取指标（穿透钻取） */
+export async function fetchIndicatorsByEntity(entityId: string): Promise<CtioIndicatorResponse[]> {
+  return request<CtioIndicatorResponse[]>('GET', `/indicators?entity_id=${entityId}`);
+}

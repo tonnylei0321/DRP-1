@@ -28,8 +28,19 @@ function statusColor(status: DomainIndicator['status']): string {
   return '#00ffb3';
 }
 
+/**
+ * 判断域内所有指标是否均无有效数据（currentValue 为 0 或 null）
+ */
+export function isDomainEmpty(indicators: DomainIndicator[]): boolean {
+  if (indicators.length === 0) return true;
+  return indicators.every(ind => ind.currentValue === 0 || ind.currentValue == null);
+}
+
 export default function IndicatorDrilldown({ domain, indicators, onClose, onIndicatorClick }: IndicatorDrilldownProps) {
   if (!domain) return null;
+
+  // 诊断提示：当域内所有指标 currentValue 均为 0 或 null 时显示
+  const showDiagnostic = isDomainEmpty(indicators);
 
   return (
     <div style={{
@@ -102,6 +113,24 @@ export default function IndicatorDrilldown({ domain, indicators, onClose, onIndi
 
       {/* 指标列表 */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {showDiagnostic && (
+          <div
+            data-testid="domain-empty-diagnostic"
+            style={{
+              background: 'rgba(255, 170, 0, 0.1)',
+              border: '1px solid rgba(255, 170, 0, 0.4)',
+              borderRadius: '4px',
+              padding: '14px 16px',
+              fontFamily: 'var(--font-label)',
+              fontSize: '12px',
+              color: '#ffaa00',
+              lineHeight: 1.6,
+              textAlign: 'center',
+            }}
+          >
+            ⚠ 该域暂无有效数据，请检查 ETL 任务状态和映射配置
+          </div>
+        )}
         {indicators.map(ind => (
           <div
             key={ind.code}

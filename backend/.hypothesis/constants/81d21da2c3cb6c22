@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/mapping/models.py
+# hypothesis_version: 6.151.10
+
+[100, 255, 500, 'CASCADE', 'approved', 'auto_approved', 'confidence', 'ddl_hash', 'mapping_spec', 'pending', 'source_field', 'source_table', 'target_property', 'tenant.id', 'tenant_id', 'transform_rule', 'user.id']

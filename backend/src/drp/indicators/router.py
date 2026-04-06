@@ -1,9 +1,10 @@
 """实体指标 API — 查询实体在7大监管领域下的指标数据。"""
 from __future__ import annotations
 
+import json
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 from drp.auth.middleware import get_current_user
 from drp.auth.schemas import TokenPayload
@@ -49,6 +50,55 @@ def _safe_float(val: str | None) -> float | None:
         return float(val)
     except (ValueError, TypeError):
         return None
+
+
+@router.get(
+    "",
+    summary="获取全局或按实体过滤的监管指标",
+    response_model=list[IndicatorResponse],
+)
+async def get_indicators(
+    entity_id: str | None = Query(None, pattern=r"^[a-zA-Z0-9_-]*$"),
+    current_user: TokenPayload = Depends(get_current_user),
+) -> list[IndicatorResponse]:
+    """获取指标列表。entity_id 为空时返回全局指标（从 Redis 缓存读取）。"""
+    if entity_id:
+        return await get_entity_indicators(entity_id, current_user)
+
+    # 全局指标：从 Redis 缓存读取
+    import redis.asyncio as aioredis
+    from drp.config import settings
+    from drp.indicators.registry import INDICATORS
+    from drp.indicators.calculator import _redis_key
+
+    results: list[IndicatorResponse] = []
+    try:
+        r = aioredis.from_url(settings.redis_url)
+        for ind in INDICATORS:
+            key = _redis_key(current_user.tenant_id, ind["id"])
+            cached = await r.get(key)
+            if cached:
+                data = json.loads(cached)
+                backend_domain = ind.get("domain", "")
+                frontend_domain = _DOMAIN_MAP.get(backend_domain, backend_domain)
+                if backend_domain == "结算" and ind["id"] >= _SETTLEMENT_INVEST_THRESHOLD:
+                    frontend_domain = "invest"
+                results.append(
+                    IndicatorResponse(
+                        id=ind["id"],
+                        name=ind["name"],
+                        domain=frontend_domain,
+                        unit=ind.get("unit", ""),
+                        value=data.get("value"),
+                        threshold=[ind.get("threshold"), None],
+                        direction=ind.get("direction", "up"),
+                    )
+                )
+        await r.aclose()
+    except Exception as exc:
+        logger.warning("全局指标 Redis 读取失败: %s", exc)
+
+    return results
 
 
 @router.get(

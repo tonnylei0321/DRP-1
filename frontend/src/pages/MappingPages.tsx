@@ -18,6 +18,21 @@ export function DdlUploadPage() {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    setError('');
+
+    // 文件大小校验：≤ 5MB
+    if (file.size > 5242880) {
+      setError('文件大小不能超过 5MB');
+      return;
+    }
+
+    // 扩展名校验：仅 .sql/.ddl/.txt
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+    if (!['sql', 'ddl', 'txt'].includes(ext)) {
+      setError('仅支持 .sql/.ddl/.txt 文件');
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = ev => setDdl(ev.target?.result as string ?? '');
     reader.readAsText(file);
@@ -142,6 +157,24 @@ export function MappingsPage() {
     setRejectReason('');
   }
 
+  async function handleBatchApproveAll() {
+    try {
+      await mappingApi.batchApprove('all');
+      load();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : '批量确认失败');
+    }
+  }
+
+  async function handleBatchApproveThreshold() {
+    try {
+      await mappingApi.batchApprove('threshold', 80);
+      load();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : '按阈值确认失败');
+    }
+  }
+
   function statusBadge(s: string): 'success' | 'danger' | 'warn' | 'info' {
     if (s === 'approved') return 'success';
     if (s === 'rejected') return 'danger';
@@ -166,8 +199,12 @@ export function MappingsPage() {
         <>
           {pending.length > 0 && (
             <>
-              <div style={{ marginBottom: '12px', color: 'var(--warn)', fontWeight: 500 }}>
-                待审核 ({pending.length})
+              <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ color: 'var(--warn)', fontWeight: 500 }}>
+                  待审核 ({pending.length})
+                </span>
+                <Btn variant="primary" size="sm" onClick={handleBatchApproveAll}>全部确认</Btn>
+                <Btn variant="primary" size="sm" onClick={handleBatchApproveThreshold}>按阈值确认(≥80%)</Btn>
               </div>
               <table style={{ marginBottom: '24px' }}>
                 <thead>

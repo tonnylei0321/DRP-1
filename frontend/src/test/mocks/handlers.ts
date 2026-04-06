@@ -260,6 +260,15 @@ export const handlers = [
     });
   }),
 
+  // ── 映射扩展 ──────────────────────────────────────────────────────────────
+  http.get(`${BASE_URL}/mappings/export-yaml`, () => {
+    return HttpResponse.json({ mapping_yaml: 'mappings:\n  - source_table: accounts\n    source_field: balance\n    target_property: drp:balance' });
+  }),
+
+  http.post(`${BASE_URL}/mappings/batch-approve`, () => {
+    return HttpResponse.json({ approved_count: 1, skipped_count: 0, total_pending: 1 });
+  }),
+
   // ── ETL ───────────────────────────────────────────────────────────────────
   http.get(`${BASE_URL}/etl/jobs`, () => {
     return HttpResponse.json(MOCK_ETL_JOBS);

@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/mapping/router.py
+# hypothesis_version: 6.151.10
+
+[400, 404, 422, 5242880, '/batch-approve', '/export-yaml', '/generate', '/mappings', '/{mapping_id}/reject', '<[^>]+>', 'DDL 内容超过 5MB 限制', 'DDL 解析失败，未找到有效表定义', '^[a-zA-Z0-9_]+$', 'all', 'approved', 'auto_approved', 'confidence', 'mapping:approve', 'mapping:read', 'mapping_yaml', 'pending', 'rejected', 'source_field', 'source_table', 'target_property', 'threshold', 'transform_rule', 'utf-8', '无已审核通过的映射记录', '映射不存在', '语义映射', '需要租户上下文']

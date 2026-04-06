@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/mapping/schemas.py
+# hypothesis_version: 6.151.10
+
+[80.0, 500, 5000, 5242880, '^(all|threshold)$', 'all', 'from_attributes', '仅处理指定表（留空则处理所有表）', '单次操作最大数量', '审核模式：all 或 threshold', '拒绝原因', '数据库 DDL SQL 内容']

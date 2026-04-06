@@ -1,0 +1,52 @@
+-- 票据域 测试数据
+-- 自动生成，请勿手动修改
+
+INSERT INTO bill (id, entity_id, bill_type, face_value, issue_date, maturity_date, status, is_overdue, created_at) VALUES
+('bc8871ad-90d0-4d8b-9911-13bfba71755b', 'test_sub_east_a', 'commercial_draft', '3572312.52', '2024-05-24', '2025-03-15', 'active', false, '2024-11-20 00:05:47'),
+('61938d41-8e06-4f4c-a684-a5b2b6614009', 'test_sub_north_a', 'bank_acceptance', '21049641.44', '2024-02-25', '2024-12-03', 'active', false, '2024-06-23 05:23:19'),
+('2dd417a7-2db6-473a-bfbf-6911ab1e3d6f', 'test_sub_north_a', 'electronic_commercial', '44178775.01', '2024-03-24', '2024-08-04', 'active', false, '2024-03-20 05:48:39'),
+('c408b5f0-aa8c-49b3-b0a5-9f2f6c170f0a', 'test_sub_east_a', 'commercial_draft', '13677931.89', '2024-06-21', '2024-10-30', 'active', false, '2024-12-04 13:31:38'),
+('6fa5e02f-1cb8-4556-83a1-7d863f8ae9db', 'test_sub_east_b', 'bank_acceptance', '10856891.37', '2024-04-16', '2024-12-01', 'active', false, '2024-09-19 03:22:27'),
+('8ae0a74c-471b-4700-a2af-73d230d9ebd6', 'test_sub_east_a', 'electronic_commercial', '26394011.95', '2024-03-13', '2025-02-15', 'active', false, '2024-06-06 01:14:25'),
+('41162180-ff1b-4ccb-9cc2-1eb2b9bf4e16', 'test_sub_north_a', 'commercial_draft', '10300713.91', '2024-01-15', '2024-04-17', 'active', false, '2024-04-18 04:48:16'),
+('4aa4dc20-9043-4c3c-83f2-6b5d00069cab', 'test_sub_east_b', 'bank_acceptance', '485722.34', '2024-03-24', '2024-08-22', 'active', false, '2024-08-08 05:08:24'),
+('7ffd408b-26a2-4d63-b6a2-69b36efb67d7', 'test_sub_north_a', 'electronic_commercial', '25063091.09', '2024-06-29', '2025-01-22', 'active', false, '2024-12-08 11:04:25'),
+('cbb702e3-e1f0-4608-81f7-0dd0c5286ce6', 'test_sub_north_a', 'commercial_draft', '1035202.68', '2024-01-11', '2024-11-19', 'active', false, '2024-02-09 10:36:27'),
+('529c2bba-45d6-4c12-88e8-7384ec350e24', 'test_sub_north_a', 'bank_acceptance', '14546808.76', '2024-04-13', '2025-02-10', 'active', false, '2024-07-26 00:20:10'),
+('2050dd12-105d-44cd-8e04-50798e9a60b1', 'test_sub_north_a', 'electronic_commercial', '4497681.08', '2024-04-27', '2025-01-27', 'active', false, '2024-02-24 07:27:37'),
+('7946c7a0-f95d-400b-abe0-4544cb3e0277', 'test_sub_east_b', 'commercial_draft', '19848758.17', '2024-05-14', '2024-09-21', 'active', false, '2024-06-07 23:21:14'),
+('297ec315-af85-40d0-a8a9-d151e982fb90', 'test_sub_east_b', 'bank_acceptance', '25573115.90', '2024-02-13', '2024-06-21', 'active', false, '2024-02-28 16:32:12'),
+('0b5b5b37-0831-4075-aad5-152ba9881563', 'test_sub_east_b', 'electronic_commercial', '11889815.56', '2024-03-30', '2024-09-11', 'active', false, '2024-03-15 08:12:11'),
+('cbe7402d-367f-43ef-91a9-78a51294feee', 'test_sub_north_a', 'commercial_draft', '8939591.83', '2024-02-09', '2024-06-16', 'active', false, '2024-11-17 15:29:48'),
+('f623b5dd-2355-44c3-81bd-4d0b436090f8', 'test_sub_north_a', 'bank_acceptance', '34088560.57', '2024-05-28', '2025-04-12', 'active', false, '2024-10-16 20:40:39'),
+('865b19ff-cffd-4b57-8b8e-d4afa8a807bb', 'test_sub_east_b', 'electronic_commercial', '7632774.33', '2024-06-09', '2025-02-15', 'active', false, '2024-02-04 15:28:40'),
+('f28525fc-1171-4f5f-995b-e0f21260e9e5', 'test_sub_east_b', 'commercial_draft', '17661916.91', '2024-03-11', '2024-07-07', 'active', false, '2024-02-07 09:29:28'),
+('992952e2-3e4b-4276-b65b-2dcbf7e9682c', 'test_sub_east_a', 'bank_acceptance', '41601661.92', '2024-01-15', '2024-10-19', 'active', false, '2024-02-09 20:55:54'),
+('f4502759-c08d-435e-8af3-f7162dcdf70f', 'test_sub_east_a', 'electronic_commercial', '19285675.58', '2024-06-06', '2025-05-21', 'active', false, '2024-10-24 17:50:47'),
+('607fe7e5-2047-40b4-8006-31921946fe19', 'test_sub_east_a', 'commercial_draft', '16144185.47', '2024-04-25', '2024-10-28', 'pending', false, '2024-08-31 16:09:03'),
+('37f9581f-d839-4347-925a-6999af0d21e2', 'test_sub_east_b', 'bank_acceptance', '49121040.50', '2024-01-27', '2024-10-18', 'pending', false, '2024-02-13 16:41:11'),
+('9187bb0f-ed92-4f47-a157-bccef5d62245', 'test_sub_east_a', 'electronic_commercial', '49550202.53', '2024-03-04', '2025-01-12', 'pending', false, '2024-09-25 16:39:10'),
+('efc5599f-3b5a-447e-a87b-4058f449a170', 'test_sub_east_b', 'commercial_draft', '19432086.32', '2024-04-05', '2024-11-25', 'pending', false, '2024-06-22 21:38:03'),
+('9a7e7d86-fd80-4136-89d0-d4dc23279bd7', 'test_sub_north_a', 'bank_acceptance', '3389001.53', '2024-06-14', '2025-03-02', 'pending', false, '2024-02-18 17:43:24'),
+('9f83060d-560f-4d1b-b583-00172aec0555', 'test_sub_east_b', 'electronic_commercial', '16734765.60', '2024-03-05', '2024-08-18', 'pending', false, '2024-10-25 21:09:58'),
+('4451a859-ea6e-4441-b00a-6940361379b7', 'test_sub_east_b', 'commercial_draft', '6534687.75', '2024-03-20', '2025-01-04', 'overdue', true, '2024-12-28 02:19:35'),
+('2c9c4cf2-162d-4060-97b4-654f09c3a109', 'test_sub_east_b', 'bank_acceptance', '40677920.71', '2024-06-13', '2025-02-26', 'overdue', true, '2024-12-09 22:53:47'),
+('efb775fb-af08-4023-8468-8ae4242873fe', 'test_sub_north_a', 'electronic_commercial', '32336638.55', '2024-05-14', '2024-09-28', 'overdue', true, '2024-08-04 16:23:01');
+
+INSERT INTO endorsement_chain (id, bill_id, endorser_id, endorsee_id, endorse_date, sequence_no) VALUES
+('41ff63a5-4c65-4bed-965a-c44c23ee15a5', 'cbb702e3-e1f0-4608-81f7-0dd0c5286ce6', 'test_sub_east_a', 'test_sub_north_a', '2024-06-23', 1),
+('e99c8e1c-6187-4550-b6b1-19ba838860dd', '41162180-ff1b-4ccb-9cc2-1eb2b9bf4e16', 'test_sub_east_a', 'test_sub_north_a', '2024-03-20', 2),
+('172e0009-9389-48b4-bdae-b407d18d28d7', 'cbb702e3-e1f0-4608-81f7-0dd0c5286ce6', 'test_sub_east_a', 'test_sub_north_a', '2024-12-04', 3),
+('ccdb1ae4-8c4c-4edb-aa85-84f34c63b86d', '2c9c4cf2-162d-4060-97b4-654f09c3a109', 'test_sub_north_a', 'test_sub_east_a', '2024-11-01', 4),
+('b3ee094d-d28f-4d92-bc4d-a650fbe361ad', '6fa5e02f-1cb8-4556-83a1-7d863f8ae9db', 'test_sub_east_a', 'test_sub_north_a', '2024-12-20', 5),
+('33ead903-4a18-42f4-acc1-367aea512ed6', '9a7e7d86-fd80-4136-89d0-d4dc23279bd7', 'test_sub_east_a', 'test_sub_east_b', '2024-01-23', 6),
+('fc95df8d-8cfc-4b3c-a4d9-8d28a7a501c3', '2050dd12-105d-44cd-8e04-50798e9a60b1', 'test_sub_north_a', 'test_sub_east_a', '2024-08-15', 7),
+('a377bdb2-7de7-48d3-a85c-e3a263928775', 'cbb702e3-e1f0-4608-81f7-0dd0c5286ce6', 'test_sub_north_a', 'test_sub_east_b', '2024-04-29', 8),
+('a292bb4f-1390-4cb8-928c-41ac8279967d', '4aa4dc20-9043-4c3c-83f2-6b5d00069cab', 'test_sub_east_b', 'test_sub_north_a', '2024-04-09', 9),
+('b19e9154-b4f8-431c-aa9f-e09ca3804ffe', '607fe7e5-2047-40b4-8006-31921946fe19', 'test_sub_north_a', 'test_sub_east_b', '2024-08-24', 10),
+('2e76129c-b4e4-488e-90e6-5ffddcedf7c6', 'efc5599f-3b5a-447e-a87b-4058f449a170', 'test_sub_east_b', 'test_sub_north_a', '2024-03-23', 11),
+('c1935445-a0a1-44c9-8a66-7b886e27f9cd', '9a7e7d86-fd80-4136-89d0-d4dc23279bd7', 'test_sub_north_a', 'test_sub_east_a', '2024-05-08', 12),
+('2f3bc891-f39c-48bd-9f61-09461096dc46', 'f4502759-c08d-435e-8af3-f7162dcdf70f', 'test_sub_east_b', 'test_sub_north_a', '2024-10-10', 13),
+('bb724e9e-83bd-4253-992c-72cc04f185e4', '37f9581f-d839-4347-925a-6999af0d21e2', 'test_sub_north_a', 'test_sub_east_a', '2024-05-25', 14),
+('1a87a3d9-2a80-4bdb-8640-5024f686c173', 'efc5599f-3b5a-447e-a87b-4058f449a170', 'test_sub_east_a', 'test_sub_east_b', '2024-08-18', 15);
+

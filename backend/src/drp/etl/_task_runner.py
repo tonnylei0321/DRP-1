@@ -79,6 +79,15 @@ async def run_full_sync(tenant_id: str, table: str, mapping_yaml: str, run_id: s
             triples = await engine.full_sync(table)
             await repo.mark_success(session, job, triples)
             await session.commit()
+
+            # ETL 成功后自动触发指标计算
+            try:
+                from drp.indicators.tasks import calculate_indicators_for_tenant_task
+                calculate_indicators_for_tenant_task.delay(tenant_id)
+                logger.info("[全量同步] 已触发指标计算: tenant=%s", tenant_id)
+            except Exception as exc:
+                logger.warning("[全量同步] 触发指标计算失败: %s", exc)
+
             return {"status": "success", "triples": triples, "job_id": str(job.id), "run_id": str(resolved_run_id)}
         except Exception as exc:
             await repo.mark_failed(session, job, str(exc))
@@ -115,6 +124,15 @@ async def run_incremental_sync(tenant_id: str, table: str, mapping_yaml: str, ru
             triples, new_watermark = await engine.incremental_sync(table, watermark)
             await repo.mark_success(session, job, triples, watermark=new_watermark)
             await session.commit()
+
+            # ETL 成功后自动触发指标计算
+            try:
+                from drp.indicators.tasks import calculate_indicators_for_tenant_task
+                calculate_indicators_for_tenant_task.delay(tenant_id)
+                logger.info("[增量同步] 已触发指标计算: tenant=%s", tenant_id)
+            except Exception as exc:
+                logger.warning("[增量同步] 触发指标计算失败: %s", exc)
+
             return {"status": "success", "triples": triples, "job_id": str(job.id), "run_id": str(resolved_run_id)}
         except Exception as exc:
             await repo.mark_failed(session, job, str(exc))

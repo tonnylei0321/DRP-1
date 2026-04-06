@@ -175,6 +175,12 @@ export const mappingApi = {
   approve: (id: string) => request<MappingSpec>('PUT', `/mappings/${id}/approve`),
   reject: (id: string, reason?: string) =>
     request<MappingSpec>('PUT', `/mappings/${id}/reject`, { reason }),
+  exportYaml: () =>
+    request<{ mapping_yaml: string }>('GET', '/mappings/export-yaml'),
+  batchApprove: (mode: 'all' | 'threshold', threshold?: number) =>
+    request<{ approved_count: number; skipped_count: number; total_pending: number }>(
+      'POST', '/mappings/batch-approve', { mode, threshold }
+    ),
 };
 
 // ─── ETL 任务 ─────────────────────────────────────────────────────────────────
