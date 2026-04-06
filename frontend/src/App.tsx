@@ -44,20 +44,33 @@ function PageContent({ page }: { page: Page }) {
   }
 }
 
+/** 根据当前 token 计算可见菜单 */
+function getVisibleNavItems(): typeof NAV_ITEMS {
+  const perms = getPermissions();
+  return NAV_ITEMS.filter(item =>
+    perms === null || perms.includes(item.requiredPermission)
+  );
+}
+
+/** 取第一个有权限的页面，兜底 'dashboard' */
+function getDefaultPage(): Page {
+  const visible = getVisibleNavItems();
+  return visible.length > 0 ? visible[0].id : 'dashboard';
+}
+
 export default function App() {
   const [authed, setAuthed] = useState(() => !!getToken());
-  const [page, setPage] = useState<Page>('users');
+  // tokenVersion 每次登录递增，驱动 useMemo 重新计算权限
+  const [tokenVersion, setTokenVersion] = useState(0);
+  const [page, setPage] = useState<Page>(() => getToken() ? getDefaultPage() : 'dashboard');
   const savedPageRef = useRef<Page | null>(null);
 
-  // 根据权限过滤可见菜单（依赖 authed 状态确保登录后重新计算）
+  // 根据权限过滤可见菜单
   // null 表示 token 无 permissions 字段，显示全部向后兼容
   const visibleNavItems = useMemo(() => {
     if (!authed) return NAV_ITEMS;
-    const perms = getPermissions();
-    return NAV_ITEMS.filter(item =>
-      perms === null || perms.includes(item.requiredPermission)
-    );
-  }, [authed]);
+    return getVisibleNavItems();
+  }, [authed, tokenVersion]);
 
   // 监听 401 auth-expired 事件，保存当前 page 并跳转登录页
   useEffect(() => {
@@ -70,20 +83,23 @@ export default function App() {
   }, [page]);
 
   function handleLogin() {
-    setAuthed(true);
+    // 先计算可见菜单和默认页面（此时 _token 已由 LoginPage setToken 设置）
+    const visible = getVisibleNavItems();
+    const defaultPage = visible.length > 0 ? visible[0].id : 'dashboard';
+
     if (savedPageRef.current) {
-      setPage(savedPageRef.current);
+      // 401 恢复场景：跳回之前的页面
+      const restored = savedPageRef.current;
       savedPageRef.current = null;
+      // 如果恢复的页面不在可见列表中，回退到默认页面
+      setPage(visible.some(v => v.id === restored) ? restored : defaultPage);
     } else {
-      // 登录后跳转到第一个有权限的菜单页面
-      const perms = getPermissions();
-      const visible = NAV_ITEMS.filter(item =>
-        perms === null || perms.includes(item.requiredPermission)
-      );
-      if (visible.length > 0) {
-        setPage(visible[0].id);
-      }
+      setPage(defaultPage);
     }
+
+    // 最后更新 authed + tokenVersion，触发 useMemo 重新计算
+    setTokenVersion(v => v + 1);
+    setAuthed(true);
   }
 
   if (!authed) {

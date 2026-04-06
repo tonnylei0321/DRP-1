@@ -86,15 +86,19 @@ describe('App 导航切换', () => {
     loginWithToken();
     render(<App />);
     const user = userEvent.setup();
+    const nav = getSidebar();
 
-    // 默认页面是用户管理（导航项 + PageHeader 标题 = 至少 2 处）
+    // 先点击"用户管理"导航项（默认页面可能不是用户管理）
+    const userBtn = within(nav).getByRole('button', { name: /用户管理/ });
+    await user.click(userBtn);
+
+    // 用户管理页面应显示（导航项 + PageHeader 标题 = 至少 2 处）
     await waitFor(() => {
       const matches = screen.getAllByText('用户管理');
       expect(matches.length).toBeGreaterThanOrEqual(2);
     });
 
     // 点击"审计日志"导航项
-    const nav = getSidebar();
     const auditBtn = within(nav).getByRole('button', { name: /审计日志/ });
     await user.click(auditBtn);
 
