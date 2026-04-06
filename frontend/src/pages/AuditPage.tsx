@@ -28,8 +28,9 @@ export default function AuditPage() {
 
   useEffect(() => { load(); }, [eventType, page]);
 
-  function eventVariant(t: string): 'success' | 'danger' | 'warn' | 'info' {
-    if (t === 'login') return 'success';
+  function eventVariant(t: string | undefined): 'success' | 'danger' | 'warn' | 'info' {
+    if (!t) return 'info';
+    if (t === 'user.login') return 'success';
     if (t.includes('failed') || t.includes('denied') || t.includes('deleted')) return 'danger';
     if (t.includes('created') || t.includes('changed')) return 'warn';
     return 'info';
@@ -46,7 +47,7 @@ export default function AuditPage() {
     const csv = [
       'ID,UserID,EventType,Resource,IP,CreatedAt',
       ...logs.map(l =>
-        [l.id, l.user_id, l.event_type, l.resource || '', l.ip_address || '', l.created_at]
+        [l.id, l.user_id || '', l.action, l.resource_type || '', l.ip_address || '', l.created_at]
           .map(sanitizeCsvField)
           .join(',')
       ),
@@ -87,9 +88,9 @@ export default function AuditPage() {
             <tbody>
               {logs.map(l => (
                 <tr key={l.id}>
-                  <td><Badge label={l.event_type} variant={eventVariant(l.event_type)} /></td>
-                  <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{l.user_id.slice(0, 8)}...</td>
-                  <td>{l.resource || '—'}</td>
+                  <td><Badge label={l.action} variant={eventVariant(l.action)} /></td>
+                  <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{l.user_id ? l.user_id.slice(0, 8) + '...' : '—'}</td>
+                  <td>{l.resource_type || '—'}</td>
                   <td style={{ color: 'var(--text-muted)' }}>{l.ip_address || '—'}</td>
                   <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>
                     {new Date(l.created_at).toLocaleString('zh-CN')}

@@ -23,7 +23,7 @@ describe('AuditPage 渲染', () => {
 
     // 等待加载完成
     await waitFor(() => {
-      expect(screen.getByText('login')).toBeInTheDocument();
+      expect(screen.getByText('user.login')).toBeInTheDocument();
     });
 
     // 验证表头列
@@ -34,7 +34,7 @@ describe('AuditPage 渲染', () => {
     expect(screen.getByText('时间')).toBeInTheDocument();
 
     // 验证两条 mock 审计日志数据
-    expect(screen.getByText('update')).toBeInTheDocument();
+    expect(screen.getByText('user.update')).toBeInTheDocument();
     expect(screen.getByText('192.168.1.1')).toBeInTheDocument();
     expect(screen.getByText('192.168.1.2')).toBeInTheDocument();
   });
@@ -43,7 +43,7 @@ describe('AuditPage 渲染', () => {
 // ─── 过滤测试 ────────────────────────────────────────────────────────────────
 
 describe('AuditPage 过滤', () => {
-  it('选择事件类型过滤器 → 以新 event_type 参数重新调用 auditApi.list', async () => {
+  it('选择事件类型过滤器 → 以新 action 参数重新调用 auditApi.list', async () => {
     let capturedUrl = '';
 
     server.use(
@@ -58,16 +58,16 @@ describe('AuditPage 过滤', () => {
 
     // 等待初始加载
     await waitFor(() => {
-      expect(screen.getByText('login')).toBeInTheDocument();
+      expect(screen.getByText('user.login')).toBeInTheDocument();
     });
 
     // 选择 "login" 事件类型过滤
     const select = screen.getByRole('combobox');
     await user.selectOptions(select, 'login');
 
-    // 验证重新调用时 URL 包含 event_type=login
+    // 验证重新调用时 URL 包含 action=login
     await waitFor(() => {
-      expect(capturedUrl).toContain('event_type=login');
+      expect(capturedUrl).toContain('action=login');
     });
   });
 });
@@ -109,7 +109,7 @@ describe('AuditPage CSV 导出', () => {
 
     // 等待数据加载
     await waitFor(() => {
-      expect(screen.getByText('login')).toBeInTheDocument();
+      expect(screen.getByText('user.login')).toBeInTheDocument();
     });
 
     // 点击导出按钮
@@ -138,8 +138,10 @@ describe('AuditPage CSV 注入防护', () => {
       {
         id: 'log-evil-1',
         user_id: 'user-1',
-        event_type: 'update',
-        resource: "=CMD('calc')",
+        tenant_id: null,
+        action: 'user.update',
+        resource_type: "=CMD('calc')",
+        resource_id: null,
         ip_address: '+1234567',
         created_at: '2024-01-01T00:00:00Z',
         detail: null,
@@ -147,8 +149,10 @@ describe('AuditPage CSV 注入防护', () => {
       {
         id: 'log-evil-2',
         user_id: 'user-2',
-        event_type: 'login',
-        resource: '-1+1',
+        tenant_id: null,
+        action: 'user.login',
+        resource_type: '-1+1',
+        resource_id: null,
         ip_address: '@SUM(A1)',
         created_at: '2024-01-02T00:00:00Z',
         detail: null,
@@ -189,7 +193,7 @@ describe('AuditPage CSV 注入防护', () => {
 
     // 等待恶意数据加载
     await waitFor(() => {
-      expect(screen.getByText('update')).toBeInTheDocument();
+      expect(screen.getByText('user.update')).toBeInTheDocument();
     });
 
     // 点击导出
@@ -227,7 +231,7 @@ describe('AuditPage 分页交互', () => {
 
     // 等待初始加载
     await waitFor(() => {
-      expect(screen.getByText('login')).toBeInTheDocument();
+      expect(screen.getByText('user.login')).toBeInTheDocument();
     });
 
     // 点击"下一页"
@@ -254,7 +258,7 @@ describe('AuditPage 分页交互', () => {
 
     // 等待初始加载
     await waitFor(() => {
-      expect(screen.getByText('login')).toBeInTheDocument();
+      expect(screen.getByText('user.login')).toBeInTheDocument();
     });
 
     // 先到第 2 页
@@ -275,7 +279,7 @@ describe('AuditPage 分页交互', () => {
 
     // 等待加载完成
     await waitFor(() => {
-      expect(screen.getByText('login')).toBeInTheDocument();
+      expect(screen.getByText('user.login')).toBeInTheDocument();
     });
 
     // 第 1 页时"上一页"按钮应该被禁用

@@ -186,7 +186,7 @@ describe('业务 API 请求构造', () => {
     const url = new URL(capturedUrl);
     expect(url.searchParams.get('page')).toBe('2');
     expect(url.searchParams.get('per_page')).toBe('20');
-    expect(url.searchParams.get('event_type')).toBe('login');
+    expect(url.searchParams.get('action')).toBe('login');
   });
 
   it('auditApi.list page=0 时仍拼接到查询字符串', async () => {
@@ -621,7 +621,7 @@ describe('属性测试 — Property 4: 审计日志查询字符串构造', () =>
             if (url.searchParams.get('per_page') !== String(params.per_page)) return false;
           }
           if (params.event_type) {
-            if (url.searchParams.get('event_type') !== params.event_type) return false;
+            if (url.searchParams.get('action') !== params.event_type) return false;
           }
           // URL 不应包含 'undefined'
           if (capturedUrl.includes('undefined')) return false;

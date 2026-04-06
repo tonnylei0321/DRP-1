@@ -151,9 +151,11 @@ export const rolesApi = {
 
 export interface AuditLog {
   id: string;
-  user_id: string;
-  event_type: string;
-  resource: string | null;
+  user_id: string | null;
+  tenant_id: string | null;
+  action: string;
+  resource_type: string | null;
+  resource_id: string | null;
   ip_address: string | null;
   created_at: string;
   detail: Record<string, unknown> | null;
@@ -164,7 +166,7 @@ export const auditApi = {
     const qs = new URLSearchParams();
     if (params?.page != null) qs.set('page', String(params.page));
     if (params?.per_page != null) qs.set('per_page', String(params.per_page));
-    if (params?.event_type) qs.set('event_type', params.event_type);
+    if (params?.event_type) qs.set('action', params.event_type);
     return request<AuditLog[]>('GET', `/auth/audit-logs?${qs}`);
   },
 };
