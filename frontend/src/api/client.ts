@@ -186,9 +186,9 @@ export interface MappingSpec {
 }
 
 export const mappingApi = {
-  generate: (ddl: string) =>
+  generate: (ddl: string, format: 'ddl' | 'csv' = 'ddl') =>
     request<{ mappings: MappingSpec[]; mapping_yaml: string }>(
-      'POST', '/mappings/generate', { ddl }
+      'POST', '/mappings/generate', { ddl, format }
     ),
   list: () => request<MappingSpec[]>('GET', '/mappings'),
   approve: (id: string) => request<MappingSpec>('PUT', `/mappings/${id}/approve`),

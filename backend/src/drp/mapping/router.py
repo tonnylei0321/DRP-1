@@ -13,6 +13,7 @@ from drp.auth.middleware import get_current_user, require_permission
 from drp.auth.schemas import TokenPayload
 from drp.db.session import get_session
 from drp.mapping.ddl_parser import parse_ddl
+from drp.mapping.csv_parser import parse_csv
 from drp.mapping.llm_service import generate_mapping_suggestions
 from drp.mapping.models import MappingRepository, compute_ddl_hash
 from drp.mapping.schemas import (
@@ -73,10 +74,16 @@ async def generate_mapping(
     tenant_id = uuid.UUID(current_user.tenant_id)
     ddl_hash = compute_ddl_hash(data.ddl)
 
-    # 解析 DDL
-    tables = parse_ddl(data.ddl)
+    # 解析 DDL 或 CSV
+    if data.format == "csv":
+        try:
+            tables = parse_csv(data.ddl)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc))
+    else:
+        tables = parse_ddl(data.ddl)
     if not tables:
-        raise HTTPException(status_code=422, detail="DDL 解析失败，未找到有效表定义")
+        raise HTTPException(status_code=422, detail="解析失败，未找到有效表定义")
 
     if data.table_name:
         tables = [t for t in tables if t.name.lower() == data.table_name.lower()]

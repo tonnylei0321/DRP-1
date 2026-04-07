@@ -10,7 +10,8 @@ import { Btn, Badge, PageHeader, EmptyState, Spinner, ErrorBox, Card, Modal, Inp
 // ─── DDL 上传页 ──────────────────────────────────────────────────────────────
 
 export function DdlUploadPage() {
-  const [ddl, setDdl] = useState('');
+  const [content, setContent] = useState('');
+  const [format, setFormat] = useState<'ddl' | 'csv'>('ddl');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<{ mappings: MappingSpec[]; mapping_yaml: string } | null>(null);
@@ -20,30 +21,35 @@ export function DdlUploadPage() {
     if (!file) return;
     setError('');
 
-    // 文件大小校验：≤ 5MB
     if (file.size > 5242880) {
       setError('文件大小不能超过 5MB');
       return;
     }
 
-    // 扩展名校验：仅 .sql/.ddl/.txt
     const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
-    if (!['sql', 'ddl', 'txt'].includes(ext)) {
-      setError('仅支持 .sql/.ddl/.txt 文件');
+    if (!['sql', 'ddl', 'txt', 'csv'].includes(ext)) {
+      setError('仅支持 .sql/.ddl/.txt/.csv 文件');
       return;
     }
 
+    // 根据文件扩展名自动切换格式
+    if (ext === 'csv') {
+      setFormat('csv');
+    } else {
+      setFormat('ddl');
+    }
+
     const reader = new FileReader();
-    reader.onload = ev => setDdl(ev.target?.result as string ?? '');
+    reader.onload = ev => setContent(ev.target?.result as string ?? '');
     reader.readAsText(file);
   }
 
   async function handleGenerate() {
-    if (!ddl.trim()) return;
+    if (!content.trim()) return;
     setError('');
     setLoading(true);
     try {
-      setResult(await mappingApi.generate(ddl));
+      setResult(await mappingApi.generate(content, format));
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : '生成失败');
     } finally {
@@ -59,25 +65,51 @@ export function DdlUploadPage() {
 
   return (
     <div>
-      <PageHeader title="DDL 上传与映射生成" />
+      <PageHeader title="DDL / CSV 上传与映射生成" />
       {error && <ErrorBox message={error} />}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
         <Card>
+          {/* 格式选择 */}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+            <button
+              onClick={() => setFormat('ddl')}
+              style={{
+                padding: '6px 16px', borderRadius: '6px', border: 'none', fontSize: '13px',
+                background: format === 'ddl' ? 'var(--accent)' : 'var(--ghost-btn-bg)',
+                color: format === 'ddl' ? '#fff' : 'var(--text-muted)',
+                cursor: 'pointer', transition: 'all 0.2s', fontWeight: format === 'ddl' ? 600 : 400,
+              }}
+            >DDL 模式</button>
+            <button
+              onClick={() => setFormat('csv')}
+              style={{
+                padding: '6px 16px', borderRadius: '6px', border: 'none', fontSize: '13px',
+                background: format === 'csv' ? 'var(--accent)' : 'var(--ghost-btn-bg)',
+                color: format === 'csv' ? '#fff' : 'var(--text-muted)',
+                cursor: 'pointer', transition: 'all 0.2s', fontWeight: format === 'csv' ? 600 : 400,
+              }}
+            >CSV 模式</button>
+          </div>
+
           <div style={{ marginBottom: '12px', color: 'var(--text-muted)', fontSize: '13px' }}>
-            支持 MySQL / PostgreSQL / Oracle DDL
+            {format === 'ddl'
+              ? '支持 MySQL / PostgreSQL / Oracle DDL'
+              : 'CSV 表头：数据库名,表名,表说明,字段名,数据类型,允许空值,默认值,额外信息,字段说明'}
           </div>
           <div style={{ marginBottom: '12px' }}>
-            <input type="file" accept=".sql,.ddl,.txt" onChange={handleFileChange}
+            <input type="file" accept={format === 'csv' ? '.csv' : '.sql,.ddl,.txt,.csv'} onChange={handleFileChange}
               style={{ width: 'auto', background: 'none', border: 'none', color: 'var(--text)' }} />
           </div>
           <textarea
-            value={ddl}
-            onChange={e => setDdl(e.target.value)}
-            placeholder="或直接粘贴 DDL..."
+            value={content}
+            onChange={e => setContent(e.target.value)}
+            placeholder={format === 'ddl'
+              ? '或直接粘贴 DDL...'
+              : '或直接粘贴 CSV 内容（含表头行）...'}
             style={{ height: '240px', resize: 'vertical', fontFamily: 'monospace', fontSize: '12px' }}
           />
           <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'flex-end' }}>
-            <Btn onClick={handleGenerate} disabled={loading || !ddl.trim()}>
+            <Btn onClick={handleGenerate} disabled={loading || !content.trim()}>
               {loading ? '分析中...' : '生成映射建议'}
             </Btn>
           </div>
