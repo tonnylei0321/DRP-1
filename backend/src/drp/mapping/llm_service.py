@@ -1,4 +1,8 @@
-"""LLM 映射服务：调用 Claude API，输入 DDL + CTIO 本体上下文，输出字段映射建议。"""
+"""LLM 映射服务：调用 OpenAI 兼容 API（DeepSeek/GPT/Claude），生成字段映射建议。
+
+支持 DeepSeek、OpenAI、任何 OpenAI 兼容 API。
+通过 LLM_API_BASE + LLM_API_KEY + LLM_MODEL 环境变量配置。
+"""
 import json
 import logging
 from dataclasses import dataclass
@@ -55,28 +59,47 @@ class MappingSuggestion:
     reasoning: str = ""
 
 
-async def _call_claude(prompt: str, client: httpx.AsyncClient) -> str:
-    """调用 Claude API，返回文本响应。"""
-    api_key = getattr(settings, "claude_api_key", None) or getattr(settings, "anthropic_api_key", None)
+def _get_api_config() -> tuple[str, str, str]:
+    """获取 LLM API 配置，优先使用 llm_* 配置，回退到 claude/anthropic。"""
+    api_key = settings.llm_api_key
+    api_base = settings.llm_api_base
+    model = settings.llm_model
+
+    # 回退到旧配置
     if not api_key:
-        raise RuntimeError("未配置 CLAUDE_API_KEY 或 ANTHROPIC_API_KEY")
+        api_key = settings.claude_api_key or settings.anthropic_api_key
+    if not api_key:
+        raise RuntimeError("未配置 LLM_API_KEY（或 CLAUDE_API_KEY）")
+
+    return api_key, api_base, model
+
+
+async def _call_llm(prompt: str, client: httpx.AsyncClient) -> str:
+    """调用 OpenAI 兼容 API（DeepSeek/GPT 等），返回文本响应。"""
+    api_key, api_base, model = _get_api_config()
+
+    # 统一使用 OpenAI 兼容的 /chat/completions 端点
+    url = f"{api_base.rstrip('/')}/chat/completions"
 
     resp = await client.post(
-        "https://api.anthropic.com/v1/messages",
+        url,
         headers={
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
         },
         json={
-            "model": "claude-sonnet-4-6",
-            "max_tokens": 2048,
-            "system": _SYSTEM_PROMPT,
-            "messages": [{"role": "user", "content": prompt}],
+            "model": model,
+            "messages": [
+                {"role": "system", "content": _SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+            "max_tokens": 4096,
+            "temperature": 0.1,
         },
     )
     resp.raise_for_status()
-    return resp.json()["content"][0]["text"]
+    data = resp.json()
+    return data["choices"][0]["message"]["content"]
 
 
 def _build_prompt(table: TableInfo) -> str:
@@ -89,15 +112,14 @@ def _build_prompt(table: TableInfo) -> str:
         null_str = "允许NULL" if col.nullable else "NOT NULL"
         lines.append(f"  - {col.name}: {col.data_type} {null_str} {note}")
 
-    lines.append("\n可用目��属性：")
+    lines.append("\n可用目标属性：")
     lines.extend(f"  - {p}" for p in _CTIO_PROPERTIES)
     lines.append("\n请输出 JSON 数组。")
     return "\n".join(lines)
 
 
 def _parse_llm_response(raw: str) -> list[dict]:
-    """从 LLM 响应中提取 JSON 数组���"""
-    # 找到 JSON 数组边界
+    """从 LLM 响应中提取 JSON 数组。"""
     start = raw.find("[")
     end = raw.rfind("]") + 1
     if start == -1 or end == 0:
@@ -115,24 +137,15 @@ async def generate_mapping_suggestions(
     history: list[dict] | None = None,
     client: httpx.AsyncClient | None = None,
 ) -> list[MappingSuggestion]:
-    """调用 LLM 生成映射建议，附加置信度计算。
-
-    Args:
-        table: 待映射表的元数据
-        history: 历史映射记录（用于置信度计算）
-        client: 可注入 httpx.AsyncClient（测试用）
-
-    Returns:
-        每个字段的映射建议列表
-    """
+    """调用 LLM 生成映射建议，附加置信度计算。"""
     prompt = _build_prompt(table)
 
     should_close = client is None
     if client is None:
-        client = httpx.AsyncClient(timeout=60.0)
+        client = httpx.AsyncClient(timeout=120.0)
 
     try:
-        raw = await _call_claude(prompt, client)
+        raw = await _call_llm(prompt, client)
     finally:
         if should_close:
             await client.aclose()

@@ -37,9 +37,14 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 60
 
-    # Claude / Anthropic API
+    # Claude / Anthropic API（兼容旧配置）
     claude_api_key: str = ""
     anthropic_api_key: str = ""
+
+    # LLM 映射服务（推荐配置）
+    llm_api_key: str = ""
+    llm_api_base: str = "https://api.deepseek.com"
+    llm_model: str = "deepseek-chat"
 
     @property
     def postgres_dsn(self) -> str:

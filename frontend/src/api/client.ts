@@ -190,6 +190,18 @@ export const mappingApi = {
     request<{ mappings: MappingSpec[]; mapping_yaml: string }>(
       'POST', '/mappings/generate', { ddl, format }
     ),
+  generateAsync: (ddl: string, format: 'ddl' | 'csv' = 'ddl') =>
+    request<{ job_id: string; status: string }>(
+      'POST', '/mappings/generate-async', { ddl, format }
+    ),
+  getJobStatus: (jobId: string) =>
+    request<{
+      job_id: string; status: string; progress: number;
+      total_tables: number; processed_tables: number;
+      total_fields: number; processed_fields: number;
+      current_table: string; error: string | null;
+      result_count: number;
+    }>('GET', `/mappings/jobs/${jobId}`),
   list: () => request<MappingSpec[]>('GET', '/mappings'),
   approve: (id: string) => request<MappingSpec>('PUT', `/mappings/${id}/approve`),
   reject: (id: string, reason?: string) =>

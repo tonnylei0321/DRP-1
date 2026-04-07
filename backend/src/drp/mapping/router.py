@@ -1,4 +1,5 @@
 """映射 API 路由。"""
+import asyncio
 import logging
 import re
 import time
@@ -6,7 +7,7 @@ import uuid
 from datetime import datetime, timezone
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from drp.auth.middleware import get_current_user, require_permission
@@ -265,3 +266,63 @@ async def reject_mapping(
     await session.commit()
     await session.refresh(mapping)
     return MappingItemResponse.model_validate(mapping)
+
+
+# ─── 异步映射任务（大文件） ────────────────────────────────────────────────────
+
+
+@router.post(
+    "/generate-async",
+    status_code=HTTPStatus.ACCEPTED,
+    dependencies=[Depends(require_permission("mapping:read"))],
+)
+async def generate_mapping_async(
+    data: GenerateMappingRequest,
+    current_user: TokenPayload = Depends(get_current_user),
+) -> dict:
+    """异步生成映射建议（适用于大文件）。
+
+    立即返回 job_id，后台异步处理。
+    前端通过 GET /mappings/jobs/{job_id} 轮询进度。
+    """
+    from drp.mapping.job_manager import run_mapping_job
+
+    if not current_user.tenant_id:
+        raise HTTPException(status_code=400, detail="需要租户上下文")
+
+    # 内容大小限制
+    content_size = len(data.ddl.encode("utf-8"))
+    if data.format == "csv":
+        if content_size > 209_715_200:
+            raise HTTPException(status_code=422, detail="CSV 内容超过 200MB 限制")
+    else:
+        if content_size > 5_242_880:
+            raise HTTPException(status_code=422, detail="DDL 内容超过 5MB 限制")
+
+    job_id = str(uuid.uuid4())
+
+    # 启动后台任务
+    asyncio.create_task(run_mapping_job(
+        job_id=job_id,
+        content=data.ddl,
+        fmt=data.format,
+        tenant_id=current_user.tenant_id,
+        user_id=current_user.sub,
+        table_name_filter=data.table_name,
+    ))
+
+    return {"job_id": job_id, "status": "pending"}
+
+
+@router.get(
+    "/jobs/{job_id}",
+    dependencies=[Depends(require_permission("mapping:read"))],
+)
+async def get_mapping_job_status(job_id: str) -> dict:
+    """查询映射任务进度。"""
+    from drp.mapping.job_manager import get_job_status
+
+    status = await get_job_status(job_id)
+    if status is None:
+        raise HTTPException(status_code=404, detail="任务不存在或已过期")
+    return status
