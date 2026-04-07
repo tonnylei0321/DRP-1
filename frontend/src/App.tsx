@@ -114,31 +114,29 @@ export default function App() {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      {/* 侧边栏 — 玻璃态 */}
+      {/* 侧边栏 */}
       <aside style={{
         width: '240px', flexShrink: 0,
-        background: 'rgba(17, 24, 39, 0.7)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderRight: '1px solid rgba(255, 255, 255, 0.06)',
+        background: '#0a0f1a',
+        borderRight: '1px solid #374151',
         display: 'flex', flexDirection: 'column',
       }}>
         {/* Logo */}
         <div style={{
-          padding: '20px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          padding: '20px 16px', borderBottom: '1px solid #374151',
           display: 'flex', alignItems: 'center', gap: '12px',
         }}>
           <div style={{
             width: '36px', height: '36px',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+            background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
             borderRadius: '10px',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: '#fff', fontWeight: 700, fontSize: '14px',
-            boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)',
+            boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)',
           }}>DR</div>
           <div>
-            <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)' }}>DRP 管理后台</div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '11px' }}>资金监管平台</div>
+            <div style={{ fontWeight: 600, fontSize: '14px', color: '#e6f0ff' }}>DRP 管理后台</div>
+            <div style={{ color: '#94a3b8', fontSize: '11px' }}>资金监管平台</div>
           </div>
         </div>
 
@@ -154,22 +152,21 @@ export default function App() {
               <button
                 key={item.id}
                 onClick={() => setPage(item.id)}
+                className={`nav-item${isActive ? ' active' : ''}`}
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: '10px',
-                  padding: '9px 14px', borderRadius: '10px', border: 'none',
+                  padding: '9px 14px', paddingLeft: '16px',
+                  borderRadius: '8px', border: 'none',
                   background: isActive
-                    ? 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(139,92,246,0.1) 100%)'
+                    ? 'rgba(79, 70, 229, 0.1)'
                     : 'transparent',
-                  color: isActive ? '#93c5fd' : 'var(--text-muted)',
+                  color: isActive ? '#e6f0ff' : '#94a3b8',
                   fontSize: '13px', cursor: 'pointer', marginBottom: '2px',
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                   fontWeight: isActive ? 600 : 400,
-                  ...(isActive && {
-                    boxShadow: '0 0 0 1px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
-                  }),
                 }}
               >
-                <span style={{ fontSize: '16px' }}>{item.icon}</span>
+                <span style={{ fontSize: '16px', color: isActive ? '#cbd5e1' : '#94a3b8' }}>{item.icon}</span>
                 <span>{item.label}</span>
               </button>
             );
@@ -177,17 +174,17 @@ export default function App() {
         </nav>
 
         {/* 退出 */}
-        <div style={{ padding: '12px 8px', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+        <div style={{ padding: '12px 8px', borderTop: '1px solid #374151' }}>
           <button
             onClick={() => { clearToken(); setAuthed(false); }}
             style={{
-              width: '100%', padding: '9px 14px', borderRadius: '10px', border: 'none',
-              background: 'transparent', color: 'var(--text-muted)', fontSize: '13px', cursor: 'pointer',
+              width: '100%', padding: '9px 14px', borderRadius: '8px', border: 'none',
+              background: 'transparent', color: '#94a3b8', fontSize: '13px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: '10px',
               transition: 'all 0.2s',
             }}
           >
-            <span style={{ fontSize: '16px' }}>🚪</span><span>退出登录</span>
+            <span style={{ fontSize: '16px', color: '#cbd5e1' }}>🚪</span><span>退出登录</span>
           </button>
         </div>
       </aside>

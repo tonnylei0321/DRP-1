@@ -21,9 +21,9 @@ export function Btn({ variant = 'primary', size = 'md', style, children, ...rest
     letterSpacing: '0.02em',
     cursor: 'pointer',
     ...(variant === 'primary' && {
-      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+      background: 'linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)',
       color: '#fff',
-      boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)',
+      boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)',
     }),
     ...(variant === 'danger' && {
       background: 'rgba(239,68,68,0.1)',
@@ -51,13 +51,13 @@ export function Card({ children, style, hover = true }: {
 }) {
   return (
     <div className={`card glass-card${hover ? ' hover-scale' : ''}`} style={{
-      background: 'rgba(17, 24, 39, 0.6)',
+      background: '#111928',
       backdropFilter: 'blur(12px)',
       WebkitBackdropFilter: 'blur(12px)',
-      border: '1px solid rgba(255, 255, 255, 0.08)',
+      border: '1px solid #374151',
       borderRadius: '12px',
       padding: '20px',
-      boxShadow: '0 4px 24px rgba(0, 0, 0, 0.3), 0 0 1px rgba(255, 255, 255, 0.05)',
+      boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.03)',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       ...style,
     }}>
@@ -184,7 +184,7 @@ export function Spinner() {
     <div style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
       <div style={{
         width: '24px', height: '24px', margin: '0 auto 12px',
-        border: '2px solid rgba(59, 130, 246, 0.2)',
+        border: '2px solid rgba(79, 70, 229, 0.2)',
         borderTopColor: 'var(--accent)',
         borderRadius: '50%',
         animation: 'spin 0.8s linear infinite',
