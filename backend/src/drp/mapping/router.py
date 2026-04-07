@@ -65,8 +65,15 @@ async def generate_mapping(
     current_user: TokenPayload = Depends(get_current_user),
 ) -> GenerateMappingResponse:
     """解析 DDL，调用 LLM 生成字段映射建议并持久化。"""
-    if not current_user.tenant_id:
-        raise HTTPException(status_code=400, detail="需要租户上下文")
+    # 获取租户 ID，无 tenant_id 时使用默认租户
+    tenant_id_str = current_user.tenant_id
+    if not tenant_id_str:
+        from sqlalchemy import text as sa_text
+        result = await session.execute(sa_text("SELECT id FROM tenant LIMIT 1"))
+        row = result.fetchone()
+        if not row:
+            raise HTTPException(status_code=400, detail="系统中无可用租户")
+        tenant_id_str = str(row[0])
 
     # 内容大小限制：DDL 最大 5MB，CSV 最大 200MB
     content_size = len(data.ddl.encode("utf-8"))
@@ -77,7 +84,7 @@ async def generate_mapping(
         if content_size > 5_242_880:
             raise HTTPException(status_code=422, detail="DDL 内容超过 5MB 限制")
 
-    tenant_id = uuid.UUID(current_user.tenant_id)
+    tenant_id = uuid.UUID(tenant_id_str)
     ddl_hash = compute_ddl_hash(data.ddl)
 
     # 解析 DDL 或 CSV
