@@ -21,14 +21,17 @@ export function DdlUploadPage() {
     if (!file) return;
     setError('');
 
-    if (file.size > 5242880) {
-      setError('文件大小不能超过 5MB');
-      return;
-    }
-
     const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
     if (!['sql', 'ddl', 'txt', 'csv'].includes(ext)) {
       setError('仅支持 .sql/.ddl/.txt/.csv 文件');
+      return;
+    }
+
+    // 文件大小校验：DDL ≤ 5MB，CSV ≤ 200MB
+    const maxSize = ext === 'csv' ? 209715200 : 5242880;
+    const maxLabel = ext === 'csv' ? '200MB' : '5MB';
+    if (file.size > maxSize) {
+      setError(`文件大小不能超过 ${maxLabel}`);
       return;
     }
 

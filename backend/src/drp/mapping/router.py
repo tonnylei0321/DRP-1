@@ -67,9 +67,14 @@ async def generate_mapping(
     if not current_user.tenant_id:
         raise HTTPException(status_code=400, detail="需要租户上下文")
 
-    # DDL 大小限制：最大 5MB
-    if len(data.ddl.encode("utf-8")) > 5_242_880:
-        raise HTTPException(status_code=422, detail="DDL 内容超过 5MB 限制")
+    # 内容大小限制：DDL 最大 5MB，CSV 最大 200MB
+    content_size = len(data.ddl.encode("utf-8"))
+    if data.format == "csv":
+        if content_size > 209_715_200:
+            raise HTTPException(status_code=422, detail="CSV 内容超过 200MB 限制")
+    else:
+        if content_size > 5_242_880:
+            raise HTTPException(status_code=422, detail="DDL 内容超过 5MB 限制")
 
     tenant_id = uuid.UUID(current_user.tenant_id)
     ddl_hash = compute_ddl_hash(data.ddl)
