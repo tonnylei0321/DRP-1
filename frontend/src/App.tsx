@@ -10,11 +10,13 @@ import AuditPage from './pages/AuditPage';
 import { DdlUploadPage, MappingsPage } from './pages/MappingPages';
 import { EtlPage, TenantsPage, QualityPage } from './pages/AdminPages';
 import Dashboard from './dashboard/Dashboard';
+import { DataScopeRulesPage, ColumnMaskRulesPage } from './pages/DataScopePages';
 
 type Page =
   | 'users' | 'groups' | 'roles' | 'audit'
   | 'ddl' | 'mappings' | 'etl' | 'tenants' | 'quality'
-  | 'dashboard';
+  | 'dashboard'
+  | 'data-scope-rules' | 'data-scope-masks';
 
 const NAV_ITEMS: { id: Page; label: string; icon: string; requiredPermission: string }[] = [
   { id: 'dashboard', label: '监管看板',        icon: '🖥️', requiredPermission: 'drill:read' },
@@ -27,6 +29,8 @@ const NAV_ITEMS: { id: Page; label: string; icon: string; requiredPermission: st
   { id: 'etl',      label: 'ETL 监控',        icon: '⚙️', requiredPermission: 'etl:read' },
   { id: 'tenants',  label: '租户管理',        icon: '🏢', requiredPermission: 'tenant:read' },
   { id: 'quality',  label: '数据质量',        icon: '📊', requiredPermission: 'etl:read' },
+  { id: 'data-scope-rules', label: '行级规则', icon: '🛡️', requiredPermission: 'data_scope:read' },
+  { id: 'data-scope-masks', label: '列级规则', icon: '🔒', requiredPermission: 'data_scope:read' },
 ];
 
 function PageContent({ page }: { page: Page }) {
@@ -41,6 +45,8 @@ function PageContent({ page }: { page: Page }) {
     case 'etl':      return <EtlPage />;
     case 'tenants':  return <TenantsPage />;
     case 'quality':  return <QualityPage />;
+    case 'data-scope-rules': return <DataScopeRulesPage />;
+    case 'data-scope-masks': return <ColumnMaskRulesPage />;
   }
 }
 

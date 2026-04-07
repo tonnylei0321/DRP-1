@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import type { Tenant, UserItem, Role, AuditLog, MappingSpec, EtlJob, DataQuality } from '../../api/client';
+import type { Tenant, UserItem, Role, AuditLog, MappingSpec, EtlJob, DataQuality, DataScopeRule, ColumnMaskRule, TableMeta, CircuitBreakerStatus } from '../../api/client';
 
 const BASE_URL = 'http://localhost:8000';
 
@@ -115,6 +115,50 @@ export const MOCK_QUALITY: DataQuality = {
   format_compliance: 0.95,
   overall: 90.5,
   is_healthy: true,
+};
+
+export const MOCK_TABLES: TableMeta[] = [
+  {
+    table_name: 'item',
+    columns: { id: 'uuid', name: 'varchar', phone: 'varchar', created_by: 'uuid', dept_id: 'uuid' },
+    supports_self: true,
+  },
+];
+
+export const MOCK_SCOPE_RULES: DataScopeRule[] = [
+  {
+    id: 'dsr-1',
+    tenant_id: 't-1',
+    user_id: 'user-1',
+    table_name: 'item',
+    scope_type: 'self',
+    custom_condition: null,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+  },
+];
+
+export const MOCK_MASK_RULES: ColumnMaskRule[] = [
+  {
+    id: 'cmr-1',
+    tenant_id: 't-1',
+    role_id: 'role-1',
+    table_name: 'item',
+    column_name: 'phone',
+    mask_strategy: 'mask',
+    mask_pattern: 'phone',
+    regex_expression: null,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+  },
+];
+
+export const MOCK_CIRCUIT_BREAKER: CircuitBreakerStatus = {
+  enabled: true,
+  operator_id: null,
+  disabled_at: null,
+  auto_recover_at: null,
+  cooldown_remaining: 0,
 };
 
 // ─── MSW v2 请求处理器 ──────────────────────────────────────────────────────
@@ -285,5 +329,132 @@ export const handlers = [
   // ── 数据质量 ──────────────────────────────────────────────────────────────
   http.get(`${BASE_URL}/etl/quality/:tenantId`, () => {
     return HttpResponse.json(MOCK_QUALITY);
+  }),
+
+  // ── 数据权限 ──────────────────────────────────────────────────────────────
+  http.get(`${BASE_URL}/data-scope/tables`, () => {
+    return HttpResponse.json(MOCK_TABLES);
+  }),
+
+  http.get(`${BASE_URL}/data-scope/rules`, () => {
+    return HttpResponse.json(MOCK_SCOPE_RULES);
+  }),
+
+  http.post(`${BASE_URL}/data-scope/rules`, async ({ request }) => {
+    const body = (await request.json()) as Record<string, unknown>;
+    const newRule: DataScopeRule = {
+      id: 'dsr-new',
+      tenant_id: (body.tenant_id as string) || 't-1',
+      user_id: (body.user_id as string) || 'user-1',
+      table_name: (body.table_name as string) || 'item',
+      scope_type: (body.scope_type as string) || 'self',
+      custom_condition: (body.custom_condition as string) || null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    return HttpResponse.json(newRule, { status: 201 });
+  }),
+
+  http.put(`${BASE_URL}/data-scope/rules/:id`, async ({ params, request }) => {
+    const body = (await request.json()) as Record<string, unknown>;
+    return HttpResponse.json({
+      ...MOCK_SCOPE_RULES[0],
+      ...body,
+      id: params.id as string,
+      updated_at: new Date().toISOString(),
+    });
+  }),
+
+  http.delete(`${BASE_URL}/data-scope/rules/:id`, () => {
+    return HttpResponse.json({ detail: '已删除', warning: null });
+  }),
+
+  http.get(`${BASE_URL}/data-scope/mask-rules`, () => {
+    return HttpResponse.json(MOCK_MASK_RULES);
+  }),
+
+  http.post(`${BASE_URL}/data-scope/mask-rules`, async ({ request }) => {
+    const body = (await request.json()) as Record<string, unknown>;
+    const newRule: ColumnMaskRule = {
+      id: 'cmr-new',
+      tenant_id: (body.tenant_id as string) || 't-1',
+      role_id: (body.role_id as string) || 'role-1',
+      table_name: (body.table_name as string) || 'item',
+      column_name: (body.column_name as string) || 'phone',
+      mask_strategy: (body.mask_strategy as string) || 'mask',
+      mask_pattern: (body.mask_pattern as string) || null,
+      regex_expression: (body.regex_expression as string) || null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    return HttpResponse.json(newRule, { status: 201 });
+  }),
+
+  http.put(`${BASE_URL}/data-scope/mask-rules/:id`, async ({ params, request }) => {
+    const body = (await request.json()) as Record<string, unknown>;
+    return HttpResponse.json({
+      ...MOCK_MASK_RULES[0],
+      ...body,
+      id: params.id as string,
+      updated_at: new Date().toISOString(),
+    });
+  }),
+
+  http.delete(`${BASE_URL}/data-scope/mask-rules/:id`, () => {
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.get(`${BASE_URL}/data-scope/circuit-breaker`, () => {
+    return HttpResponse.json(MOCK_CIRCUIT_BREAKER);
+  }),
+
+  http.post(`${BASE_URL}/data-scope/circuit-breaker`, async ({ request }) => {
+    const body = (await request.json()) as Record<string, unknown>;
+    return HttpResponse.json({
+      enabled: body.enabled as boolean,
+      operator_id: 'user-1',
+      disabled_at: body.enabled ? null : new Date().toISOString(),
+      auto_recover_at: null,
+      cooldown_remaining: 300,
+    });
+  }),
+
+  // ── 部门 ──────────────────────────────────────────────────────────────────
+  http.get(`${BASE_URL}/departments`, () => {
+    return HttpResponse.json([]);
+  }),
+
+  http.post(`${BASE_URL}/departments`, async ({ request }) => {
+    const body = (await request.json()) as Record<string, unknown>;
+    return HttpResponse.json({
+      id: 'dept-new',
+      tenant_id: 't-1',
+      name: body.name,
+      parent_id: body.parent_id || null,
+      sort_order: body.sort_order || 0,
+      status: body.status || 'active',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      children: [],
+    }, { status: 201 });
+  }),
+
+  http.put(`${BASE_URL}/departments/:id`, async ({ params, request }) => {
+    const body = (await request.json()) as Record<string, unknown>;
+    return HttpResponse.json({
+      id: params.id,
+      tenant_id: 't-1',
+      name: body.name || '部门',
+      parent_id: body.parent_id || null,
+      sort_order: body.sort_order || 0,
+      status: body.status || 'active',
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: new Date().toISOString(),
+      children: [],
+    });
+  }),
+
+  http.delete(`${BASE_URL}/departments/:id`, () => {
+    return new HttpResponse(null, { status: 204 });
   }),
 ];

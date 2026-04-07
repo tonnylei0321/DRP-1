@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/scope/cache.py
+# hypothesis_version: 6.151.10
+
+['dept 缓存失效操作失败', 'ds:dept_tree', 'ds:mask', 'ds:scope', 'mask 缓存失效操作失败', 'role_id', 'scope 缓存失效操作失败', '查询角色关联用户失败']

@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/scope/dept_service.py
+# hypothesis_version: 6.151.10
+
+[300, 'Redis 缓存写入失败', 'dept_id', 'ds:dept_tree', 'max_depth', 'new_parent_id', '部门树缓存命中: %s']

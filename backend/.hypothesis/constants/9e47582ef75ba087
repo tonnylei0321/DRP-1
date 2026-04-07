@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/scope/interceptor.py
+# hypothesis_version: 6.151.10
+
+[300, ' OR ', '1=0', 'Redis 缓存写入失败', 'ScopeContext | None', '_current_table', 'all', 'columns', 'custom', 'custom_condition', 'dept', 'do_orm_execute', 'ds:scope', 'enabled', 'scope 规则缓存命中: %s', 'scope 过滤注入失败', 'scope_ctx', 'scope_type', 'self', 'table_name', 'tenant_id', 'user_id', '未配置数据范围规则，请联系管理员', '熔断状态检查失败，默认不旁路']

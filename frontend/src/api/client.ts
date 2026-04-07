@@ -236,3 +236,100 @@ export const qualityApi = {
   get: (tenantId: string) =>
     request<DataQuality>('GET', `/etl/quality/${tenantId}`),
 };
+
+// ─── 数据权限 ─────────────────────────────────────────────────────────────────
+
+export interface DataScopeRule {
+  id: string;
+  tenant_id: string;
+  user_id: string;
+  table_name: string;
+  scope_type: string;
+  custom_condition: string | null;
+  created_at: string;
+  updated_at: string;
+  warning?: string | null;
+  requires_confirmation?: boolean | null;
+}
+
+export interface ColumnMaskRule {
+  id: string;
+  tenant_id: string;
+  role_id: string;
+  table_name: string;
+  column_name: string;
+  mask_strategy: string;
+  mask_pattern: string | null;
+  regex_expression: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TableMeta {
+  table_name: string;
+  columns: Record<string, string>;
+  supports_self: boolean;
+}
+
+export interface CircuitBreakerStatus {
+  enabled: boolean;
+  operator_id: string | null;
+  disabled_at: string | null;
+  auto_recover_at: string | null;
+  cooldown_remaining: number;
+}
+
+export interface DepartmentItem {
+  id: string;
+  tenant_id: string;
+  name: string;
+  parent_id: string | null;
+  sort_order: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  children: DepartmentItem[];
+}
+
+export const dataScopeApi = {
+  getTables: () =>
+    request<TableMeta[]>('GET', '/data-scope/tables'),
+  listRules: (userId?: string) =>
+    request<DataScopeRule[]>('GET', `/data-scope/rules${userId ? `?user_id=${userId}` : ''}`),
+  createRule: (data: {
+    tenant_id: string; user_id: string; table_name: string;
+    scope_type: string; custom_condition?: string | null;
+  }) => request<DataScopeRule>('POST', '/data-scope/rules', data),
+  updateRule: (id: string, data: { scope_type?: string; custom_condition?: string | null }) =>
+    request<DataScopeRule>('PUT', `/data-scope/rules/${id}`, data),
+  deleteRule: (id: string) =>
+    request<{ detail: string; warning?: string | null }>('DELETE', `/data-scope/rules/${id}`),
+  listMaskRules: (roleId?: string) =>
+    request<ColumnMaskRule[]>('GET', `/data-scope/mask-rules${roleId ? `?role_id=${roleId}` : ''}`),
+  createMaskRule: (data: {
+    tenant_id: string; role_id: string; table_name: string; column_name: string;
+    mask_strategy: string; mask_pattern?: string | null; regex_expression?: string | null;
+  }) => request<ColumnMaskRule>('POST', '/data-scope/mask-rules', data),
+  updateMaskRule: (id: string, data: {
+    mask_strategy?: string; mask_pattern?: string | null; regex_expression?: string | null;
+  }) => request<ColumnMaskRule>('PUT', `/data-scope/mask-rules/${id}`, data),
+  deleteMaskRule: (id: string) =>
+    request<void>('DELETE', `/data-scope/mask-rules/${id}`),
+  getCircuitBreaker: () =>
+    request<CircuitBreakerStatus>('GET', '/data-scope/circuit-breaker'),
+  setCircuitBreaker: (data: {
+    enabled: boolean; password: string; auto_recover_minutes?: number | null;
+  }) => request<CircuitBreakerStatus>('POST', '/data-scope/circuit-breaker', data),
+};
+
+export const departmentApi = {
+  list: () => request<DepartmentItem[]>('GET', '/departments'),
+  create: (data: {
+    name: string; parent_id?: string | null; sort_order?: number;
+    status?: string; tenant_id?: string | null;
+  }) => request<DepartmentItem>('POST', '/departments', data),
+  update: (id: string, data: {
+    name?: string; parent_id?: string | null; sort_order?: number; status?: string;
+  }) => request<DepartmentItem>('PUT', `/departments/${id}`, data),
+  delete: (id: string) => request<void>('DELETE', `/departments/${id}`),
+};

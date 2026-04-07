@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/auth/router.py
+# hypothesis_version: 6.151.10
+
+[100, 403, 404, 409, '/audit-logs', '/auth', '/login', '/oidc/callback', '/roles', '/roles/{role_id}', '/saml/callback', '/users', '/users/{user_id}', 'Bearer', 'OIDC 尚未实现', 'SAML SSO 尚未实现', 'WWW-Authenticate', 'active', 'audit:read', 'deleted', 'detail', 'from_attributes', 'role:read', 'role:write', 'user-agent', 'user:delete', 'user:read', 'user:write', '用户不存在', '系统角色不可删除', '角色不存在', '认证', '邮箱已被使用']

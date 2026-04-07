@@ -39,6 +39,9 @@ class User(Base):
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     password_changed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    dept_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("department.id", ondelete="SET NULL"), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
@@ -46,6 +49,7 @@ class User(Base):
 
     roles: Mapped[list["Role"]] = relationship("Role", secondary="user_role", back_populates="users", lazy="selectin")
     groups: Mapped[list["Group"]] = relationship("Group", secondary="user_group", back_populates="users", lazy="selectin")
+    department: Mapped["Department | None"] = relationship("Department", back_populates="users", lazy="selectin")
 
 
 class Group(Base):

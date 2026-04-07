@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/scope/dept_router.py
+# hypothesis_version: 6.151.10
+
+[255, 400, 404, 409, '/departments', '/{dept_id}', 'DepartmentResponse', 'active', 'department', 'department.create', 'department.delete', 'department.update', 'department:read', 'department:write', 'from_attributes', 'name', 'parent_id', '父部门不存在', '缺少 tenant_id', '部门不存在', '部门层级存在循环引用', '部门管理']

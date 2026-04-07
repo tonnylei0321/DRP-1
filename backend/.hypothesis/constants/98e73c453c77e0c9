@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/scope/expr_parser.py
+# hypothesis_version: 6.151.10
+
+[500, '!=', "'", '(', ')', '*/', ',', '-', '--', '-?\\d+(?:\\.\\d+)?', '.', '/*', ';', '<', '<=', '=', '>', '>=', 'ALTER', 'AND', 'BETWEEN', 'COLUMN_REF', 'COMMA', 'COMMIT', 'CREATE', 'DELETE', 'DROP', 'EOF', 'EXEC', 'EXECUTE', 'GRANT', 'IN', 'INSERT', 'KEYWORD', 'LIKE', 'LPAREN', 'MERGE', 'NFC', 'NOT', 'NULL', 'NULL_LIT', 'NUMBER_LIT', 'OPERATOR', 'OR', 'REVOKE', 'ROLLBACK', 'RPAREN', 'SAVEPOINT', 'SELECT', 'STRING_LIT', 'TRUNCATE', 'UNION', 'UPDATE', '自定义条件表达式不合法：表达式不能为空']

@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/scope/models.py
+# hypothesis_version: 6.151.10
+
+[255, 'CASCADE', 'Department', 'Department | None', 'RESTRICT', 'User', 'active', 'children', 'ck_cmr_mask_strategy', 'ck_dept_status', 'ck_dsr_scope_type', 'column_mask_rule', 'column_name', 'data_scope_rule', 'department', 'department.id', 'name', 'parent', 'parent_id', 'role.id', 'role_id', 'scope_type', 'selectin', 'table_name', 'tenant.id', 'tenant_id', 'user.id', 'user_id']

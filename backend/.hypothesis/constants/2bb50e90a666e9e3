@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/scope/tasks.py
+# hypothesis_version: 6.151.10
+
+[300.0, 'CELERY', 'action', 'beat_schedule', 'detail', 'drp', 'ds:circuit_breaker', 'enabled', 'message', 'operator_id', 'schedule', 'task', 'tenant_id', 'unknown', '审计提醒日志写入失败', '数据权限熔断开关仍处于禁用状态', '熔断审计定时任务执行失败']

@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/scope/circuit_breaker.py
+# hypothesis_version: 6.151.10
+
+[300, '1', 'TokenPayload', 'action', 'auto_recover_at', 'auto_recover_minutes', 'cooldown_remaining', 'detail', 'disabled_at', 'ds:cb_cooldown', 'ds:circuit_breaker', 'enabled', 'last_toggle_at', 'operator_id', 'reason', 'tenant_id', 'user_id', '密码验证失败', '密码验证失败（无法获取数据库会话）', '熔断审计日志写入失败', '熔断状态检查失败，默认不旁路', '获取熔断状态失败']

@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/scope/mask_serializer.py
+# hypothesis_version: 6.151.10
+
+[300, '*', '***', '****', ', ', '@', 'Redis 缓存写入失败', 'column_name', 'custom_regex', 'ds:mask', 'email', 'enabled', 'hide', 'id_card', 'mask', 'mask 规则缓存命中: %s', 'mask_pattern', 'mask_strategy', 'none', 'phone', 'regex_expression', 'role_id', 'role_ids', 'sub', 'table_name', 'tenant_id', 'user', 'user_id', '从数据库加载脱敏规则失败', '熔断状态检查失败，默认不旁路', '自定义正则表达式无效: %s']

@@ -33,6 +33,7 @@ dev = [
     "schemathesis>=3.25.0",
     "openapi-pydantic>=0.4.0",
     "hypothesis>=6.100.0",
+    "aiosqlite>=0.22.1",
 ]
 
 [tool.pytest.ini_options]
@@ -40,6 +41,7 @@ asyncio_mode = "auto"
 testpaths = ["tests"]
 markers = [
     "integration: 需要外部服务（GraphDB）的集成测试",
+    "smoke: 冒烟测试（核心功能最小可用路径）",
 ]
 
 [build-system]

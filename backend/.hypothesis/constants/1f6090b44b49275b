@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/scope/router.py
+# hypothesis_version: 6.151.10
+
+[400, 401, 404, 429, '/circuit-breaker', '/data-scope', '/mask-rules', '/rules', '/rules/{rule_id}', '/tables', '^(mask|hide|none)$', 'all', 'column_mask_rule', 'column_name', 'columns', 'custom', 'custom_regex', 'data_scope:read', 'data_scope:write', 'data_scope_rule', 'from_attributes', 'mask', 'mask 缓存清除失败', 'mask_strategy', 'scope 缓存清除失败', 'scope_type', 'self', 'supports_self', 'table_name', 'target_role_id', 'target_user_id', '删除后该用户将无法访问此表数据', '已删除', '数据权限管理', '规则不存在']

@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/auth/schemas.py
+# hypothesis_version: 6.151.10
+
+['bearer', 'from_attributes', '密码', '用户邮箱', '过期秒数']

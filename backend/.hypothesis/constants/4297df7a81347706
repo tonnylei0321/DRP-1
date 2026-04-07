@@ -1,0 +1,4 @@
+# file: /Users/leitao/Documents/Cursor-workspace/Demo8/DRP-1/backend/src/drp/scope/registry.py
+# hypothesis_version: 6.151.10
+
+['__data_scope__', 'columns', 'created_by', '业务表注册表构建完成，共 %d 张表']
