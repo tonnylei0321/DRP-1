@@ -21,21 +21,19 @@ export function Btn({ variant = 'primary', size = 'md', style, children, ...rest
     letterSpacing: '0.02em',
     cursor: 'pointer',
     ...(variant === 'primary' && {
-      background: 'linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)',
-      color: '#fff',
-      boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)',
+      background: 'var(--accent-gradient)',
+      color: 'var(--accent-btn-text)',
+      boxShadow: 'var(--accent-shadow)',
     }),
     ...(variant === 'danger' && {
-      background: 'rgba(239,68,68,0.1)',
+      background: 'var(--danger-btn-bg)',
       color: 'var(--danger)',
-      border: '1px solid rgba(239,68,68,0.3)',
-      backdropFilter: 'blur(4px)',
+      border: '1px solid var(--danger-btn-border)',
     }),
     ...(variant === 'ghost' && {
-      background: 'rgba(255,255,255,0.03)',
+      background: 'var(--ghost-btn-bg)',
       color: 'var(--text-muted)',
-      border: '1px solid rgba(255,255,255,0.08)',
-      backdropFilter: 'blur(4px)',
+      border: '1px solid var(--ghost-btn-border)',
     }),
     ...style,
   };
@@ -51,13 +49,11 @@ export function Card({ children, style, hover = true }: {
 }) {
   return (
     <div className={`card glass-card${hover ? ' hover-scale' : ''}`} style={{
-      background: '#111928',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-      border: '1px solid #374151',
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border-glass)',
       borderRadius: '12px',
       padding: '20px',
-      boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.03)',
+      boxShadow: 'var(--shadow-card)',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       ...style,
     }}>
@@ -77,7 +73,7 @@ export function PageHeader({ title, action }: { title: string; action?: React.Re
     }}>
       <h2 style={{
         fontSize: '20px', fontWeight: 700, letterSpacing: '-0.01em',
-        background: 'linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%)',
+        background: 'linear-gradient(135deg, var(--text-heading-from) 0%, var(--text-heading-to) 100%)',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
@@ -127,19 +123,18 @@ export function Modal({ title, onClose, children }: {
   return (
     <div style={{
       position: 'fixed', inset: 0,
-      background: 'rgba(0, 0, 0, 0.7)',
+      background: 'var(--bg-modal-overlay)',
       backdropFilter: 'blur(4px)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999,
       animation: 'fadeIn 0.2s ease-out',
     }}>
       <div className="glass-card" style={{
-        background: 'rgba(17, 24, 39, 0.9)',
-        backdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        background: 'var(--bg-modal)',
+        border: '1px solid var(--border)',
         borderRadius: '16px',
         padding: '28px',
         minWidth: '420px', maxWidth: '600px', width: '90%',
-        boxShadow: '0 24px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+        boxShadow: '0 24px 48px rgba(0, 0, 0, 0.3)',
         animation: 'fadeIn 0.25s ease-out',
       }}>
         <div style={{
@@ -168,8 +163,8 @@ export function EmptyState({ message }: { message: string }) {
   return (
     <div style={{
       textAlign: 'center', padding: '48px 24px', color: 'var(--text-muted)',
-      background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px',
-      border: '1px dashed rgba(255, 255, 255, 0.06)',
+      background: 'var(--empty-bg)', borderRadius: '12px',
+      border: '1px dashed var(--empty-border)',
     }}>
       <div style={{ fontSize: '32px', marginBottom: '12px', opacity: 0.4 }}>📭</div>
       {message}
@@ -216,9 +211,8 @@ export function sanitizeErrorMessage(message: string): string {
 export function ErrorBox({ message }: { message: string }) {
   return (
     <div style={{
-      background: 'rgba(239,68,68,0.08)',
-      backdropFilter: 'blur(8px)',
-      border: '1px solid rgba(239,68,68,0.25)',
+      background: 'var(--error-bg)',
+      border: '1px solid var(--error-border)',
       borderRadius: '10px', padding: '12px 16px',
       color: 'var(--danger)', marginBottom: '16px',
       display: 'flex', alignItems: 'center', gap: '8px',

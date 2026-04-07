@@ -3,6 +3,8 @@
  */
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { clearToken, getToken, getPermissions } from './api/client';
+import { useTheme } from './hooks/useTheme';
+import type { ThemeMode } from './hooks/useTheme';
 import LoginPage from './pages/LoginPage';
 import UsersPage from './pages/UsersPage';
 import { GroupsPage, RolesPage } from './pages/RbacPages';
@@ -66,10 +68,10 @@ function getDefaultPage(): Page {
 
 export default function App() {
   const [authed, setAuthed] = useState(() => !!getToken());
-  // tokenVersion 每次登录递增，驱动 useMemo 重新计算权限
   const [tokenVersion, setTokenVersion] = useState(0);
   const [page, setPage] = useState<Page>(() => getToken() ? getDefaultPage() : 'dashboard');
   const savedPageRef = useRef<Page | null>(null);
+  const { mode, setMode } = useTheme();
 
   // 根据权限过滤可见菜单
   // null 表示 token 无 permissions 字段，显示全部向后兼容
@@ -117,26 +119,26 @@ export default function App() {
       {/* 侧边栏 */}
       <aside style={{
         width: '240px', flexShrink: 0,
-        background: '#0a0f1a',
-        borderRight: '1px solid #374151',
+        background: 'var(--bg-sidebar)',
+        borderRight: '1px solid var(--border)',
         display: 'flex', flexDirection: 'column',
       }}>
         {/* Logo */}
         <div style={{
-          padding: '20px 16px', borderBottom: '1px solid #374151',
+          padding: '20px 16px', borderBottom: '1px solid var(--border)',
           display: 'flex', alignItems: 'center', gap: '12px',
         }}>
           <div style={{
             width: '36px', height: '36px',
-            background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+            background: 'var(--logo-gradient)',
             borderRadius: '10px',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: '#fff', fontWeight: 700, fontSize: '14px',
-            boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)',
+            boxShadow: 'var(--accent-shadow)',
           }}>DR</div>
           <div>
-            <div style={{ fontWeight: 600, fontSize: '14px', color: '#e6f0ff' }}>DRP 管理后台</div>
-            <div style={{ color: '#94a3b8', fontSize: '11px' }}>资金监管平台</div>
+            <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)' }}>DRP 管理后台</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '11px' }}>资金监管平台</div>
           </div>
         </div>
 
@@ -157,16 +159,14 @@ export default function App() {
                   width: '100%', display: 'flex', alignItems: 'center', gap: '10px',
                   padding: '9px 14px', paddingLeft: '16px',
                   borderRadius: '8px', border: 'none',
-                  background: isActive
-                    ? 'rgba(79, 70, 229, 0.1)'
-                    : 'transparent',
-                  color: isActive ? '#e6f0ff' : '#94a3b8',
+                  background: isActive ? 'var(--bg-nav-active)' : 'transparent',
+                  color: isActive ? 'var(--text)' : 'var(--text-muted)',
                   fontSize: '13px', cursor: 'pointer', marginBottom: '2px',
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                   fontWeight: isActive ? 600 : 400,
                 }}
               >
-                <span style={{ fontSize: '16px', color: isActive ? '#cbd5e1' : '#94a3b8' }}>{item.icon}</span>
+                <span style={{ fontSize: '16px', color: isActive ? 'var(--text-icon)' : 'var(--text-muted)' }}>{item.icon}</span>
                 <span>{item.label}</span>
               </button>
             );
@@ -174,17 +174,38 @@ export default function App() {
         </nav>
 
         {/* 退出 */}
-        <div style={{ padding: '12px 8px', borderTop: '1px solid #374151' }}>
+        {/* 主题切换 + 退出 */}
+        <div style={{ padding: '8px', borderTop: '1px solid var(--border)' }}>
+          <div className="theme-switcher" style={{ marginBottom: '6px' }}>
+            <button
+              className={mode === 'light' ? 'active' : ''}
+              onClick={() => setMode('light')}
+              title="浅色模式"
+              aria-label="浅色模式"
+            >☀️</button>
+            <button
+              className={mode === 'dark' ? 'active' : ''}
+              onClick={() => setMode('dark')}
+              title="深色模式"
+              aria-label="深色模式"
+            >🌙</button>
+            <button
+              className={mode === 'system' ? 'active' : ''}
+              onClick={() => setMode('system')}
+              title="跟随系统"
+              aria-label="跟随系统"
+            >💻</button>
+          </div>
           <button
             onClick={() => { clearToken(); setAuthed(false); }}
             style={{
               width: '100%', padding: '9px 14px', borderRadius: '8px', border: 'none',
-              background: 'transparent', color: '#94a3b8', fontSize: '13px', cursor: 'pointer',
+              background: 'transparent', color: 'var(--text-muted)', fontSize: '13px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: '10px',
               transition: 'all 0.2s',
             }}
           >
-            <span style={{ fontSize: '16px', color: '#cbd5e1' }}>🚪</span><span>退出登录</span>
+            <span style={{ fontSize: '16px', color: 'var(--text-icon)' }}>🚪</span><span>退出登录</span>
           </button>
         </div>
       </aside>
