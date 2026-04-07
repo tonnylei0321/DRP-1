@@ -286,6 +286,7 @@ async def reject_mapping(
 async def generate_mapping_async(
     data: GenerateMappingRequest,
     current_user: TokenPayload = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
 ) -> dict:
     """异步生成映射建议（适用于大文件）。
 
@@ -294,8 +295,15 @@ async def generate_mapping_async(
     """
     from drp.mapping.job_manager import run_mapping_job
 
-    if not current_user.tenant_id:
-        raise HTTPException(status_code=400, detail="需要租户上下文")
+    # 获取租户 ID，无 tenant_id 时使用默认租户
+    tenant_id_str = current_user.tenant_id
+    if not tenant_id_str:
+        from sqlalchemy import text as sa_text
+        result = await session.execute(sa_text("SELECT id FROM tenant LIMIT 1"))
+        row = result.fetchone()
+        if not row:
+            raise HTTPException(status_code=400, detail="系统中无可用租户")
+        tenant_id_str = str(row[0])
 
     # 内容大小限制
     content_size = len(data.ddl.encode("utf-8"))
@@ -313,7 +321,7 @@ async def generate_mapping_async(
         job_id=job_id,
         content=data.ddl,
         fmt=data.format,
-        tenant_id=current_user.tenant_id,
+        tenant_id=tenant_id_str,
         user_id=current_user.sub,
         table_name_filter=data.table_name,
     ))
